@@ -55,7 +55,7 @@ namespace OlympusBugTracker.Client.Models
 
         public ICollection<TicketCommentDTO> TicketComments { get; set; } = new HashSet<TicketCommentDTO>();
 
-        public ICollection<AttachmentDTO> Attachments { get; set; } = new HashSet<AttachmentDTO>();
+        public ICollection<TicketAttachmentDTO> Attachments { get; set; } = new HashSet<TicketAttachmentDTO>();
 
         // History?
 
