@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OlympusBugTracker", "OlympusBugTracker\OlympusBugTracker.csproj", "{8EEC36A8-22F7-49F7-8BDB-A8B6144E02EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OlympusBugTracker", "OlympusBugTracker\OlympusBugTracker.csproj", "{8EEC36A8-22F7-49F7-8BDB-A8B6144E02EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OlympusBugTracker.Client", "OlympusBugTracker.Client\OlympusBugTracker.Client.csproj", "{CDC13227-884B-4779-920F-95B740266357}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OlympusBugTracker.Client", "OlympusBugTracker.Client\OlympusBugTracker.Client.csproj", "{CDC13227-884B-4779-920F-95B740266357}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
