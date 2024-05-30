@@ -1,4 +1,5 @@
 ﻿@page "/project/create"
+@using OlympusBugTracker.Client.Helpers
 @rendermode InteractiveServer
 
 @inject IProjectDTOService ProjectService
@@ -9,7 +10,7 @@
 
 
 
-<div>
+<div my-5>
 
     <ProjectForm Project="new ProjectDTO()" OnSubmit="HandleSubmit" />
 
@@ -22,26 +23,40 @@
 
     #region parameters
 
-
+    [CascadingParameter]
+    public Task<AuthenticationState>? AuthStateTask { get; set; }
 
     #endregion
 
 
     #region state
 
-
+    private UserInfo? userInfo;
 
     #endregion
 
 
     #region methods
 
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            userInfo = await UserInfoHelper.GetUserInfoAsync(AuthStateTask);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            throw;
+        }
+    }
+
     private async Task HandleSubmit(ProjectDTO project)
     {
         try
         {
-            
-        }
+            await ProjectService.AddProjectAsync(project, userInfo!.CompanyId);
+    }
         catch (Exception ex)
         {
             Console.WriteLine(ex);

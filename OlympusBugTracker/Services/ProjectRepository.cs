@@ -8,6 +8,18 @@ namespace OlympusBugTracker.Services
 {
     public class ProjectRepository(IDbContextFactory<ApplicationDbContext> contextFactory) : IProjectRepository
     {
+        public async Task<Project> AddProjectAsync(Project project, int companyId)
+        {
+            using ApplicationDbContext context = contextFactory.CreateDbContext();
+
+            project.Created = DateTimeOffset.Now;
+            project.CompanyId = companyId;
+
+            context.Projects.Add(project);
+            await context.SaveChangesAsync();
+
+            return project;
+        }
 
         public async Task<IEnumerable<Project>> GetAllProjectsAsync(int companyId)
         {
@@ -60,5 +72,6 @@ namespace OlympusBugTracker.Services
                 await context.SaveChangesAsync();
             }
         }
+
     }
 }

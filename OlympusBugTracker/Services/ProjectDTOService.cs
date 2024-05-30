@@ -7,6 +7,21 @@ namespace OlympusBugTracker.Services
 {
     public class ProjectDTOService(IProjectRepository repository) : IProjectDTOService
     {
+        public async Task<ProjectDTO> AddProjectAsync(ProjectDTO projectDTO, int companyId)
+        {
+            Project project = new()
+            {
+                Name = projectDTO.Name,
+                Description = projectDTO.Description,
+                StartDate = projectDTO.StartDate,
+                EndDate = projectDTO.EndDate,
+                Priority = projectDTO.Priority,
+            };
+
+            project = await repository.AddProjectAsync(project, companyId);
+
+            return project.ToDTO();
+        }
 
         public async Task<IEnumerable<ProjectDTO>> GetAllProjectsAsync(int companyId)
         {
@@ -31,5 +46,6 @@ namespace OlympusBugTracker.Services
         {
             await repository.RestoreProjectAsync(projectId, companyId);
         }
+
     }
 }
