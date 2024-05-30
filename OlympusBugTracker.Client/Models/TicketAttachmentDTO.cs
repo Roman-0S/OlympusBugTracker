@@ -21,8 +21,7 @@ namespace OlympusBugTracker.Client.Models
             set => _created = value.ToUniversalTime();
         }
 
-        public string ImageURL { get; set; } = ImageHelper.DefaultProfilePicture;
-
+        public required string AttachmentURL { get; set; }
 
         public string? UserId { get; set; }
 

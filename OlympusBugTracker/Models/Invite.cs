@@ -1,4 +1,5 @@
-﻿using OlympusBugTracker.Data;
+﻿using OlympusBugTracker.Client.Models;
+using OlympusBugTracker.Data;
 using System.ComponentModel.DataAnnotations;
 
 namespace OlympusBugTracker.Models
@@ -56,5 +57,43 @@ namespace OlympusBugTracker.Models
 
         public virtual ApplicationUser? Invitee { get; set; }
 
+    }
+
+    public static class InviteExtensions
+    {
+        public static InviteDTO ToDTO(this Invite invite)
+        {
+            InviteDTO dto = new()
+            {
+                Id = invite.Id,
+                InviteDate = invite.InviteDate,
+                JoinDate = invite.JoinDate,
+                InviteeEmail = invite.InviteeEmail,
+                InviteeFirstName = invite.InviteeFirstName,
+                InviteeLastName = invite.InviteeLastName,
+                InviteMessage = invite.InviteMessage,
+                IsValid = invite.IsValid,
+                ProjectId = invite.ProjectId,
+                InvitorId = invite.InvitorId,
+                InviteeId = invite.InviteeId,
+            };
+
+            if (invite.Project is not null)
+            {
+                dto.Project = invite.Project.ToDTO();
+            }
+
+            if (invite.Invitor is not null)
+            {
+                dto.Invitor = invite.Invitor.ToDTO();
+            }
+
+            if (invite.Invitee is not null)
+            {
+                dto.Invitee = invite.Invitee.ToDTO();
+            }
+
+            return dto;
+        }
     }
 }

@@ -1,4 +1,6 @@
-﻿using OlympusBugTracker.Data;
+﻿using OlympusBugTracker.Client.Models;
+using OlympusBugTracker.Data;
+using OlympusBugTracker.Helpers;
 using System.ComponentModel.DataAnnotations;
 
 namespace OlympusBugTracker.Models
@@ -35,4 +37,29 @@ namespace OlympusBugTracker.Models
         public virtual Ticket? Ticket { get; set; }
 
     }
+
+    public static class TicketAttachmentExtensions
+    {
+        public static TicketAttachmentDTO ToDTO(this TicketAttachment attachment)
+        {
+            TicketAttachmentDTO dto = new()
+            {
+                Id = attachment.Id,
+                FileName = attachment.FileName,
+                Description = attachment.Description,
+                Created = attachment.Created,
+                AttachmentURL = attachment.UploadId.HasValue ? $"api/uploads/{attachment.UploadId}" : UploadHelper.DefaultCompanyImage,
+                UserId = attachment.UserId,
+                TicketId = attachment.TicketId,
+            };
+
+            if (attachment.User is not null)
+            {
+                dto.User = attachment.User.ToDTO();
+            }
+
+            return dto;
+        }
+    }
+
 }

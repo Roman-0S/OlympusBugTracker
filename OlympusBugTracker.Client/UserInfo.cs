@@ -10,8 +10,6 @@ namespace OlympusBugTracker.Client
         public required string LastName { get; set; }
         public required string ProfilePictureUrl { get; set; }
 
-        public required string[] Roles { get; set; }
-
         public string FullName => $"{FirstName} {LastName}";
     }
 }

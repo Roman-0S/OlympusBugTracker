@@ -1,4 +1,5 @@
-﻿using OlympusBugTracker.Data;
+﻿using OlympusBugTracker.Client.Models;
+using OlympusBugTracker.Data;
 using System.ComponentModel.DataAnnotations;
 
 namespace OlympusBugTracker.Models
@@ -29,4 +30,27 @@ namespace OlympusBugTracker.Models
         public virtual ApplicationUser? User { get; set; }
 
     }
+
+    public static class TicketCommentExtensions
+    {
+        public static TicketCommentDTO ToDTO(this TicketComment ticketComment)
+        {
+            TicketCommentDTO dto = new()
+            {
+                Id = ticketComment.Id,
+                Content = ticketComment.Content,
+                Created = ticketComment.Created,
+                TicketId = ticketComment.TicketId,
+                UserId = ticketComment.UserId,
+            };
+
+            if (ticketComment.User is not null)
+            {
+                dto.User = ticketComment.User.ToDTO();
+            }
+
+            return dto;
+        }
+    }
+
 }

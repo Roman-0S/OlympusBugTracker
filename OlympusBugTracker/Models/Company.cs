@@ -1,4 +1,7 @@
-﻿using OlympusBugTracker.Data;
+﻿using OlympusBugTracker.Client;
+using OlympusBugTracker.Client.Models;
+using OlympusBugTracker.Data;
+using OlympusBugTracker.Helpers;
 using System.ComponentModel.DataAnnotations;
 
 namespace OlympusBugTracker.Models
@@ -23,4 +26,36 @@ namespace OlympusBugTracker.Models
         public ICollection<Invite> Invites { get; set; } = new HashSet<Invite>();
 
     }
+
+    public static class CompanyExtensions
+    {
+        public static CompanyDTO ToDTO(this Company company)
+        {
+            CompanyDTO dto = new()
+            {
+                Id = company.Id,
+                Name = company.Name,
+                Description = company.Description,
+                ImageURL = company.ImageId.HasValue ? $"api/uploads/{company.ImageId}" : UploadHelper.DefaultCompanyImage
+            };
+
+            foreach (Project project in company.Projects)
+            {
+                dto.Projects.Add(project.ToDTO());
+            }
+
+            foreach (ApplicationUser user in company.Users)
+            {
+                dto.Users.Add(user.ToDTO());
+            }
+
+            foreach (Invite invite in company.Invites)
+            {
+                dto.Invites.Add(invite.ToDTO());
+            }
+
+            return dto;
+        }
+    }
+
 }

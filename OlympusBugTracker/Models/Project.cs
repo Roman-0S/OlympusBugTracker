@@ -1,4 +1,5 @@
-﻿using OlympusBugTracker.Data;
+﻿using OlympusBugTracker.Client.Models;
+using OlympusBugTracker.Data;
 using System.ComponentModel.DataAnnotations;
 using static OlympusBugTracker.Client.Models.Enums;
 
@@ -44,4 +45,34 @@ namespace OlympusBugTracker.Models
         public ICollection<Ticket> Tickets { get; set; } = new HashSet<Ticket>();
 
     }
+
+    public static class ProjectExtensions
+    {
+        public static ProjectDTO ToDTO(this Project project)
+        {
+            ProjectDTO dto = new()
+            {
+                Id = project.Id,
+                Name = project.Name,
+                Description = project.Description,
+                StartDate = project.StartDate,
+                EndDate = project.EndDate,
+                Priority = project.Priority,
+                Archived = project.Archived,
+            };
+
+            foreach (ApplicationUser user in project.Users)
+            {
+                dto.Users.Add(user.ToDTO());
+            }
+
+            foreach (Ticket ticket in project.Tickets)
+            {
+                dto.Tickets.Add(ticket.ToDTO());
+            }
+
+            return dto;
+        }
+    }
+
 }

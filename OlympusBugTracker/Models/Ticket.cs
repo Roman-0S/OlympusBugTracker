@@ -1,4 +1,5 @@
-﻿using OlympusBugTracker.Data;
+﻿using OlympusBugTracker.Client.Models;
+using OlympusBugTracker.Data;
 using System.ComponentModel.DataAnnotations;
 using static OlympusBugTracker.Client.Models.Enums;
 
@@ -54,9 +55,62 @@ namespace OlympusBugTracker.Models
 
         public virtual ApplicationUser? DeveloperUser { get; set; }
 
-        public ICollection<TicketComment> Comments { get; set; } = new HashSet<TicketComment>();
+        public ICollection<TicketComment> TicketComments { get; set; } = new HashSet<TicketComment>();
 
-        public ICollection<TicketAttachment> Attachments { get; set; } = new HashSet<TicketAttachment>();
+        public ICollection<TicketAttachment> TicketAttachments { get; set; } = new HashSet<TicketAttachment>();
 
     }
+
+    public static class TicketExtensions
+    {
+        public static TicketDTO ToDTO(this Ticket ticket)
+        {
+            TicketDTO dto = new()
+            {
+                Id = ticket.Id,
+                Title = ticket.Title,
+                Description = ticket.Description,
+                Created = ticket.Created,
+                Updated = ticket.Updated,
+                Archived = ticket.Archived,
+                ArchivedByProject = ticket.ArchivedByProject,
+                Priority = ticket.Priority,
+                Type = ticket.Type,
+                Status = ticket.Status,
+                ProjectId = ticket.ProjectId,
+                SubmitterUserId = ticket.SubmitterUserId,
+                DeveloperUserId = ticket.DeveloperUserId,
+            };
+
+            if (ticket.Project is not null)
+            {
+                ticket.Project.Tickets = [];
+
+                dto.Project = ticket.Project.ToDTO();
+            }
+
+            if (ticket.SubmitterUser is not null)
+            {
+                dto.SubmitterUser = ticket.SubmitterUser.ToDTO();
+            }
+
+            if (ticket.DeveloperUser is not null)
+            {
+                dto.DeveloperUser = ticket.DeveloperUser.ToDTO();
+            }
+
+            foreach (TicketComment comment in ticket.TicketComments)
+            {
+                dto.TicketComments.Add(comment.ToDTO());
+            }
+
+            foreach (TicketAttachment attachment in ticket.TicketAttachments)
+            {
+                dto.Attachments.Add(attachment.ToDTO());
+            }
+
+            return dto;
+        }
+    }
+
 }

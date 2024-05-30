@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Identity;
+using OlympusBugTracker.Client;
+using OlympusBugTracker.Helpers;
 using OlympusBugTracker.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -31,6 +33,23 @@ namespace OlympusBugTracker.Data
 
         public virtual ICollection<Project> Projects { get; set; } = new HashSet<Project>();
 
+    }
+
+    public static class ApplicationUserExtensions
+    {
+        public static UserInfo ToDTO(this ApplicationUser user)
+        {
+            UserInfo dto = new()
+            {
+                UserId = user.Id,
+                Email = user.Email!,
+                FirstName = user.FirstName!,
+                LastName = user.LastName!,
+                ProfilePictureUrl = user.ImageId.HasValue ? $"api/uploads/{user.ImageId}" : UploadHelper.DefaultProfilePicture,
+            };            
+
+            return dto;
+        }
     }
 
 }
