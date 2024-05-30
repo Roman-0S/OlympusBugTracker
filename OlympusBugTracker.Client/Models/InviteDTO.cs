@@ -1,4 +1,6 @@
-﻿namespace OlympusBugTracker.Client.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace OlympusBugTracker.Client.Models
 {
     public class InviteDTO
     {
@@ -21,10 +23,13 @@
             set => _joinDate = value?.ToUniversalTime();
         }
 
+        [Required]
         public string? InviteeEmail { get; set; }
 
+        [Required]
         public string? InviteeFirstName { get; set; }
 
+        [Required]
         public string? InviteeLastName { get; set; }
 
         public string? InviteMessage { get; set; }
@@ -35,13 +40,14 @@
 
         public ProjectDTO? Project { get; set; }
 
+        [Required]
         public string? InvitorId { get; set; }
 
-        public UserInfo? Invitor { get; set; }
+        public UserDTO? Invitor { get; set; }
 
         public string? InviteeId { get; set; }
 
-        public UserInfo? Invitee { get; set; }
+        public UserDTO? Invitee { get; set; }
 
     }
 }

@@ -6,6 +6,7 @@ namespace OlympusBugTracker.Client.Models
     public class ProjectDTO
     {
         private DateTimeOffset _startDate;
+        private DateTimeOffset _created;
         private DateTimeOffset? _endDate;
 
         public int Id { get; set; }
@@ -15,6 +16,13 @@ namespace OlympusBugTracker.Client.Models
 
         [Required]
         public string? Description { get; set; }
+
+        public DateTimeOffset Created
+        {
+            get => _created;
+
+            set => _created = value.ToUniversalTime();
+        }
 
         public DateTimeOffset StartDate
         {
@@ -34,7 +42,7 @@ namespace OlympusBugTracker.Client.Models
 
         public bool Archived { get; set; }
 
-        public ICollection<UserInfo> Users { get; set; } = new HashSet<UserInfo>();
+        public ICollection<UserDTO> Users { get; set; } = new HashSet<UserDTO>();
 
         public ICollection<TicketDTO> Tickets { get; set; } = new HashSet<TicketDTO>();
 

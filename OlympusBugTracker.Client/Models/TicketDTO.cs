@@ -47,11 +47,11 @@ namespace OlympusBugTracker.Client.Models
         [Required]
         public string? SubmitterUserId { get; set; }
 
-        public UserInfo? SubmitterUser { get; set; }
+        public UserDTO? SubmitterUser { get; set; }
 
         public string? DeveloperUserId { get; set; }
 
-        public UserInfo? DeveloperUser { get; set; }
+        public UserDTO? DeveloperUser { get; set; }
 
         public ICollection<TicketCommentDTO> TicketComments { get; set; } = new HashSet<TicketCommentDTO>();
 

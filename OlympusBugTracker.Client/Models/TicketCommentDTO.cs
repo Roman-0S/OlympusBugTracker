@@ -20,9 +20,10 @@ namespace OlympusBugTracker.Client.Models
 
         public int TicketId { get; set; }
 
+        [Required]
         public string? UserId { get; set; }
 
-        public UserInfo? User { get; set; }
+        public UserDTO? User { get; set; }
 
     }
 }

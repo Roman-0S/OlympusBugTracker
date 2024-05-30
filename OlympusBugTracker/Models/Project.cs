@@ -8,7 +8,8 @@ namespace OlympusBugTracker.Models
     public class Project
     {
         private DateTimeOffset _startDate;
-        private DateTimeOffset? _endDate;
+        private DateTimeOffset _created;
+        private DateTimeOffset _endDate;
 
         public int Id { get; set; }
 
@@ -18,6 +19,13 @@ namespace OlympusBugTracker.Models
         [Required]
         public string? Description { get; set; }
 
+        public DateTimeOffset Created
+        {
+            get => _created;
+
+            set => _created = value.ToUniversalTime();
+        }
+
         public DateTimeOffset StartDate
         {
             get => _startDate;
@@ -25,11 +33,11 @@ namespace OlympusBugTracker.Models
             set => _startDate = value.ToUniversalTime();
         }
 
-        public DateTimeOffset? EndDate
+        public DateTimeOffset EndDate
         {
             get => _endDate;
 
-            set => _endDate = value?.ToUniversalTime();
+            set => _endDate = value.ToUniversalTime();
         }
 
         public ProjectPriority Priority { get; set; }

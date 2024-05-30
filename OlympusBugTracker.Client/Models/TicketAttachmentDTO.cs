@@ -23,9 +23,10 @@ namespace OlympusBugTracker.Client.Models
 
         public required string AttachmentURL { get; set; }
 
+        [Required]
         public string? UserId { get; set; }
 
-        public UserInfo? User { get; set; }
+        public UserDTO? User { get; set; }
 
         public int TicketId { get; set; }
 

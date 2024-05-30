@@ -23,7 +23,7 @@ namespace OlympusBugTracker.Models
             set => _created = value.ToUniversalTime();
         }
 
-        public Guid? UploadId { get; set; }
+        public Guid UploadId { get; set; }
 
         public virtual FileUpload? Upload { get; set; }
 
@@ -48,7 +48,7 @@ namespace OlympusBugTracker.Models
                 FileName = attachment.FileName,
                 Description = attachment.Description,
                 Created = attachment.Created,
-                AttachmentURL = attachment.UploadId.HasValue ? $"api/uploads/{attachment.UploadId}" : UploadHelper.DefaultCompanyImage,
+                AttachmentURL = $"api/uploads/{attachment.UploadId}",
                 UserId = attachment.UserId,
                 TicketId = attachment.TicketId,
             };

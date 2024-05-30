@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using OlympusBugTracker.Client;
+using OlympusBugTracker.Client.Models;
 using OlympusBugTracker.Helpers;
 using OlympusBugTracker.Models;
 using System.ComponentModel.DataAnnotations;
@@ -37,15 +38,15 @@ namespace OlympusBugTracker.Data
 
     public static class ApplicationUserExtensions
     {
-        public static UserInfo ToDTO(this ApplicationUser user)
+        public static UserDTO ToDTO(this ApplicationUser user)
         {
-            UserInfo dto = new()
+            UserDTO dto = new()
             {
-                UserId = user.Id,
+                Id = user.Id,
                 Email = user.Email!,
                 FirstName = user.FirstName!,
                 LastName = user.LastName!,
-                ProfilePictureUrl = user.ImageId.HasValue ? $"api/uploads/{user.ImageId}" : UploadHelper.DefaultProfilePicture,
+                ImageURL = user.ImageId.HasValue ? $"api/uploads/{user.ImageId}" : UploadHelper.DefaultProfilePicture,
             };            
 
             return dto;

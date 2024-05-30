@@ -16,7 +16,7 @@ namespace OlympusBugTracker.Client.Models
 
         public ICollection<ProjectDTO> Projects { get; set; } = new HashSet<ProjectDTO>();
 
-        public ICollection<UserInfo> Users { get; set; } = new HashSet<UserInfo>();
+        public ICollection<UserDTO> Users { get; set; } = new HashSet<UserDTO>();
 
         public ICollection<InviteDTO> Invites { get; set; } = new HashSet<InviteDTO>();
 
