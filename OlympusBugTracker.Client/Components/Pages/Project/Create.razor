@@ -1,0 +1,54 @@
+﻿@page "/project/create"
+@rendermode InteractiveServer
+
+@inject IProjectDTOService ProjectService
+
+
+
+<PageTitle>BugTracker | Project | Create</PageTitle>
+
+
+
+<div>
+
+    <ProjectForm Project="new ProjectDTO()" OnSubmit="HandleSubmit" />
+
+</div>
+
+
+
+
+@code {
+
+    #region parameters
+
+
+
+    #endregion
+
+
+    #region state
+
+
+
+    #endregion
+
+
+    #region methods
+
+    private async Task HandleSubmit(ProjectDTO project)
+    {
+        try
+        {
+            
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            throw;
+        }
+    }
+
+    #endregion
+
+}

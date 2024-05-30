@@ -1,0 +1,226 @@
+﻿@using static OlympusBugTracker.Client.Models.Enums
+@if (Project!.Name is null)
+{
+
+    <div>
+
+        <section class="container" style="margin-top: -260px;" data-bs-theme="dark">
+
+            <div class="card border-0 bg-primary position-relative py-lg-4 py-xl-5">
+
+                <div class="card-body position-relative z-2 py-5">
+
+                    <EditForm Model="Project" class="mx-auto" style="max-width: 800px;">
+
+                        <DataAnnotationsValidator />
+
+                        <h2 class="h1 card-title text-center pb-4">New Project</h2>
+
+                        <div class="row g-4">
+
+                            <div class="col-sm-6">
+
+                                <label class="form-label fs-base" for="name">Name</label>
+
+                                <InputText @bind-Value="Project.Name" class="form-control form-control-lg" type="text" placeholder="Project Name" id="name" />
+
+                            </div>
+
+                            <div class="col-sm-6">
+
+                                <label class="form-label fs-base" for="priority">Priority</label>
+
+                                <InputSelect @bind-Value="Project.Priority" class="form-control form-control-lg" id="priority">
+
+                                    @foreach (ProjectPriority priority in Enum.GetValues(typeof(ProjectPriority)))
+                                    {
+                                        <option value="@priority">@priority.GetDisplayName()</option>
+                                    }
+
+                                </InputSelect>
+
+                            </div>
+
+                            <div class="col-sm-6">
+
+                                <label class="form-label fs-base" for="startDate">Start Date</label>
+
+                                <InputDate @bind-Value="Project.StartDate" class="form-control form-control-lg" id="startDate" />
+
+                            </div>
+
+                            <div class="col-sm-6">
+
+                                <label class="form-label fs-base" for="endDate">End Date</label>
+
+                                <InputDate @bind-Value="Project.EndDate" class="form-control form-control-lg" id="endDate" />
+
+                            </div>
+
+                            <div class="col-sm-12">
+
+                                <label class="form-label fs-base">Description</label>
+
+                                <TinyMCE.Blazor.Editor ScriptSrc="/tinymce/tinymce.min.js" @bind-Value="Project.Description" Field="() => Project.Description" ClassName="rich-text-editor" Conf="editorConfig" class="form-control form-control-lg" placeholder="Project Description" />
+
+                            </div>
+
+                            <div class="col-sm-12 text-center pt-4">
+
+                                <button class="btn btn-lg btn-light" type="submit">Create</button>
+
+                            </div>
+
+                        </div>
+
+                    </EditForm>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+}
+else
+{
+
+    <div>
+
+        <section class="container" style="margin-top: -260px;" data-bs-theme="dark">
+
+            <div class="card border-0 bg-primary position-relative py-lg-4 py-xl-5">
+
+                <div class="card-body position-relative z-2 py-5">
+
+                    <EditForm Model="Project" OnValidSubmit="HandleSubmit" class="mx-auto" style="max-width: 800px;">
+
+                        <DataAnnotationsValidator />
+
+                        <h2 class="h1 card-title text-center pb-4">@Project.Name</h2>
+
+                        <div class="row g-4">
+
+                            <div class="col-sm-6">
+
+                                <label class="form-label fs-base" for="name">Name</label>
+
+                                <InputText @bind-Value="Project.Name" class="form-control form-control-lg" type="text" placeholder="Project Name" id="name" />
+
+                            </div>
+
+                            <div class="col-sm-6">
+
+                                <label class="form-label fs-base" for="priority">Priority</label>
+
+                                <InputSelect @bind-Value="Project.Priority" class="form-control form-control-lg" id="priority">
+
+                                    @foreach (ProjectPriority priority in Enum.GetValues(typeof(ProjectPriority)))
+                                    {
+                                        <option value="@priority">@priority.GetDisplayName()</option>
+                                    }
+
+                                </InputSelect>
+
+                            </div>
+
+                            <div class="col-sm-6">
+
+                                <label class="form-label fs-base" for="startDate">Start Date</label>
+
+                                <InputDate @bind-Value="Project.StartDate" class="form-control form-control-lg" id="startDate" />
+
+                            </div>
+
+                            <div class="col-sm-6">
+
+                                <label class="form-label fs-base" for="endDate">End Date</label>
+
+                                <InputDate @bind-Value="Project.EndDate" class="form-control form-control-lg" id="endDate" />
+
+                            </div>
+
+                            <div class="col-sm-12">
+
+                                <label class="form-label fs-base">Description</label>
+
+                                <TinyMCE.Blazor.Editor ScriptSrc="/tinymce/tinymce.min.js" @bind-Value="Project.Description" Field="() => Project.Description" ClassName="rich-text-editor" Conf="editorConfig" class="form-control form-control-lg" placeholder="Project Description" />
+
+                            </div>
+
+                            <div class="col-sm-12 text-center pt-4">
+
+                                <button class="btn btn-lg btn-light" type="submit">Save</button>
+
+                            </div>
+
+                        </div>
+
+                    </EditForm>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+}
+
+
+
+
+
+@code {
+
+    #region parameters
+
+    [Parameter, EditorRequired]
+    public ProjectDTO? Project { get; set; }
+
+    [Parameter, EditorRequired]
+    public EventCallback<ProjectDTO> OnSubmit { get; set; }
+
+    #endregion
+
+
+    #region state
+
+    // tinyMCE config
+    private static readonly Dictionary<string, object> editorConfig = new()
+    {
+        { "toolbar", "undo redo | bold italic underline | link codesample " },
+        { "plugins", "anchor autolink link charmap preview table codesample" },
+        { "default_link_target", "_blank" },
+        { "link_assume_external_targets", true },
+        { "link_context_toolbar", true },
+        { "codesample_languages", new object[] {
+                new { text = "HTML/XML", value = "markup" },
+                new { text = "JavaScript", value = "javascript" },
+                new { text = "CSS", value = "css" },
+                new { text = "C#", value = "csharp" },
+                new { text = "Razor", value = "razor" },
+                new { text = "JSON", value = "json" },
+    }
+        },
+        { "codesample_global_prismjs", true },
+        { "promotion", false },
+        { "height", "100%" },
+    };
+
+    #endregion
+
+
+    #region methods
+
+    private async Task HandleSubmit()
+    {
+        await OnSubmit.InvokeAsync(Project);
+    }
+
+    #endregion
+
+}

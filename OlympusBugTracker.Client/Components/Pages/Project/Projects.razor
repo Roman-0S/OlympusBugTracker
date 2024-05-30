@@ -1,5 +1,166 @@
-﻿<h3>Projects</h3>
+﻿@page "/projects"
+@rendermode InteractiveServer
+
+@using OlympusBugTracker.Client.Helpers
+@using OlympusBugTracker.Client.Services.Interfaces
+
+@inject IProjectDTOService ProjectService
+
+<PageTitle>BugTracker | Projects</PageTitle>
+
+
+<div>
+
+    <div class="hstack gap-2 mb-3">
+
+        @if (!showArchived)
+        {
+
+            <button class="btn btn-outline-primary btn-sm" disabled>
+                Projects
+            </button>
+
+            <button class="btn btn-outline-primary btn-sm" @onclick="ShowArchived">
+                Archived Projects
+            </button>
+
+        }
+        else
+        {
+
+            <button class="btn btn-outline-primary btn-sm" @onclick="ShowProjects">
+                Projects
+            </button>
+
+            <button class="btn btn-outline-primary btn-sm" disabled>
+                Archived Projects
+            </button>
+
+        }
+
+
+    </div>
+
+    @if (!showArchived)
+    {
+
+        <h1>Projects</h1>
+
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4 pb-sm-3 pb-md-4 pb-xl-5 mb-5">
+
+            @foreach (ProjectDTO project in projects)
+            {
+                <ProjectCard Project="project" OnArchive="HandleArchive" OnRecover="HandleRecover" />
+            }
+
+        </div>
+
+    }
+    else
+    {
+
+        <h1>Archived Projects</h1>
+
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4 pb-sm-3 pb-md-4 pb-xl-5 mb-5">
+
+            @foreach (ProjectDTO project in projects)
+            {
+                <ProjectCard Project="project" OnRecover="HandleRecover" OnArchive="HandleArchive" />
+            }
+
+        </div>
+
+    }
+
+
+
+
+</div>
+
 
 @code {
+    #region parameters
+
+    [CascadingParameter]
+    public Task<AuthenticationState>? AuthStateTask { get; set; }
+
+    #endregion
+
+
+    #region state
+
+    private UserInfo? userInfo;
+
+    private IEnumerable<ProjectDTO> projects = [];
+
+    private bool showArchived;
+
+    #endregion
+
+
+    #region methods
+
+    // get projects
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            userInfo = await UserInfoHelper.GetUserInfoAsync(AuthStateTask);
+
+            projects = await ProjectService.GetAllProjectsAsync(userInfo!.CompanyId);
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            throw;
+        }
+    }
+
+    private async Task ShowProjects()
+    {
+        showArchived = false;
+
+        projects = await ProjectService.GetAllProjectsAsync(userInfo!.CompanyId);
+    }
+
+    private async Task ShowArchived()
+    {
+        showArchived = true;
+
+        projects = await ProjectService.GetArchivedProjects(userInfo!.CompanyId);
+    }
+
+    private async Task HandleArchive(int projectId)
+    {
+        try
+        {
+            await ProjectService.ArchiveProjectAsync(projectId, userInfo!.CompanyId);
+
+            await ShowProjects();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            throw;
+        }
+    }
+
+    private async Task HandleRecover(int projectId)
+    {
+        try
+        {
+            await ProjectService.RestoreProjectAsync(projectId, userInfo!.CompanyId);
+
+            await ShowArchived();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            throw;
+        }
+    }
+
+    #endregion
 
 }

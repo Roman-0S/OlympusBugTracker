@@ -2,10 +2,12 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using OlympusBugTracker.Client.Services.Interfaces;
 using OlympusBugTracker.Components;
 using OlympusBugTracker.Components.Account;
 using OlympusBugTracker.Data;
 using OlympusBugTracker.Services;
+using OlympusBugTracker.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,8 +45,12 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
     .AddDefaultTokenProviders();
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, SendGridService>();
-
 builder.Services.AddSingleton<IEmailSender, SendGridService>();
+
+
+builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
+
+builder.Services.AddScoped<IProjectDTOService, ProjectDTOService>();
 
 
 var app = builder.Build();
