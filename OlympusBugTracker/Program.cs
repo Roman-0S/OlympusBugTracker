@@ -1,13 +1,9 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using OlympusBugTracker.Client.Components.Pages;
-using OlympusBugTracker.Client.Services.Interfaces;
 using OlympusBugTracker.Components;
 using OlympusBugTracker.Components.Account;
 using OlympusBugTracker.Data;
-using OlympusBugTracker.Services;
-using OlympusBugTracker.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,11 +29,12 @@ builder.Services.AddAuthentication(options =>
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString));
+    options.UseNpgsql(connectionString, o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddClaimsPrincipalFactory<CustomUserClaimsPrincipalFactory>()
     .AddSignInManager()

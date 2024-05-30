@@ -7,7 +7,7 @@ using System.Security.Claims;
 
 namespace OlympusBugTracker.Components.Account
 {
-    public class CustomUserClaimsPrincipalFactory(UserManager<ApplicationUser> userManager, IOptions<IdentityOptions> options) : UserClaimsPrincipalFactory<ApplicationUser>(userManager, options)
+    public class CustomUserClaimsPrincipalFactory(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IOptions<IdentityOptions> options) : UserClaimsPrincipalFactory<ApplicationUser, IdentityRole>(userManager, roleManager, options)
     {
         protected override async Task<ClaimsIdentity> GenerateClaimsAsync(ApplicationUser user)
         {
@@ -19,6 +19,7 @@ namespace OlympusBugTracker.Components.Account
                 new Claim(nameof(UserInfo.FirstName), user.FirstName!),
                 new Claim(nameof(UserInfo.LastName), user.LastName!),
                 new Claim(nameof(UserInfo.ProfilePictureUrl), profilePictureUrl!),
+                new Claim("CompanyId", user.CompanyId.ToString())
             ];
 
             identity.AddClaims(customClaims);

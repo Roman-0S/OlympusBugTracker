@@ -19,11 +19,11 @@ namespace OlympusBugTracker.Models
 
         public virtual FileUpload? Image { get; set; }
 
-        public ICollection<Project> Projects { get; set; } = new HashSet<Project>();
+        public virtual ICollection<Project> Projects { get; set; } = new HashSet<Project>();
 
-        public ICollection<ApplicationUser> Users { get; set; } = new HashSet<ApplicationUser>();
+        public virtual ICollection<ApplicationUser> Users { get; set; } = new HashSet<ApplicationUser>();
 
-        public ICollection<Invite> Invites { get; set; } = new HashSet<Invite>();
+        public virtual ICollection<Invite> Invites { get; set; } = new HashSet<Invite>();
 
     }
 

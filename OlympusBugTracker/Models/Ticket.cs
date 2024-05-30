@@ -55,9 +55,9 @@ namespace OlympusBugTracker.Models
 
         public virtual ApplicationUser? DeveloperUser { get; set; }
 
-        public ICollection<TicketComment> TicketComments { get; set; } = new HashSet<TicketComment>();
+        public virtual ICollection<TicketComment> TicketComments { get; set; } = new HashSet<TicketComment>();
 
-        public ICollection<TicketAttachment> TicketAttachments { get; set; } = new HashSet<TicketAttachment>();
+        public virtual ICollection<TicketAttachment> TicketAttachments { get; set; } = new HashSet<TicketAttachment>();
 
     }
 

@@ -48,9 +48,9 @@ namespace OlympusBugTracker.Models
 
         public virtual Company? Company { get; set; }
 
-        public ICollection<ApplicationUser> Users { get; set; } = new HashSet<ApplicationUser>();
+        public virtual ICollection<ApplicationUser> Users { get; set; } = new HashSet<ApplicationUser>();
 
-        public ICollection<Ticket> Tickets { get; set; } = new HashSet<Ticket>();
+        public virtual ICollection<Ticket> Tickets { get; set; } = new HashSet<Ticket>();
 
     }
 
