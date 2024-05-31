@@ -1,0 +1,79 @@
+﻿@page "/tickets"
+@rendermode InteractiveServer
+
+@using OlympusBugTracker.Client.Components.UI.Ticket
+@using OlympusBugTracker.Client.Helpers
+
+@inject ITicketDTOService TicketService
+
+
+<div>
+
+    <table class="table table-responsive caption-top border border-dark">
+        <caption>List of Tickets</caption>
+        <thead>
+            <tr>
+                <th scope="col">Priority</th>
+                <th scope="col">Status</th>
+                <th scope="col">Type</th>
+                <th scope="col">Project</th>
+                <th scope="col">Title</th>
+                <th scope="col">Created</th>
+                <th scope="col">Updated</th>
+                <th scope="col">Comments</th>
+            </tr>
+        </thead>
+        <tbody class="table-striped table-hover">
+
+            @foreach (TicketDTO ticket in tickets)
+            {
+                <TicketRow Ticket="ticket" />
+            }
+
+        </tbody>
+    </table>
+
+</div>
+
+
+
+
+@code {
+
+    #region parameters
+
+    [CascadingParameter]
+    public Task<AuthenticationState>? AuthStateTask { get; set; }
+
+    #endregion
+
+
+    #region state
+
+    private UserInfo? userInfo;
+
+    private IEnumerable<TicketDTO> tickets = [];
+
+    #endregion
+
+
+    #region methods
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            userInfo = await UserInfoHelper.GetUserInfoAsync(AuthStateTask);
+
+            tickets = await TicketService.GetAllTicketsAsync(userInfo!.CompanyId);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            throw;
+        }
+    }
+
+    #endregion
+
+}

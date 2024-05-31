@@ -1,0 +1,43 @@
+﻿
+
+
+@if (Ticket is not null)
+{
+    <tr>
+        <th scope="row">@Ticket.Priority</th>
+        <td>@Ticket.Status</td>
+        <td>@Ticket.Type</td>
+        <td>@Ticket.Project?.Name</td>
+        <td>@Ticket.Title</td>
+        <td>@Ticket.Created</td>
+        <td>@Ticket.Updated</td>
+        <td>@Ticket.TicketComments.Count()</td>
+    </tr>
+}
+
+
+
+@code {
+
+    #region parameters
+
+    [Parameter, EditorRequired]
+    public TicketDTO? Ticket { get; set; }
+
+    #endregion
+
+
+    #region state
+
+
+
+    #endregion
+    
+    
+    #region methods
+
+
+
+    #endregion
+
+}
