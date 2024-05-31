@@ -1,18 +1,19 @@
-﻿@page "/project/create"
+﻿@page "/project/edit/{id:int}"
 @using OlympusBugTracker.Client.Helpers
 @rendermode InteractiveWebAssembly
 
 @inject IProjectDTOService ProjectService
+@inject NavigationManager Nav
 
 
 
-<PageTitle>BugTracker | Create a Project</PageTitle>
+<PageTitle>BugTracker | Edit a Project</PageTitle>
 
 
 
 <div my-5>
 
-    <ProjectForm Project="new ProjectDTO()" OnSubmit="HandleSubmit" />
+    <ProjectForm Project="project" OnSubmit="HandleSubmit" />
 
 </div>
 
@@ -26,12 +27,17 @@
     [CascadingParameter]
     public Task<AuthenticationState>? AuthStateTask { get; set; }
 
+    [Parameter]
+    public int Id { get; set; }
+
     #endregion
 
 
     #region state
 
     private UserInfo? userInfo;
+
+    private ProjectDTO? project;
 
     #endregion
 
@@ -43,11 +49,18 @@
         try
         {
             userInfo = await UserInfoHelper.GetUserInfoAsync(AuthStateTask);
+
+            project = await ProjectService.GetProjectByIdAsync(Id, userInfo!.CompanyId);
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex);
             throw;
+        }
+
+        if (project is null)
+        {
+            Nav.NavigateTo("/projects");
         }
     }
 
@@ -55,8 +68,10 @@
     {
         try
         {
-            await ProjectService.AddProjectAsync(project, userInfo!.CompanyId);
-    }
+            await ProjectService.UpdateProjectAsync(project, userInfo!.CompanyId);
+
+            Nav.NavigateTo("/projects");
+        }
         catch (Exception ex)
         {
             Console.WriteLine(ex);

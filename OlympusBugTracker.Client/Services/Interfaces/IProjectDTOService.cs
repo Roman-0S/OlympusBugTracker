@@ -8,7 +8,12 @@ namespace OlympusBugTracker.Client.Services.Interfaces
 
         Task<IEnumerable<ProjectDTO>> GetAllProjectsAsync(int companyId);
 
-        Task<IEnumerable<ProjectDTO>> GetArchivedProjects(int companyId);
+        Task<IEnumerable<ProjectDTO>> GetArchivedProjectsAsync(int companyId);
+
+        Task<ProjectDTO?> GetProjectByIdAsync(int projectId, int companyId);
+
+        Task UpdateProjectAsync(ProjectDTO projectDTO, int companyId);
+
 
         Task ArchiveProjectAsync(int projectId, int companyId);
 

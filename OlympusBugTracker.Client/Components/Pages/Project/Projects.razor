@@ -1,5 +1,5 @@
 ﻿@page "/projects"
-@rendermode InteractiveServer
+@rendermode InteractiveWebAssembly
 
 @using OlympusBugTracker.Client.Helpers
 @using OlympusBugTracker.Client.Services.Interfaces
@@ -143,7 +143,7 @@
     {
         showArchived = true;
 
-        projects = await ProjectService.GetArchivedProjects(userInfo!.CompanyId);
+        projects = await ProjectService.GetArchivedProjectsAsync(userInfo!.CompanyId);
     }
 
     private async Task HandleArchive(int projectId)

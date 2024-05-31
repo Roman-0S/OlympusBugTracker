@@ -19,7 +19,7 @@
                             <path d="M38.2784 27.5C37.8534 26.7833 25.6701 5.6083 25.4284 5.29996C24.4255 3.9011 22.9204 2.94436 21.2281 2.62997C19.5358 2.31559 17.7875 2.66792 16.3491 3.61323C14.9107 4.55855 13.8936 6.02357 13.5108 7.70171C13.1279 9.37984 13.409 11.141 14.2951 12.6166C14.2118 12.6166 13.8784 11.9 26.7284 34.1666C27.1662 34.925 27.749 35.5898 28.4437 36.1229C29.1383 36.656 29.9311 37.0471 30.7769 37.2739C31.6227 37.5006 32.5049 37.5585 33.373 37.4443C34.2412 37.3301 35.0784 37.046 35.8368 36.6083C36.5952 36.1706 37.2599 35.5877 37.793 34.8931C38.3262 34.1984 38.7173 33.4056 38.944 32.5598C39.1707 31.714 39.2287 30.8319 39.1145 29.9637C39.0003 29.0955 38.7162 28.2583 38.2784 27.5Z"></path>
                         </svg>
                         <h3 class="h4 card-title mt-0">@Project.Name</h3>
-                        <p class="card-text">@Project.Description</p>
+                        <p class="card-text">@((MarkupString)Project.Description!)</p>
                     </div>
                     <div class="card-footer border-0 py-3 my-3 mb-sm-4">
                         <div class="btn btn-lg btn-icon btn-outline-primary rounded-circle pe-none text-end">
@@ -28,12 +28,17 @@
                     </div>
                 </a>
 
-                <div class="ms-4 mb-4">
+                <div class="ms-4 mb-4 hstack gap-3">
 
                     <button class="btn btn-sm btn-danger" @onclick="HandleArchive">
-                        <i class="ai ai-cross-alt"></i>
-                        Archive
+                        <i class="ai ai-archive"></i>
+                        &nbsp; Archive
                     </button>
+
+                    <a href="/project/edit/@Project.Id" class="btn btn-sm btn-primary">
+                        <i class="ai ai-edit"></i>
+                        &nbsp; Edit
+                    </a>
 
                 </div>
 
@@ -57,7 +62,7 @@
                             <path d="M38.2784 27.5C37.8534 26.7833 25.6701 5.6083 25.4284 5.29996C24.4255 3.9011 22.9204 2.94436 21.2281 2.62997C19.5358 2.31559 17.7875 2.66792 16.3491 3.61323C14.9107 4.55855 13.8936 6.02357 13.5108 7.70171C13.1279 9.37984 13.409 11.141 14.2951 12.6166C14.2118 12.6166 13.8784 11.9 26.7284 34.1666C27.1662 34.925 27.749 35.5898 28.4437 36.1229C29.1383 36.656 29.9311 37.0471 30.7769 37.2739C31.6227 37.5006 32.5049 37.5585 33.373 37.4443C34.2412 37.3301 35.0784 37.046 35.8368 36.6083C36.5952 36.1706 37.2599 35.5877 37.793 34.8931C38.3262 34.1984 38.7173 33.4056 38.944 32.5598C39.1707 31.714 39.2287 30.8319 39.1145 29.9637C39.0003 29.0955 38.7162 28.2583 38.2784 27.5Z"></path>
                         </svg>
                         <h3 class="h4 card-title mt-0">@Project.Name</h3>
-                        <p class="card-text">@Project.Description</p>
+                        <p class="card-text">@((MarkupString)Project.Description!)</p>
                     </div>
                     <div class="card-footer border-0 py-3 my-3 mb-sm-4">
                         <div class="btn btn-lg btn-icon btn-outline-primary rounded-circle pe-none text-end">
@@ -70,7 +75,7 @@
 
                     <button class="btn btn-sm btn-primary" @onclick="HandleRecover">
                         <i class="ai ai-check"></i>
-                        Recover
+                        &nbsp; Recover
                     </button>
 
                 </div>

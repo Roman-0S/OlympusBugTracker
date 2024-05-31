@@ -1,173 +1,177 @@
 ﻿@using static OlympusBugTracker.Client.Models.Enums
-@if (Project!.Name is null)
+
+@if (Project is not null)
 {
+    @if (Project.Id is 0)
+    {
 
-    <div class="my-5">
+        <div class="my-5">
 
-        <section data-bs-theme="dark">
+            <section data-bs-theme="dark">
 
-            <div class="card border-0 bg-primary">
+                <div class="card border-0 bg-primary">
 
-                <div class="card-body">
+                    <div class="card-body">
 
-                    <EditForm Model="Project" >
+                        <EditForm Model="Project" OnValidSubmit="HandleSubmit">
 
-                        <DataAnnotationsValidator />
+                            <DataAnnotationsValidator />
 
-                        <h2 class="h1 card-title text-center pb-4">New Project</h2>
+                            <h2 class="h1 card-title text-center pb-4">New Project</h2>
 
-                        <div class="row g-4">
+                            <div class="row g-4">
 
-                            <div class="col-sm-6">
+                                <div class="col-sm-6">
 
-                                <label class="form-label fs-base" for="name">Name</label>
+                                    <label class="form-label fs-base" for="name">Name</label>
 
-                                <InputText @bind-Value="Project.Name" class="form-control form-control-lg" type="text" placeholder="Project Name" id="name" />
+                                    <InputText @bind-Value="Project.Name" class="form-control form-control-lg" type="text" placeholder="Project Name" id="name" />
+
+                                </div>
+
+                                <div class="col-sm-6">
+
+                                    <label class="form-label fs-base" for="priority">Priority</label>
+
+                                    <InputSelect @bind-Value="Project.Priority" class="form-control form-control-lg" id="priority">
+
+                                        @foreach (ProjectPriority priority in Enum.GetValues(typeof(ProjectPriority)))
+                                        {
+                                            <option value="@priority">@priority.GetDisplayName()</option>
+                                        }
+
+                                    </InputSelect>
+
+                                </div>
+
+                                <div class="col-sm-6">
+
+                                    <label class="form-label fs-base" for="startDate">Start Date</label>
+
+                                    <InputDate @bind-Value="Project.StartDate" class="form-control form-control-lg" id="startDate" />
+
+                                </div>
+
+                                <div class="col-sm-6">
+
+                                    <label class="form-label fs-base" for="endDate">End Date</label>
+
+                                    <InputDate @bind-Value="Project.EndDate" class="form-control form-control-lg" id="endDate" />
+
+                                </div>
+
+                                <div class="col-sm-12">
+
+                                    <label class="form-label fs-base">Description</label>
+
+                                    <TinyMCE.Blazor.Editor ScriptSrc="/tinymce/tinymce.min.js" @bind-Value="Project.Description" Field="() => Project.Description" ClassName="rich-text-editor" Conf="editorConfig" class="form-control form-control-lg" placeholder="Project Description" />
+
+                                </div>
+
+                                <div class="col-sm-12 text-center pt-4">
+
+                                    <button class="btn btn-lg btn-light" type="submit">Create</button>
+
+                                </div>
 
                             </div>
 
-                            <div class="col-sm-6">
+                        </EditForm>
 
-                                <label class="form-label fs-base" for="priority">Priority</label>
-
-                                <InputSelect @bind-Value="Project.Priority" class="form-control form-control-lg" id="priority">
-
-                                    @foreach (ProjectPriority priority in Enum.GetValues(typeof(ProjectPriority)))
-                                    {
-                                        <option value="@priority">@priority.GetDisplayName()</option>
-                                    }
-
-                                </InputSelect>
-
-                            </div>
-
-                            <div class="col-sm-6">
-
-                                <label class="form-label fs-base" for="startDate">Start Date</label>
-
-                                <InputDate @bind-Value="Project.StartDate" class="form-control form-control-lg" id="startDate" />
-
-                            </div>
-
-                            <div class="col-sm-6">
-
-                                <label class="form-label fs-base" for="endDate">End Date</label>
-
-                                <InputDate @bind-Value="Project.EndDate" class="form-control form-control-lg" id="endDate" />
-
-                            </div>
-
-                            <div class="col-sm-12">
-
-                                <label class="form-label fs-base">Description</label>
-
-                                <TinyMCE.Blazor.Editor ScriptSrc="/tinymce/tinymce.min.js" @bind-Value="Project.Description" Field="() => Project.Description" ClassName="rich-text-editor" Conf="editorConfig" class="form-control form-control-lg" placeholder="Project Description" />
-
-                            </div>
-
-                            <div class="col-sm-12 text-center pt-4">
-
-                                <button class="btn btn-lg btn-light" type="submit">Create</button>
-
-                            </div>
-
-                        </div>
-
-                    </EditForm>
+                    </div>
 
                 </div>
 
-            </div>
+            </section>
 
-        </section>
+        </div>
 
-    </div>
+    }
+    else
+    {
 
-}
-else
-{
+        <div>
 
-    <div>
+            <section data-bs-theme="dark">
 
-        <section data-bs-theme="dark">
+                <div class="card border-0 bg-primary py-lg-4 py-xl-5">
 
-            <div class="card border-0 bg-primary py-lg-4 py-xl-5">
+                    <div class="card-body py-5">
 
-                <div class="card-body py-5">
+                        <EditForm Model="Project" OnValidSubmit="HandleSubmit">
 
-                    <EditForm Model="Project" OnValidSubmit="HandleSubmit">
+                            <DataAnnotationsValidator />
 
-                        <DataAnnotationsValidator />
+                            <h2 class="h1 card-title text-center pb-4">@Project.Name</h2>
 
-                        <h2 class="h1 card-title text-center pb-4">@Project.Name</h2>
+                            <div class="row g-4">
 
-                        <div class="row g-4">
+                                <div class="col-sm-6">
 
-                            <div class="col-sm-6">
+                                    <label class="form-label fs-base" for="name">Name</label>
 
-                                <label class="form-label fs-base" for="name">Name</label>
+                                    <InputText @bind-Value="Project.Name" class="form-control form-control-lg" type="text" placeholder="Project Name" id="name" />
 
-                                <InputText @bind-Value="Project.Name" class="form-control form-control-lg" type="text" placeholder="Project Name" id="name" />
+                                </div>
+
+                                <div class="col-sm-6">
+
+                                    <label class="form-label fs-base" for="priority">Priority</label>
+
+                                    <InputSelect @bind-Value="Project.Priority" class="form-control form-control-lg" id="priority">
+
+                                        @foreach (ProjectPriority priority in Enum.GetValues(typeof(ProjectPriority)))
+                                        {
+                                            <option value="@priority">@priority.GetDisplayName()</option>
+                                        }
+
+                                    </InputSelect>
+
+                                </div>
+
+                                <div class="col-sm-6">
+
+                                    <label class="form-label fs-base" for="startDate">Start Date</label>
+
+                                    <InputDate @bind-Value="Project.StartDate" class="form-control form-control-lg" id="startDate" />
+
+                                </div>
+
+                                <div class="col-sm-6">
+
+                                    <label class="form-label fs-base" for="endDate">End Date</label>
+
+                                    <InputDate @bind-Value="Project.EndDate" class="form-control form-control-lg" id="endDate" />
+
+                                </div>
+
+                                <div class="col-sm-12">
+
+                                    <label class="form-label fs-base">Description</label>
+
+                                    <TinyMCE.Blazor.Editor ScriptSrc="/tinymce/tinymce.min.js" @bind-Value="Project.Description" Field="() => Project.Description" ClassName="rich-text-editor" Conf="editorConfig" class="form-control form-control-lg" placeholder="Project Description" />
+
+                                </div>
+
+                                <div class="col-sm-12 text-center pt-4">
+
+                                    <button class="btn btn-lg btn-light" type="submit">Save</button>
+
+                                </div>
 
                             </div>
 
-                            <div class="col-sm-6">
+                        </EditForm>
 
-                                <label class="form-label fs-base" for="priority">Priority</label>
-
-                                <InputSelect @bind-Value="Project.Priority" class="form-control form-control-lg" id="priority">
-
-                                    @foreach (ProjectPriority priority in Enum.GetValues(typeof(ProjectPriority)))
-                                    {
-                                        <option value="@priority">@priority.GetDisplayName()</option>
-                                    }
-
-                                </InputSelect>
-
-                            </div>
-
-                            <div class="col-sm-6">
-
-                                <label class="form-label fs-base" for="startDate">Start Date</label>
-
-                                <InputDate @bind-Value="Project.StartDate" class="form-control form-control-lg" id="startDate" />
-
-                            </div>
-
-                            <div class="col-sm-6">
-
-                                <label class="form-label fs-base" for="endDate">End Date</label>
-
-                                <InputDate @bind-Value="Project.EndDate" class="form-control form-control-lg" id="endDate" />
-
-                            </div>
-
-                            <div class="col-sm-12">
-
-                                <label class="form-label fs-base">Description</label>
-
-                                <TinyMCE.Blazor.Editor ScriptSrc="/tinymce/tinymce.min.js" @bind-Value="Project.Description" Field="() => Project.Description" ClassName="rich-text-editor" Conf="editorConfig" class="form-control form-control-lg" placeholder="Project Description" />
-
-                            </div>
-
-                            <div class="col-sm-12 text-center pt-4">
-
-                                <button class="btn btn-lg btn-light" type="submit">Save</button>
-
-                            </div>
-
-                        </div>
-
-                    </EditForm>
+                    </div>
 
                 </div>
 
-            </div>
+            </section>
 
-        </section>
+        </div>
 
-    </div>
-
+    }
 }
 
 

@@ -30,11 +30,34 @@ namespace OlympusBugTracker.Services
             return projects.Select(p => p.ToDTO());
         }
 
-        public async Task<IEnumerable<ProjectDTO>> GetArchivedProjects(int companyId)
+        public async Task<IEnumerable<ProjectDTO>> GetArchivedProjectsAsync(int companyId)
         {
-            IEnumerable<Project> projects = await repository.GetArchivedProjects(companyId);
+            IEnumerable<Project> projects = await repository.GetArchivedProjectsAsync(companyId);
 
             return projects.Select(p => p.ToDTO());
+        }
+
+        public async Task<ProjectDTO?> GetProjectByIdAsync(int projectId, int companyId)
+        {
+            Project? project = await repository.GetProjectByIdAsync(projectId, companyId);
+
+            return project?.ToDTO();
+        }
+
+        public async Task UpdateProjectAsync(ProjectDTO projectDTO, int companyId)
+        {
+            Project? project = await repository.GetProjectByIdAsync(projectDTO.Id, companyId);
+
+            if (project is not null)
+            {
+                project.Name = projectDTO.Name;
+                project.Description = projectDTO.Description;
+                project.StartDate = projectDTO.StartDate;
+                project.EndDate = projectDTO.EndDate;
+                project.Priority = projectDTO.Priority;
+
+                await repository.UpdateProjectAsync(project, companyId);
+            }
         }
 
         public async Task ArchiveProjectAsync(int projectId, int companyId)

@@ -30,13 +30,35 @@ namespace OlympusBugTracker.Services
             return projects;
         }
 
-        public async Task<IEnumerable<Project>> GetArchivedProjects(int companyId)
+        public async Task<IEnumerable<Project>> GetArchivedProjectsAsync(int companyId)
         {
             using ApplicationDbContext context = contextFactory.CreateDbContext();
 
             IEnumerable<Project> projects = await context.Projects.Where(p => p.CompanyId == companyId && p.Archived).OrderByDescending(p => p.Created).ToListAsync();
 
             return projects;
+        }
+
+        public async Task<Project?> GetProjectByIdAsync(int projectId, int companyId)
+        {
+            using ApplicationDbContext context = contextFactory.CreateDbContext();
+
+            Project? project = await context.Projects.Where(p => p.CompanyId == companyId).FirstOrDefaultAsync(p => p.Id == projectId);
+
+            return project;
+        }
+
+        public async Task UpdateProjectAsync(Project project, int companyId)
+        {
+            using ApplicationDbContext context = contextFactory.CreateDbContext();
+
+            bool shouldEdit = await context.Projects.AnyAsync(p => p.Id == project.Id && p.CompanyId == companyId);
+
+            if (shouldEdit)
+            {
+                context.Projects.Update(project);
+                await context.SaveChangesAsync();
+            }
         }
 
         public async Task ArchiveProjectAsync(int projectId, int companyId)

@@ -63,6 +63,7 @@ namespace OlympusBugTracker.Models
                 Id = project.Id,
                 Name = project.Name,
                 Description = project.Description,
+                Created = project.Created,
                 StartDate = project.StartDate,
                 EndDate = project.EndDate,
                 Priority = project.Priority,
