@@ -9,29 +9,115 @@
 
 <div>
 
-    <table class="table table-responsive caption-top border border-dark">
-        <caption>List of Tickets</caption>
-        <thead>
-            <tr>
-                <th scope="col">Priority</th>
-                <th scope="col">Status</th>
-                <th scope="col">Type</th>
-                <th scope="col">Project</th>
-                <th scope="col">Title</th>
-                <th scope="col">Created</th>
-                <th scope="col">Updated</th>
-                <th scope="col">Comments</th>
-            </tr>
-        </thead>
-        <tbody class="table-striped table-hover">
+    <div class="hstack justify-content-between gap-2 mb-3">
 
-            @foreach (TicketDTO ticket in tickets)
-            {
-                <TicketRow Ticket="ticket" />
-            }
+        @if (!showArchived)
+        {
 
-        </tbody>
-    </table>
+            <div>
+
+                <button class="btn btn-outline-primary btn-sm" disabled>
+                    Tickets
+                </button>
+
+                <button class="btn btn-outline-primary btn-sm" @onclick="ShowArchived">
+                    Archived Tickets
+                </button>
+
+            </div>
+
+        }
+        else
+        {
+
+            <div>
+
+                <button class="btn btn-outline-primary btn-sm" @onclick="ShowTickets">
+                    Tickets
+                </button>
+
+                <button class="btn btn-outline-primary btn-sm" disabled>
+                    Archived Tickets
+                </button>
+
+            </div>
+
+        }
+
+        <div>
+
+            <a href="/ticket/create" class="btn btn-primary btn-sm">
+                Add Ticket
+            </a>
+
+        </div>
+
+    </div>
+
+    @if (!showArchived)
+    {
+        
+        <h1>Tickets</h1>
+
+        <table class="table table-responsive border border-dark">
+            <thead>
+                <tr>
+                    <th scope="col">Priority</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Project</th>
+                    <th scope="col">Title</th>
+                    <th scope="col">Created</th>
+                    <th scope="col">Updated</th>
+                    <th scope="col">Comments</th>
+                    <th scope="col" colspan="2" class="text-center">Modify</th>
+                </tr>
+            </thead>
+            <tbody class="table-striped table-hover">
+
+                @foreach (TicketDTO ticket in tickets)
+                {
+                    <TicketRow Ticket="ticket" UserInfo="userInfo" OnArchive="HandleArchive" OnRestore="HandleRestore" />
+                }
+
+            </tbody>
+
+        </table>
+
+    }
+    else
+    {
+
+        <h1>Archived Tickets</h1>
+
+        <table class="table table-responsive caption-top border border-dark">
+            <caption>List of Tickets</caption>
+            <thead>
+                <tr>
+                    <th scope="col">Priority</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Project</th>
+                    <th scope="col">Title</th>
+                    <th scope="col">Created</th>
+                    <th scope="col">Updated</th>
+                    <th scope="col">Comments</th>
+                    <th scope="col" colspan="2" class="text-center">Modify</th>
+                </tr>
+            </thead>
+            <tbody class="table-striped table-hover">
+
+                @foreach (TicketDTO ticket in tickets)
+                {
+                    <TicketRow Ticket="ticket" UserInfo="userInfo" OnArchive="HandleArchive" OnRestore="HandleRestore" />
+                }
+
+            </tbody>
+
+        </table>
+
+    }
+
 
 </div>
 
@@ -54,6 +140,8 @@
 
     private IEnumerable<TicketDTO> tickets = [];
 
+    private bool showArchived;
+
     #endregion
 
 
@@ -73,6 +161,51 @@
             throw;
         }
     }
+
+    private async Task ShowTickets()
+    {
+        showArchived = false;
+
+        tickets = await TicketService.GetAllTicketsAsync(userInfo!.CompanyId);
+    }
+
+    private async Task ShowArchived()
+    {
+        showArchived = true;
+
+        tickets = await TicketService.GetArchivedTicketsAsync(userInfo!.CompanyId);
+    }
+
+    public async Task HandleArchive(int ticketId)
+    {
+        try
+        {
+            await TicketService.ArchiveTicketAsync(ticketId, userInfo!.CompanyId);
+
+            await ShowTickets();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            throw;
+        }
+    }
+
+    private async Task HandleRestore(int ticketId)
+    {
+        try
+        {
+            await TicketService.RestoreTicketAsync(ticketId, userInfo!.CompanyId);
+
+            await ShowArchived();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            throw;
+        }
+    }
+
 
     #endregion
 

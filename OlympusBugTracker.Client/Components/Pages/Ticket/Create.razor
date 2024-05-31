@@ -1,0 +1,88 @@
+﻿@page "/ticket/create"
+@rendermode InteractiveServer
+
+@using OlympusBugTracker.Client.Components.UI.Ticket
+@using OlympusBugTracker.Client.Helpers
+
+@inject ITicketDTOService TicketService
+@inject IProjectDTOService ProjectService
+@inject NavigationManager Nav
+
+
+<PageTitle>Bug Tracker | Create a Ticket</PageTitle>
+
+
+
+<div>
+
+    <TicketForm Ticket="new TicketDTO()" OnSubmit="HandleSubmit" Projects="projects" />
+
+</div>
+
+
+
+
+
+
+@code {
+
+    #region parameters
+
+    [CascadingParameter]
+    Task<AuthenticationState>? AuthStateTask { get; set; }
+
+    #endregion
+
+
+    #region state
+
+    private UserInfo? userInfo;
+
+    private IEnumerable<ProjectDTO>? projects;
+
+    #endregion
+
+
+    #region methods
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            userInfo = await UserInfoHelper.GetUserInfoAsync(AuthStateTask);
+
+            if (userInfo is null)
+            {
+                Nav.NavigateTo("/tickets");
+            }
+
+            projects = await ProjectService.GetAllProjectsAsync(userInfo!.CompanyId);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            throw;
+        }
+    }
+
+    private async Task HandleSubmit(TicketDTO ticket)
+    {
+        try
+        {
+            ticket.SubmitterUserId = userInfo?.UserId;
+            ticket.Project = projects?.FirstOrDefault(p => p.Id == ticket.ProjectId);
+
+            await TicketService.AddTicketAsync(ticket, userInfo!.CompanyId);
+
+            Nav.NavigateTo("/tickets");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            throw;
+        }
+    }
+
+    #endregion
+
+}

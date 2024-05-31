@@ -1,18 +1,62 @@
-﻿
-
-
-@if (Ticket is not null)
+﻿@if (Ticket is not null)
 {
-    <tr>
-        <th scope="row">@Ticket.Priority</th>
-        <td>@Ticket.Status</td>
-        <td>@Ticket.Type</td>
-        <td>@Ticket.Project?.Name</td>
-        <td>@Ticket.Title</td>
-        <td>@Ticket.Created</td>
-        <td>@Ticket.Updated</td>
-        <td>@Ticket.TicketComments.Count()</td>
-    </tr>
+
+    @if (!Ticket.Archived)
+    {
+
+        <tr>
+
+            <th scope="row">@Ticket.Priority</th>
+            <td>@Ticket.Status</td>
+            <td>@Ticket.Type</td>
+            <td>@Ticket.Project?.Name</td>
+            <td>@Ticket.Title</td>
+            <td>@Ticket.Created</td>
+            <td>@Ticket.Updated</td>
+            <td>@Ticket.TicketComments.Count()</td>
+
+            <td>
+                <button class="btn btn-outline-danger btn-sm" @onclick="HandleArchive">
+                    <i class="ai ai-archive"></i>
+                    &nbsp;Archive
+                </button>
+            </td>
+
+            <td>
+                <a href="/ticket/edit/@Ticket.Id" class="btn btn-primary btn-sm">
+                    <i class="ai ai-edit"></i>
+                    &nbsp;Edit
+                </a>
+            </td>
+
+        </tr>
+
+    }
+    else
+    {
+
+        <tr>
+
+            <th scope="row">@Ticket.Priority</th>
+            <td>@Ticket.Status</td>
+            <td>@Ticket.Type</td>
+            <td>@Ticket.Project?.Name</td>
+            <td>@Ticket.Title</td>
+            <td>@Ticket.Created</td>
+            <td>@Ticket.Updated</td>
+            <td>@Ticket.TicketComments.Count()</td>
+
+            <td>
+                <button class="btn btn-outline-primary btn-sm" @onclick="HandleRestore">
+                    <i class="ai ai-check"></i>
+                    &nbsp;Restore
+                </button>
+            </td>
+
+        </tr>
+
+    }
+
 }
 
 
@@ -24,6 +68,15 @@
     [Parameter, EditorRequired]
     public TicketDTO? Ticket { get; set; }
 
+    [Parameter, EditorRequired]
+    public UserInfo? UserInfo { get; set; }
+
+    [Parameter, EditorRequired]
+    public EventCallback<int> OnArchive { get; set; }
+
+    [Parameter, EditorRequired]
+    public EventCallback<int> OnRestore { get; set; }
+
     #endregion
 
 
@@ -32,11 +85,19 @@
 
 
     #endregion
-    
-    
+
+
     #region methods
 
+    private async Task HandleArchive()
+    {
+        await OnArchive.InvokeAsync(Ticket!.Id);
+    }
 
+    private async Task HandleRestore()
+    {
+        await OnRestore.InvokeAsync(Ticket!.Id);
+    }
 
     #endregion
 

@@ -68,6 +68,7 @@ namespace OlympusBugTracker.Models
                 EndDate = project.EndDate,
                 Priority = project.Priority,
                 Archived = project.Archived,
+                
             };
 
             foreach (ApplicationUser user in project.Users)

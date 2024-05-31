@@ -1,0 +1,157 @@
+﻿@using static OlympusBugTracker.Client.Models.Enums
+
+
+@if (Ticket is not null)
+{
+    <EditForm Model="Ticket" OnValidSubmit="HandleSubmit" class="row g-4">
+
+        <div class="col-sm-6">
+
+            <label class="form-label fs-base" for="title">Title</label>
+
+            <InputText @bind-Value="Ticket.Title" class="form-control form-control-lg" type="text" placeholder="Ticket Title" id="title" />
+
+        </div>
+
+        <div class="col-sm-6">
+
+            <label class="form-label fs-base" for="type">Type</label>
+
+            <InputSelect @bind-Value="Ticket.Type" class="form-select form-select-lg" id="type">
+
+                @foreach (TicketType type in Enum.GetValues(typeof(TicketType)))
+                {
+                    <option value="@type">@type.GetDisplayName()</option>
+                }
+
+            </InputSelect>
+
+        </div>
+
+        <div class="col-sm-6">
+
+            <label class="form-label fs-base" for="priority">Priority</label>
+
+            <InputSelect @bind-Value="Ticket.Priority" class="form-control form-control-lg" id="priority">
+
+                @foreach (TicketPriority priority in Enum.GetValues(typeof(TicketPriority)))
+                {
+                    <option value="@priority">@priority.GetDisplayName()</option>
+                }
+
+            </InputSelect>
+
+        </div>
+
+        <div class="col-sm-6">
+
+            <label class="form-label fs-base" for="project">Project</label>
+
+            <InputSelect @bind-Value="Ticket.ProjectId" class="form-control form-control-lg" id="project">
+
+                @if (Projects is not null)
+                {
+
+                    @foreach (ProjectDTO project in Projects)
+                    {
+                        <option value="@project.Id">@project.Name</option>
+                    }
+
+                }
+
+            </InputSelect>
+
+        </div>
+
+        <div class="col-sm-12">
+
+            <label class="form-label fs-base">Description</label>
+
+            <TinyMCE.Blazor.Editor ScriptSrc="/tinymce/tinymce.min.js" @bind-Value="Ticket.Description" Field="() => Ticket.Description" ClassName="rich-text-editor" Conf="editorConfig" class="form-control form-control-lg" placeholder="Project Description" />
+
+        </div>
+
+        @if (Ticket.Id is 0)
+        {
+
+            <div class="col-sm-12 pt-2">
+
+                <button class="btn btn-lg btn-primary" type="submit">Create</button>
+
+            </div>
+
+        }
+        else
+        {
+
+            <div class="col-sm-12 pt-2">
+
+                <button class="btn btn-lg btn-primary" type="submit">Save</button>
+
+            </div>
+
+        }
+
+
+    </EditForm>
+
+
+}
+
+
+
+
+@code {
+
+    #region parameters
+
+    [Parameter, EditorRequired]
+    public TicketDTO? Ticket { get; set; }
+
+    [Parameter, EditorRequired]
+    public IEnumerable<ProjectDTO>? Projects { get; set; }
+
+    [Parameter, EditorRequired]
+    public EventCallback<TicketDTO> OnSubmit { get; set; }
+
+    #endregion
+
+
+    #region state
+
+    // tinyMCE config
+    private static readonly Dictionary<string, object> editorConfig = new()
+    {
+        { "toolbar", "undo redo | bold italic underline | link codesample " },
+        { "plugins", "anchor autolink link charmap preview table codesample" },
+        { "default_link_target", "_blank" },
+        { "link_assume_external_targets", true },
+        { "link_context_toolbar", true },
+        { "codesample_languages", new object[] {
+                new { text = "HTML/XML", value = "markup" },
+                new { text = "JavaScript", value = "javascript" },
+                new { text = "CSS", value = "css" },
+                new { text = "C#", value = "csharp" },
+                new { text = "Razor", value = "razor" },
+                new { text = "JSON", value = "json" },
+    }
+        },
+        { "codesample_global_prismjs", true },
+        { "promotion", false },
+        { "height", "600px" },
+    };
+
+
+    #endregion
+
+
+    #region methods
+
+    private async Task HandleSubmit()
+    {
+        await OnSubmit.InvokeAsync(Ticket);
+    }
+
+    #endregion
+
+}
