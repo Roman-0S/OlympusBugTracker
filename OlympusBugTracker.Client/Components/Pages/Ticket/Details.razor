@@ -1,4 +1,5 @@
 ﻿@page "/ticket/{id:int}"
+@using OlympusBugTracker.Client.Components.UI.Ticket_Attachments
 @using OlympusBugTracker.Client.Components.UI.Ticket_Comments
 @using OlympusBugTracker.Client.Helpers
 @rendermode InteractiveAuto
@@ -9,20 +10,43 @@
 
 @if (ticket is not null)
 {
-    <h1>@ticket.Title</h1>
 
-    <p>@((MarkupString)ticket.Description!)</p>
+    <div class="row">
 
-    <p>@ticket.Created - @ticket.Updated</p>
+        <div class="col-md-8">
 
-    <p>@ticket.Priority</p>
+            <h1>@ticket.Title</h1>
 
-    <p>@ticket.Status</p>
+            <p>@((MarkupString)ticket.Description!)</p>
 
-    <p>@ticket.Type</p>
+            <p>@ticket.Created - @ticket.Updated</p>
+
+            <p>@ticket.Priority</p>
+
+            <p>@ticket.Status</p>
+
+            <p>@ticket.Type</p>
 
 
-    <CommentArea Comments="ticket.TicketComments" TicketId="Id" />
+            <CommentArea Comments="ticket.TicketComments" TicketId="Id" />
+
+        </div>
+
+        <div class="col-md-4">
+
+            <h1>Attachments</h1>
+
+            <div>
+
+                <AttachmentForm Attachment="new TicketAttachmentDTO()" />
+
+            </div>
+
+
+        </div>
+
+    </div>
+
 
 
 }

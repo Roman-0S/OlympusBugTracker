@@ -1,0 +1,40 @@
+﻿
+
+
+<EditForm Model="Attachment" OnValidSubmit="HandleSubmit">
+
+    <label class="form-label">Make an attachment</label>
+
+    <InputFile class="form-control mt-2" accept=".png, .pjg, .jpeg, .svg" />
+
+</EditForm>
+
+
+
+
+@code {
+    #region parameters
+
+    [Parameter, EditorRequired]
+    public TicketAttachmentDTO? Attachment { get; set; }
+
+    #endregion
+
+
+    #region state
+
+
+
+    #endregion
+
+
+    #region methods
+
+    private async Task HandleSubmit()
+    {
+        
+    }
+
+    #endregion
+
+}

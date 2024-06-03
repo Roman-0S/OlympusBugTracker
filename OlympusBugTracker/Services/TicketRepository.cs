@@ -8,6 +8,7 @@ namespace OlympusBugTracker.Services
     public class TicketRepository(IDbContextFactory<ApplicationDbContext> contextFactory) : ITicketRepository
     {
         #region Tickets
+
         public async Task<IEnumerable<Ticket>> GetAllTicketsAsync(int companyId)
         {
             using ApplicationDbContext context = contextFactory.CreateDbContext();
@@ -105,6 +106,7 @@ namespace OlympusBugTracker.Services
                 await context.SaveChangesAsync();
             }
         }
+
         #endregion
 
         #region Ticket Comments

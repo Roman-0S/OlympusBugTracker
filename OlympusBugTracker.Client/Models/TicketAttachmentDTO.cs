@@ -21,7 +21,7 @@ namespace OlympusBugTracker.Client.Models
             set => _created = value.ToUniversalTime();
         }
 
-        public required string AttachmentURL { get; set; }
+        public string? AttachmentURL { get; set; }
 
         [Required]
         public string? UserId { get; set; }
