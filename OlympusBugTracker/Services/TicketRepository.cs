@@ -38,7 +38,10 @@ namespace OlympusBugTracker.Services
         {
             using ApplicationDbContext context = contextFactory.CreateDbContext();
 
-            Ticket? ticket = await context.Tickets.Include(t => t.Project).FirstOrDefaultAsync(t => t.Id == ticketId && t.Project!.CompanyId == companyId);
+            Ticket? ticket = await context.Tickets.Include(t => t.Project)
+                                                  .Include(t => t.TicketComments)
+                                                     .ThenInclude(tc => tc.User)
+                                                  .FirstOrDefaultAsync(t => t.Id == ticketId && t.Project!.CompanyId == companyId);
 
             return ticket;
         }
@@ -110,8 +113,58 @@ namespace OlympusBugTracker.Services
         {
             using ApplicationDbContext context = contextFactory.CreateDbContext();
 
+            comment.Created = DateTimeOffset.Now;
+
             context.TicketComments.Add(comment);
             await context.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<TicketComment>> GetTicketCommentsAsync(int ticketId, int companyId)
+        {
+            using ApplicationDbContext context = contextFactory.CreateDbContext();
+
+            IEnumerable<TicketComment> comments = await context.TicketComments.Include(tc => tc.User)
+                                                                              .Where(tc => tc.Ticket!.Project!.CompanyId == companyId && tc.TicketId == ticketId)
+                                                                              .OrderByDescending(tc => tc.Created)
+                                                                              .ToListAsync();
+
+            return comments;
+        }
+
+        public async Task<TicketComment?> GetCommentByIdAsync(int commentId, int companyId)
+        {
+            using ApplicationDbContext context = contextFactory.CreateDbContext();
+
+            TicketComment? comment = await context.TicketComments.Include(tc => tc.User).FirstOrDefaultAsync(tc => tc.Id == commentId && tc.Ticket!.Project!.CompanyId == companyId);
+
+            return comment;
+        }
+
+        public async Task DeleteCommentAsync(int commentId, int companyId)
+        {
+            using ApplicationDbContext context = contextFactory.CreateDbContext();
+
+            TicketComment? comment = await context.TicketComments.FirstOrDefaultAsync(tc => tc.Id == commentId && tc.Ticket!.Project!.CompanyId == companyId);
+
+            if (comment is not null)
+            {
+                context.TicketComments.Remove(comment);
+                await context.SaveChangesAsync();
+            }
+        }
+
+
+        public async Task UpdateCommentAsync(TicketComment comment, int companyId, string userId)
+        {
+            using ApplicationDbContext context = contextFactory.CreateDbContext();
+
+            bool shouldUpdate = await context.TicketComments.AnyAsync(tc => tc.Id == comment.Id && tc.UserId == userId && tc.Ticket!.Project!.CompanyId == companyId);
+
+            if (shouldUpdate)
+            {
+                context.TicketComments.Update(comment);
+                await context.SaveChangesAsync();
+            }
         }
 
         #endregion

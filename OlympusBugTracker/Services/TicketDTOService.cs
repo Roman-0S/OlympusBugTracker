@@ -91,12 +91,41 @@ namespace OlympusBugTracker.Services
                 UserId = commentDTO.UserId,
             };
 
-            if (comment.User?.CompanyId == companyId)
+
+            await repository.AddCommentAsync(comment, companyId);
+
+        }
+
+        public async Task<IEnumerable<TicketCommentDTO>> GetTicketCommentsAsync(int ticketId, int companyId)
+        {
+            IEnumerable<TicketComment> comments = await repository.GetTicketCommentsAsync(ticketId, companyId);
+
+            return comments.Select(c => c.ToDTO());
+        }
+
+        public async Task<TicketCommentDTO?> GetCommentByIdAsync(int commentId, int companyId)
+        {
+            TicketComment? comment = await repository.GetCommentByIdAsync(commentId, companyId);
+
+            return comment?.ToDTO();
+        }
+
+        public async Task DeleteCommentAsync(int commentId, int companyId)
+        {
+            await repository.DeleteCommentAsync(commentId, companyId);
+        }
+
+
+        public async Task UpdateCommentAsync(TicketCommentDTO commentDTO, int companyId, string userId)
+        {
+            TicketComment? comment = await repository.GetCommentByIdAsync(commentDTO.Id, companyId);
+
+            if (comment is not null)
             {
-                await repository.AddCommentAsync(comment, companyId);
+                comment.Content = commentDTO.Content;
+
+                await repository.UpdateCommentAsync(comment, companyId, userId);
             }
-
-
         }
 
         #endregion

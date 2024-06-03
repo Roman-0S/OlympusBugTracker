@@ -21,6 +21,7 @@ namespace OlympusBugTracker.Controllers
             _ticketService = ticketService;
         }
 
+        #region Tickets
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TicketDTO>>> GetAllTickets()
@@ -222,6 +223,163 @@ namespace OlympusBugTracker.Controllers
                 throw;
             }
         }
-        
+
+        #endregion
+
+        #region Ticket Comments
+
+        [HttpGet("{ticketId:int}/comments")]
+        public async Task<ActionResult<IEnumerable<TicketCommentDTO>>> GetTicketComments([FromRoute] int ticketId)
+        {
+            try
+            {
+                if (_companyId is not null)
+                {
+                    IEnumerable<TicketCommentDTO> comments = await _ticketService.GetTicketCommentsAsync(ticketId, _companyId.Value);
+
+                    return Ok(comments);
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
+        }
+
+
+        [HttpGet("comments/{commentId:int}")]
+        public async Task<ActionResult<TicketCommentDTO>> GetCommentById([FromRoute] int commentId)
+        {
+            try
+            {
+                if (_companyId is not null)
+                {
+                    TicketCommentDTO? comment = await _ticketService.GetCommentByIdAsync(commentId, _companyId.Value);
+
+                    if (comment is not null)
+                    {
+                        return Ok(comment);
+                    }
+                    else
+                    {
+                        return NotFound();
+                    }
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
+        }
+
+
+        [HttpPost("comments")]
+        public async Task<IActionResult> AddComment([FromBody] TicketCommentDTO commentDTO)
+        {
+            try
+            {
+                if (_companyId is not null)
+                {
+                    await _ticketService.AddCommentAsync(commentDTO, _companyId.Value);
+
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
+        }
+
+
+        [HttpPut("comment/{commentId:int}")]
+        public async Task<IActionResult> UpdateComment([FromRoute] int commentId, [FromBody] TicketCommentDTO commentDTO)
+        {
+            try
+            {
+                if (_companyId is not null)
+                {
+                    TicketCommentDTO? comment = await _ticketService.GetCommentByIdAsync(commentId, _companyId.Value);
+
+                    if (comment is not null)
+                    {
+                        await _ticketService.UpdateCommentAsync(commentDTO, _companyId.Value, _userId);
+
+                        return Ok();
+                    }
+                    else
+                    {
+                        return NotFound();
+                    }
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
+        }
+
+
+        [HttpDelete("{commentId:int}")]
+        public async Task<IActionResult> DeleteComment([FromRoute] int commentId)
+        {
+            try
+            {
+                if (_companyId is not null)
+                {
+                    TicketCommentDTO? comment = await _ticketService.GetCommentByIdAsync(commentId, _companyId.Value);
+
+                    if (comment is not null)
+                    {
+                        if (comment.UserId == _userId)
+                        {
+                            await _ticketService.DeleteCommentAsync(commentId, _companyId.Value);
+
+                            return Ok();
+                        }
+                        else
+                        {
+                            return BadRequest();
+                        }
+                    }
+                    else
+                    {
+                        return NotFound();
+                    }
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
+        }
+
+        #endregion
+
     }
 }

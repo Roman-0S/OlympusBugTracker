@@ -1,6 +1,7 @@
 ﻿@page "/ticket/{id:int}"
+@using OlympusBugTracker.Client.Components.UI.Ticket_Comments
 @using OlympusBugTracker.Client.Helpers
-@rendermode InteractiveServer
+@rendermode InteractiveAuto
 
 @inject ITicketDTOService ticketService
 
@@ -21,7 +22,7 @@
     <p>@ticket.Type</p>
 
 
-
+    <CommentArea Comments="ticket.TicketComments" TicketId="Id" />
 
 
 }

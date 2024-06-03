@@ -13,6 +13,8 @@ namespace OlympusBugTracker.Client.Services
             _httpClient = httpClient;
         }
 
+        #region Tickets
+
         public async Task<IEnumerable<TicketDTO>> GetAllTicketsAsync(int companyId)
         {
             IEnumerable<TicketDTO> tickets = await _httpClient.GetFromJsonAsync<IEnumerable<TicketDTO>>("api/tickets") ?? [];
@@ -61,5 +63,42 @@ namespace OlympusBugTracker.Client.Services
             response.EnsureSuccessStatusCode();
         }
 
+        #endregion
+
+        #region Ticket Comments
+
+        public async Task AddCommentAsync(TicketCommentDTO commentDTO, int companyId)
+        {
+            HttpResponseMessage response = await _httpClient.PostAsJsonAsync("api/tickets/comments", commentDTO);
+            response.EnsureSuccessStatusCode();
+        }
+
+        public async Task<IEnumerable<TicketCommentDTO>> GetTicketCommentsAsync(int ticketId, int companyId)
+        {
+            IEnumerable<TicketCommentDTO> comments = await _httpClient.GetFromJsonAsync<IEnumerable<TicketCommentDTO>>($"api/tickets/{ticketId}/comments") ?? [];
+
+            return comments;
+        }
+
+        public async Task<TicketCommentDTO?> GetCommentByIdAsync(int commentId, int companyId)
+        {
+            TicketCommentDTO? comment = await _httpClient.GetFromJsonAsync<TicketCommentDTO>($"api/tickets/comments/{commentId}");
+
+            return comment;
+        }
+
+        public async Task DeleteCommentAsync(int commentId, int companyId)
+        {
+            HttpResponseMessage response = await _httpClient.DeleteAsync($"api/tickets/{commentId}");
+            response.EnsureSuccessStatusCode();
+        }
+
+        public async Task UpdateCommentAsync(TicketCommentDTO commentDTO, int companyId, string userId)
+        {
+            HttpResponseMessage response = await _httpClient.PutAsJsonAsync<TicketCommentDTO>($"api/tickets/comment/{commentDTO.Id}", commentDTO);
+            response.EnsureSuccessStatusCode();
+        }
+
+        #endregion
     }
 }

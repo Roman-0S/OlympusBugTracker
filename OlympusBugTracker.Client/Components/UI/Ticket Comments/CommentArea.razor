@@ -101,12 +101,42 @@
             if (userInfo is not null)
             {
                 comment.UserId = userInfo.UserId;
-                TicketId = TicketId;
+                comment.TicketId = TicketId;
 
                 await ticketService.AddCommentAsync(comment, userInfo!.CompanyId);
 
-                
+                Comments = await ticketService.GetTicketCommentsAsync(TicketId, userInfo!.CompanyId);
             }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            throw;
+        }
+    }
+
+    private async Task HandleDelete(int commentId)
+    {
+        try
+        {
+            await ticketService.DeleteCommentAsync(commentId, userInfo!.CompanyId);
+
+            Comments = await ticketService.GetTicketCommentsAsync(TicketId, userInfo!.CompanyId);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            throw;
+        }
+    }
+
+    private async Task HandleEdit(TicketCommentDTO comment)
+    {
+        try
+        {
+            await ticketService.UpdateCommentAsync(comment, userInfo!.CompanyId, userInfo.UserId);
+
+            Comments = await ticketService.GetTicketCommentsAsync(TicketId, userInfo!.CompanyId);
         }
         catch (Exception ex)
         {

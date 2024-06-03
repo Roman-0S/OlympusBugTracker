@@ -26,6 +26,14 @@ namespace OlympusBugTracker.Services.Interfaces
 
         Task AddCommentAsync(TicketComment comment, int companyId);
 
+        Task<IEnumerable<TicketComment>> GetTicketCommentsAsync(int ticketId, int companyId);
+
+        Task<TicketComment?> GetCommentByIdAsync(int commentId, int companyId);
+
+        Task DeleteCommentAsync(int commentId, int companyId);
+
+        Task UpdateCommentAsync(TicketComment comment, int companyId, string userId);
+
         #endregion
 
     }

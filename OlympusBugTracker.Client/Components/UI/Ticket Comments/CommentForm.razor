@@ -1,19 +1,15 @@
-﻿
+﻿@inject NavigationManager Nav
 
 @if (Comment is not null)
 {
 
     <div>
 
-        <EditForm Context="FormContext" Model="Comment" OnValidSubmit="HandleSubmit">
-
-            <DataAnnotationsValidator />
+        <EditForm Model="Comment" OnValidSubmit="HandleSubmit">
 
             <div class="flex-fill vstack">
 
                 <TinyMCE.Blazor.Editor ScriptSrc="/tinymce/tinymce.min.js" @bind-Value="Comment.Content" Field="() => Comment.Content" ClassName="rich-text-editor" Conf="editorConfig" />
-
-                <ValidationMessage For="() => Comment.Content" />
 
                 <div class="text-end mt-3">
                     <button class="btn btn-sm btn-primary"><i class="ai ai-circle-check"></i></button>
