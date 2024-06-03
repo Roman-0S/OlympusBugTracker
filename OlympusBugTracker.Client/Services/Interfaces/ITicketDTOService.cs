@@ -4,6 +4,8 @@ namespace OlympusBugTracker.Client.Services.Interfaces
 {
     public interface ITicketDTOService
     {
+        #region Tickets
+
         Task<IEnumerable<TicketDTO>> GetAllTicketsAsync(int companyId);
 
         Task<IEnumerable<TicketDTO>> GetArchivedTicketsAsync(int companyId);
@@ -18,6 +20,13 @@ namespace OlympusBugTracker.Client.Services.Interfaces
 
         Task RestoreTicketAsync(int ticketId, int companyId);
 
+        #endregion
+
+        #region Ticket Comments
+
+        Task AddCommentAsync(TicketCommentDTO commentDTO, int companyId);
+
+        #endregion
 
     }
 }

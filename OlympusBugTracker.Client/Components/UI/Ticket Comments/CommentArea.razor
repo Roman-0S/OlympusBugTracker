@@ -1,0 +1,120 @@
+﻿@using OlympusBugTracker.Client.Helpers
+
+@inject ITicketDTOService ticketService
+
+
+
+@if (Comments is not null)
+{
+
+    @if ((Comments.Count() is 0))
+    {
+        <div class="pt-4 pt-xl-5 mt-4">
+
+            <h2>Leave a comment</h2>
+
+            <CommentForm OnSubmit="HandleSubmit" Comment="new TicketCommentDTO()" />
+
+            <div>
+
+                <h2 class="h1 py-lg-1 py-xl-3">No comments yet</h2>
+
+                <div class="d-flex justify-content-center align-items-center mt-5">
+
+                    <h4 class="text-secondary-emphasis bolder">Leave a comment!</h4>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    }
+    else
+    {
+
+        <!-- Comments -->
+        <div class="pt-4 pt-xl-5 mt-4">
+
+            <h2>Leave a comment</h2>
+
+            <CommentForm OnSubmit="HandleSubmit" Comment="new TicketCommentDTO()" />
+
+            <h2 class="h1 py-lg-1 py-xl-3">@Comments.Count() comments</h2>
+
+            @foreach (TicketCommentDTO comment in Comments)
+            {
+                <CommentCard Comment="comment" UserInfo="userInfo" OnDelete="HandleDelete" OnEdit="HandleEdit" />
+            }
+
+        </div>
+
+    }
+
+}
+
+
+
+
+@code {
+
+    #region parameters
+
+    [CascadingParameter]
+    public Task<AuthenticationState>? AuthStateTask { get; set; }
+
+    [Parameter, EditorRequired]
+    public int TicketId { get; set; }
+
+    [Parameter, EditorRequired]
+    public IEnumerable<TicketCommentDTO>? Comments { get; set; }
+
+    #endregion
+
+
+    #region state
+
+    private UserInfo? userInfo;
+
+    #endregion
+
+
+    #region methods
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            userInfo = await UserInfoHelper.GetUserInfoAsync(AuthStateTask);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            throw;
+        }
+    }
+
+    private async Task HandleSubmit(TicketCommentDTO comment)
+    {
+        try
+        {
+            if (userInfo is not null)
+            {
+                comment.UserId = userInfo.UserId;
+                TicketId = TicketId;
+
+                await ticketService.AddCommentAsync(comment, userInfo!.CompanyId);
+
+                
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            throw;
+        }
+    }
+
+    #endregion
+
+}

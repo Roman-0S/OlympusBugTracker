@@ -1,5 +1,7 @@
-﻿using OlympusBugTracker.Client.Models;
+﻿using OlympusBugTracker.Client.Helpers;
+using OlympusBugTracker.Client.Models;
 using OlympusBugTracker.Client.Services.Interfaces;
+using OlympusBugTracker.Data;
 using OlympusBugTracker.Models;
 using OlympusBugTracker.Services.Interfaces;
 
@@ -7,6 +9,8 @@ namespace OlympusBugTracker.Services
 {
     public class TicketDTOService(ITicketRepository repository) : ITicketDTOService
     {
+        #region Tickets
+
         public async Task<TicketDTO> AddTicketAsync(TicketDTO ticketDTO, int companyId)
         {
             Ticket ticket = new()
@@ -74,6 +78,28 @@ namespace OlympusBugTracker.Services
             await repository.RestoreTicketAsync(ticketId, companyId);
         }
 
+        #endregion
+
+        #region Ticket Comments
+
+        public async Task AddCommentAsync(TicketCommentDTO commentDTO, int companyId)
+        {
+            TicketComment comment = new()
+            {
+                Content = commentDTO.Content,
+                TicketId = commentDTO.TicketId,
+                UserId = commentDTO.UserId,
+            };
+
+            if (comment.User?.CompanyId == companyId)
+            {
+                await repository.AddCommentAsync(comment, companyId);
+            }
+
+
+        }
+
+        #endregion
 
     }
 }
