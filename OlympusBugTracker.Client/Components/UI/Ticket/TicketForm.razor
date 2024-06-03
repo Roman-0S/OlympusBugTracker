@@ -45,21 +45,42 @@
 
         <div class="col-sm-6">
 
-            <label class="form-label fs-base" for="project">Project</label>
+            @if (Ticket.Id is 0)
+            {
 
-            <InputSelect @bind-Value="Ticket.ProjectId" class="form-control form-control-lg" id="project">
+                <label class="form-label fs-base" for="project">Project</label>
 
-                @if (Projects is not null)
-                {
+                <InputSelect @bind-Value="Ticket.ProjectId" class="form-control form-control-lg" id="project">
 
-                    @foreach (ProjectDTO project in Projects)
+                    @if (Projects is not null)
                     {
-                        <option value="@project.Id">@project.Name</option>
+
+                        @foreach (ProjectDTO project in Projects)
+                        {
+                            <option value="@project.Id">@project.Name</option>
+                        }
+
                     }
 
-                }
+                </InputSelect>
 
-            </InputSelect>
+            }
+            else
+            {
+
+                <label class="form-label fs-base" for="status">Status</label>
+
+                <InputSelect @bind-Value="Ticket.Status" class="form-control form-control-lg" id="status">
+
+                    @foreach (TicketStatus status in Enum.GetValues(typeof(TicketStatus)))
+                    {
+                        <option value="@status">@status.GetDisplayName()</option>
+                    }
+
+                </InputSelect>
+
+            }
+
 
         </div>
 

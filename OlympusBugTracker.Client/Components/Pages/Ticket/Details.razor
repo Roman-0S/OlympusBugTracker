@@ -1,0 +1,68 @@
+﻿@page "/ticket/{id:int}"
+@using OlympusBugTracker.Client.Helpers
+@rendermode InteractiveAuto
+
+@inject ITicketDTOService ticketService
+
+
+
+@if (ticket is not null)
+{
+    <h1>@ticket.Title</h1>
+
+    <p>@((MarkupString)ticket.Description!)</p>
+
+    <p>@ticket.Created - @ticket.Updated</p>
+
+    <p>@ticket.Priority</p>
+
+    <p>@ticket.Status</p>
+
+    <p>@ticket.Type</p>
+}
+
+
+
+
+@code {
+
+    #region parameters
+
+    [CascadingParameter]
+    public Task<AuthenticationState>? AuthStateTask { get; set; }
+
+    [Parameter]
+    public int Id { get; set; }
+
+    #endregion
+
+
+    #region state
+
+    private UserInfo? userInfo;
+
+    private TicketDTO? ticket;
+
+    #endregion
+
+
+    #region methods
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            userInfo = await UserInfoHelper.GetUserInfoAsync(AuthStateTask);
+
+            ticket = await ticketService.GetTicketByIdAsync(Id, userInfo!.CompanyId);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            throw;
+        }
+    }
+
+    #endregion
+
+}

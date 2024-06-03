@@ -1,21 +1,20 @@
-﻿@page "/ticket/create"
+﻿@page "/ticket/edit/{id:int}"
 @rendermode InteractiveAuto
 
 @using OlympusBugTracker.Client.Components.UI.Ticket
 @using OlympusBugTracker.Client.Helpers
 
 @inject ITicketDTOService TicketService
-@inject IProjectDTOService ProjectService
 @inject NavigationManager Nav
 
 
-<PageTitle>Bug Tracker | Create a Ticket</PageTitle>
+<PageTitle>Bug Tracker | Edit a Ticket</PageTitle>
 
 
 
 <div>
 
-    <TicketForm Ticket="new TicketDTO()" OnSubmit="HandleSubmit" Projects="projects" />
+    <TicketForm Ticket="ticket" OnSubmit="HandleSubmit" Projects="projects" />
 
 </div>
 
@@ -31,12 +30,17 @@
     [CascadingParameter]
     Task<AuthenticationState>? AuthStateTask { get; set; }
 
+    [Parameter]
+    public int Id { get; set; }
+
     #endregion
 
 
     #region state
 
     private UserInfo? userInfo;
+
+    private TicketDTO? ticket;
 
     private IEnumerable<ProjectDTO>? projects;
 
@@ -56,7 +60,7 @@
                 Nav.NavigateTo("/tickets");
             }
 
-            projects = await ProjectService.GetAllProjectsAsync(userInfo!.CompanyId);
+            ticket = await TicketService.GetTicketByIdAsync(Id, userInfo!.CompanyId);
         }
         catch (Exception ex)
         {
@@ -69,10 +73,7 @@
     {
         try
         {
-            ticket.SubmitterUserId = userInfo?.UserId;
-            ticket.Project = projects?.FirstOrDefault(p => p.Id == ticket.ProjectId);
-
-            await TicketService.AddTicketAsync(ticket, userInfo!.CompanyId);
+            await TicketService.UpdateTicketAsync(ticket, userInfo!.CompanyId, userInfo.UserId);
 
             Nav.NavigateTo("/tickets");
         }

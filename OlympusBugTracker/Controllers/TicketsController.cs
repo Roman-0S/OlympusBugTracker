@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OlympusBugTracker.Client.Models;
 using OlympusBugTracker.Client.Services.Interfaces;
@@ -9,35 +8,35 @@ namespace OlympusBugTracker.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
-    public class ProjectsController : ControllerBase
+    public class TicketsController : ControllerBase
     {
         private string _userId => User.GetUserId()!;
+
         private int? _companyId => User.FindFirst("CompanyId") != null ? int.Parse(User.FindFirst("CompanyId")!.Value) : null;
 
-        private readonly IProjectDTOService _projectService;
+        private readonly ITicketDTOService _ticketService;
 
-        public ProjectsController(IProjectDTOService projectService)
+        public TicketsController(ITicketDTOService ticketService)
         {
-            _projectService = projectService;
+            _ticketService = ticketService;
         }
+
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProjectDTO>>> GetAllProjects()
+        public async Task<ActionResult<IEnumerable<TicketDTO>>> GetAllTickets()
         {
             try
             {
                 if (_companyId is not null)
                 {
-                    IEnumerable<ProjectDTO> projects = await _projectService.GetAllProjectsAsync(_companyId.Value);
+                    IEnumerable<TicketDTO> tickets = await _ticketService.GetAllTicketsAsync(_companyId.Value);
 
-                    return Ok(projects);
+                    return Ok(tickets);
                 }
                 else
                 {
                     return BadRequest();
                 }
-
             }
             catch (Exception ex)
             {
@@ -45,17 +44,18 @@ namespace OlympusBugTracker.Controllers
                 throw;
             }
         }
+
 
         [HttpGet("archived")]
-        public async Task<ActionResult<IEnumerable<ProjectDTO>>> GetArchivedProjects()
+        public async Task<ActionResult<IEnumerable<TicketDTO>>> GetArchivedTickets()
         {
             try
             {
                 if (_companyId is not null)
                 {
-                    IEnumerable<ProjectDTO> projects = await _projectService.GetArchivedProjectsAsync(_companyId.Value);
+                    IEnumerable<TicketDTO> tickets = await _ticketService.GetArchivedTicketsAsync(_companyId.Value);
 
-                    return Ok(projects);
+                    return Ok(tickets);
                 }
                 else
                 {
@@ -69,18 +69,19 @@ namespace OlympusBugTracker.Controllers
             }
         }
 
-        [HttpGet("project/{projectId:int}")]
-        public async Task<ActionResult<ProjectDTO>> GetProjectById([FromRoute] int projectId)
+
+        [HttpGet("ticket/{ticketId:int}")]
+        public async Task<ActionResult<TicketDTO>> GetTicketById([FromRoute] int ticketId)
         {
             try
             {
                 if (_companyId is not null)
                 {
-                    ProjectDTO? project = await _projectService.GetProjectByIdAsync(projectId, _companyId.Value);
+                    TicketDTO? ticket = await _ticketService.GetTicketByIdAsync(ticketId, _companyId.Value);
 
-                    if (project is not null)
+                    if (ticket is not null)
                     {
-                        return Ok(project);
+                        return Ok(ticket);
                     }
                     else
                     {
@@ -98,17 +99,18 @@ namespace OlympusBugTracker.Controllers
                 throw;
             }
         }
+
 
         [HttpPost]
-        public async Task<ActionResult<ProjectDTO>> AddProject([FromBody] ProjectDTO projectDTO)
+        public async Task<ActionResult<TicketDTO>> AddTicket([FromBody] TicketDTO ticket)
         {
             try
             {
                 if (_companyId is not null)
                 {
-                    ProjectDTO projectAdded = await _projectService.AddProjectAsync(projectDTO, _companyId.Value);
+                    TicketDTO ticketAdded = await _ticketService.AddTicketAsync(ticket, _companyId.Value);
 
-                    return Ok(projectAdded);
+                    return Ok(ticketAdded);
                 }
                 else
                 {
@@ -122,18 +124,19 @@ namespace OlympusBugTracker.Controllers
             }
         }
 
-        [HttpPut("{projectId:int}")]
-        public async Task<IActionResult> UpdateProject([FromRoute] int projectId, [FromBody] ProjectDTO projectDTO)
+
+        [HttpPut("{ticketId:int}")]
+        public async Task<IActionResult> UpdateTicket([FromRoute] int ticketId, [FromBody] TicketDTO ticket)
         {
             try
             {
                 if (_companyId is not null)
                 {
-                    ProjectDTO? projectToUpdate = await _projectService.GetProjectByIdAsync(projectId, _companyId.Value);
+                    TicketDTO? ticketToUpdate = await _ticketService.GetTicketByIdAsync(ticketId, _companyId.Value);
 
-                    if (projectToUpdate is not null)
+                    if (ticketToUpdate is not null)
                     {
-                        await _projectService.UpdateProjectAsync(projectDTO, _companyId.Value);
+                        await _ticketService.UpdateTicketAsync(ticket, _companyId.Value, _userId);
 
                         return Ok();
                     }
@@ -154,18 +157,19 @@ namespace OlympusBugTracker.Controllers
             }
         }
 
-        [HttpPut("archive/{projectId:int}")]
-        public async Task<IActionResult> ArchiveProject([FromRoute] int projectId)
+
+        [HttpPut("archive/{ticketId:int}")]
+        public async Task<IActionResult> ArchiveTicket([FromRoute] int ticketId)
         {
             try
             {
                 if (_companyId is not null)
                 {
-                    ProjectDTO? projectToArchive = await _projectService.GetProjectByIdAsync(projectId, _companyId.Value);
+                    TicketDTO? ticketToArchive = await _ticketService.GetTicketByIdAsync(ticketId, _companyId.Value);
 
-                    if (projectToArchive is not null)
+                    if (ticketToArchive is not null)
                     {
-                        await _projectService.ArchiveProjectAsync(projectId, _companyId.Value);
+                        await _ticketService.ArchiveTicketAsync(ticketId, _companyId.Value);
 
                         return Ok();
                     }
@@ -186,18 +190,19 @@ namespace OlympusBugTracker.Controllers
             }
         }
 
-        [HttpPut("restore/{projectId:int}")]
-        public async Task<IActionResult> RestoreProject([FromRoute] int projectId)
+
+        [HttpPut("restore/{ticketId:int}")]
+        public async Task<IActionResult> RestoreTicket([FromRoute] int ticketId)
         {
             try
             {
                 if (_companyId is not null)
                 {
-                    ProjectDTO? projectToRecover = await _projectService.GetProjectByIdAsync(projectId, _companyId.Value);
+                    TicketDTO? ticketToRestore = await _ticketService.GetTicketByIdAsync(ticketId, _companyId.Value);
 
-                    if (projectToRecover is not null)
+                    if (ticketToRestore is not null)
                     {
-                        await _projectService.RestoreProjectAsync(projectId, _companyId.Value);
+                        await _ticketService.RestoreTicketAsync(ticketId, _companyId.Value);
 
                         return Ok();
                     }
@@ -217,6 +222,6 @@ namespace OlympusBugTracker.Controllers
                 throw;
             }
         }
-
+        
     }
 }
