@@ -1,11 +1,17 @@
-﻿
+﻿@inject ITicketDTOService TicketService
 
 
-<EditForm Model="Attachment" OnValidSubmit="HandleSubmit">
+<EditForm Model="attachment" OnValidSubmit="HandleSubmit" class="vstack gap-1">
 
     <label class="form-label">Make an attachment</label>
 
-    <InputFile class="form-control mt-2" accept=".png, .pjg, .jpeg, .svg" />
+    <InputFile OnChange="a => newFile = a.File" />
+
+    <label class="form-label mt-3">Attachment Description</label>
+
+    <InputText @bind-Value="attachment!.Description" class="form-control" placeholder="Description" />
+
+    <button class="btn btn-sm btn-primary">Upload</button>
 
 </EditForm>
 
@@ -16,23 +22,71 @@
     #region parameters
 
     [Parameter, EditorRequired]
-    public TicketAttachmentDTO? Attachment { get; set; }
+    public int TicketId { get; set; }
+
+    [Parameter, EditorRequired]
+    public UserInfo? UserInfo { get; set; }
+
+    [Parameter]
+    public EventCallback OnUpload { get; set; }
 
     #endregion
 
 
     #region state
 
+    private IBrowserFile? newFile;
 
+    private TicketAttachmentDTO attachment = new();
 
     #endregion
 
 
     #region methods
 
+    protected override void OnInitialized()
+    {
+        attachment!.UserId = UserInfo!.UserId;
+        attachment!.TicketId = TicketId;
+    }
+
     private async Task HandleSubmit()
     {
-        
+
+        if (newFile is not null)
+        {
+            Stream stream = newFile.OpenReadStream();
+
+            MemoryStream ms = new();
+
+            await stream.CopyToAsync(ms);
+
+            byte[] fileData = ms.ToArray();
+            string fileType = newFile.ContentType;
+
+            attachment!.FileName = newFile.Name;
+
+            try
+            {
+                await TicketService.AddTicketAttachment(attachment, fileData, fileType, UserInfo!.CompanyId);
+            }
+            catch (Exception ex)
+            {
+                //error message
+                Console.WriteLine(ex);
+                throw;
+            }
+
+            newFile = null;
+            attachment = new()
+            {
+                UserId = UserInfo!.UserId,
+                TicketId = TicketId,
+            };
+
+            await OnUpload.InvokeAsync();
+        }
+
     }
 
     #endregion

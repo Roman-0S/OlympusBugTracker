@@ -36,5 +36,13 @@ namespace OlympusBugTracker.Services.Interfaces
 
         #endregion
 
+        #region Ticket Attachments
+
+        Task<TicketAttachment> AddTicketAttachment(TicketAttachment attachment, int companyId);
+
+        Task DeleteTicketAttachment(int attachmentId, int companyId);
+
+        #endregion
+
     }
 }

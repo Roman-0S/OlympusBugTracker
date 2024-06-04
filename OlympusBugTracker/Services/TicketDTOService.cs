@@ -9,6 +9,7 @@ namespace OlympusBugTracker.Services
 {
     public class TicketDTOService(ITicketRepository repository) : ITicketDTOService
     {
+
         #region Tickets
 
         public async Task<TicketDTO> AddTicketAsync(TicketDTO ticketDTO, int companyId)
@@ -115,7 +116,6 @@ namespace OlympusBugTracker.Services
             await repository.DeleteCommentAsync(commentId, companyId);
         }
 
-
         public async Task UpdateCommentAsync(TicketCommentDTO commentDTO, int companyId, string userId)
         {
             TicketComment? comment = await repository.GetCommentByIdAsync(commentDTO.Id, companyId);
@@ -126,6 +126,38 @@ namespace OlympusBugTracker.Services
 
                 await repository.UpdateCommentAsync(comment, companyId, userId);
             }
+        }
+
+        #endregion
+
+        #region Ticket Attachments
+
+        public async Task<TicketAttachmentDTO> AddTicketAttachment(TicketAttachmentDTO attachmentDTO, byte[] uploadData, string contentType, int companyId)
+        {
+            FileUpload file = new()
+            {
+                Type = contentType,
+                Data = uploadData,
+            };
+
+            TicketAttachment attachment = new()
+            {
+                TicketId = attachmentDTO.TicketId,
+                Description = attachmentDTO.Description,
+                FileName = attachmentDTO.FileName,
+                Upload = file,
+                Created = DateTimeOffset.Now,
+                UserId = attachmentDTO.UserId,
+            };
+
+            attachment = await repository.AddTicketAttachment(attachment, companyId);
+
+            return attachment.ToDTO();
+        }
+
+        public async Task DeleteTicketAttachment(int attachmentId, int companyId)
+        {
+            await repository.DeleteTicketAttachment(attachmentId, companyId);
         }
 
         #endregion

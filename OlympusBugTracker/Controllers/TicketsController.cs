@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OlympusBugTracker.Client.Models;
 using OlympusBugTracker.Client.Services.Interfaces;
+using OlympusBugTracker.Data;
+using OlympusBugTracker.Helpers;
 using OlympusBugTracker.Helpers.Extensions;
+using OlympusBugTracker.Models;
 
 namespace OlympusBugTracker.Controllers
 {
@@ -10,15 +13,18 @@ namespace OlympusBugTracker.Controllers
     [ApiController]
     public class TicketsController : ControllerBase
     {
-        private string _userId => User.GetUserId()!;
+        private readonly UserManager<ApplicationUser> _userManager;
+
+        private string _userId => _userManager.GetUserId(User)!; 
 
         private int? _companyId => User.FindFirst("CompanyId") != null ? int.Parse(User.FindFirst("CompanyId")!.Value) : null;
 
         private readonly ITicketDTOService _ticketService;
 
-        public TicketsController(ITicketDTOService ticketService)
+        public TicketsController(ITicketDTOService ticketService, UserManager<ApplicationUser> userManager)
         {
             _ticketService = ticketService;
+            _userManager = userManager;
         }
 
         #region Tickets
@@ -377,6 +383,62 @@ namespace OlympusBugTracker.Controllers
                 Console.WriteLine(ex);
                 throw;
             }
+        }
+
+        #endregion
+
+        #region Ticket Attachments
+
+        [HttpPost("{Id:int}/attachments")]
+        public async Task<ActionResult<TicketAttachmentDTO>> AddTicketAttachment(int Id, [FromForm] TicketAttachmentDTO attachment, [FromForm] IFormFile? file)
+        {
+            try
+            {
+
+                if (attachment.TicketId != Id || file is null)
+                {
+                    return BadRequest();
+                }
+
+                ApplicationUser? user = await _userManager.GetUserAsync(User);
+
+                TicketDTO? ticket = await _ticketService.GetTicketByIdAsync(Id, user!.CompanyId);
+
+                if (ticket is null)
+                {
+                    return NotFound();
+                }
+
+                attachment.UserId = user!.Id;
+                attachment.Created = DateTimeOffset.Now;
+
+                if (string.IsNullOrWhiteSpace(attachment.FileName))
+                {
+                    attachment.FileName = file.FileName;
+                }
+
+                FileUpload upload = await UploadHelper.GetImageUploadAsync(file);
+
+                TicketAttachmentDTO newAttachment = await _ticketService.AddTicketAttachment(attachment, upload.Data!, upload.Type!, user!.CompanyId);
+
+                return Ok(newAttachment);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
+        }
+
+        [HttpDelete("attachments/{attachmentId}")]
+        public async Task<IActionResult> DeleteTicketAttachment([FromRoute] int attachmentId)
+        {
+            ApplicationUser? user = await _userManager.GetUserAsync(User);
+
+            await _ticketService.DeleteTicketAttachment(attachmentId, user!.CompanyId);
+
+            return NoContent();
         }
 
         #endregion

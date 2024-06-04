@@ -1,10 +1,11 @@
 ﻿@page "/ticket/{id:int}"
+@rendermode InteractiveServer
+
 @using OlympusBugTracker.Client.Components.UI.Ticket_Attachments
 @using OlympusBugTracker.Client.Components.UI.Ticket_Comments
 @using OlympusBugTracker.Client.Helpers
-@rendermode InteractiveAuto
 
-@inject ITicketDTOService ticketService
+@inject ITicketDTOService TicketService
 
 
 
@@ -36,12 +37,22 @@
 
             <h1>Attachments</h1>
 
-            <div>
+            <div class="mb-5">
 
-                <AttachmentForm Attachment="new TicketAttachmentDTO()" />
+                <AttachmentForm TicketId="Id" UserInfo="userInfo" OnUpload="HandleUpload" />
 
             </div>
 
+            <hr />
+
+            <div class="row mt-5">
+
+                @foreach (TicketAttachmentDTO attachment in ticket.Attachments)
+                {
+                    <AttachmentCard Attachment="attachment" OnDelete="HandleDelete" />
+                }
+
+            </div>
 
         </div>
 
@@ -84,7 +95,35 @@
         {
             userInfo = await UserInfoHelper.GetUserInfoAsync(AuthStateTask);
 
-            ticket = await ticketService.GetTicketByIdAsync(Id, userInfo!.CompanyId);
+            ticket = await TicketService.GetTicketByIdAsync(Id, userInfo!.CompanyId);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            throw;
+        }
+    }
+
+    private async Task HandleUpload()
+    {
+        try
+        {
+            ticket = await TicketService.GetTicketByIdAsync(Id, userInfo!.CompanyId);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            throw;
+        }
+    }
+
+    private async Task HandleDelete(TicketAttachmentDTO attachment)
+    {
+        try
+        {
+            await TicketService.DeleteTicketAttachment(attachment.Id, userInfo!.CompanyId);
+
+            ticket = await TicketService.GetTicketByIdAsync(Id, userInfo!.CompanyId);
         }
         catch (Exception ex)
         {

@@ -1,6 +1,7 @@
 ﻿using OlympusBugTracker.Client.Models;
 using OlympusBugTracker.Client.Services.Interfaces;
 using System.Net.Http.Json;
+using System.Net.Mail;
 
 namespace OlympusBugTracker.Client.Services
 {
@@ -96,6 +97,48 @@ namespace OlympusBugTracker.Client.Services
         public async Task UpdateCommentAsync(TicketCommentDTO commentDTO, int companyId, string userId)
         {
             HttpResponseMessage response = await _httpClient.PutAsJsonAsync<TicketCommentDTO>($"api/tickets/comment/{commentDTO.Id}", commentDTO);
+            response.EnsureSuccessStatusCode();
+        }
+
+        #endregion
+
+        #region Ticket Attachments
+
+        public async Task<TicketAttachmentDTO> AddTicketAttachment(TicketAttachmentDTO attachmentDTO, byte[] uploadData, string contentType, int companyId)
+        {
+            using MultipartFormDataContent formData = new();
+            formData.Headers.ContentDisposition = new("form-data");
+
+            ByteArrayContent fileContent = new ByteArrayContent(uploadData);
+            fileContent.Headers.ContentType = new(contentType);
+
+            if (string.IsNullOrWhiteSpace(attachmentDTO.FileName))
+            {
+                formData.Add(fileContent, "file");
+            }
+            else
+            {
+                formData.Add(fileContent, "file", attachmentDTO.FileName);
+            }
+
+            formData.Add(new StringContent(attachmentDTO.Id.ToString()), nameof(attachmentDTO.Id));
+            formData.Add(new StringContent(attachmentDTO.FileName ?? string.Empty), nameof(attachmentDTO.FileName));
+            formData.Add(new StringContent(attachmentDTO.Description ?? string.Empty), nameof(attachmentDTO.Description));
+            formData.Add(new StringContent(DateTimeOffset.Now.ToString()), nameof(attachmentDTO.Created));
+            formData.Add(new StringContent(attachmentDTO.UserId ?? string.Empty), nameof(attachmentDTO.UserId));
+            formData.Add(new StringContent(attachmentDTO.TicketId.ToString()), nameof(attachmentDTO.TicketId));
+
+            HttpResponseMessage response = await _httpClient.PostAsync($"api/tickets/{attachmentDTO.TicketId}/attachments", formData);
+            response.EnsureSuccessStatusCode();
+
+            TicketAttachmentDTO? addedAttachment = await response.Content.ReadFromJsonAsync<TicketAttachmentDTO>();
+
+            return addedAttachment!;
+        }
+
+        public async Task DeleteTicketAttachment(int attachmentId, int companyId)
+        {
+            HttpResponseMessage response = await _httpClient.DeleteAsync($"api/tickets/attachments/{attachmentId}");
             response.EnsureSuccessStatusCode();
         }
 

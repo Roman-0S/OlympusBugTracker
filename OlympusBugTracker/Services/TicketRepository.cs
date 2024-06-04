@@ -7,6 +7,7 @@ namespace OlympusBugTracker.Services
 {
     public class TicketRepository(IDbContextFactory<ApplicationDbContext> contextFactory) : ITicketRepository
     {
+
         #region Tickets
 
         public async Task<IEnumerable<Ticket>> GetAllTicketsAsync(int companyId)
@@ -40,6 +41,8 @@ namespace OlympusBugTracker.Services
             using ApplicationDbContext context = contextFactory.CreateDbContext();
 
             Ticket? ticket = await context.Tickets.Include(t => t.Project)
+                                                  .Include(t => t.TicketAttachments)
+                                                     .ThenInclude(ta => ta.User)
                                                   .Include(t => t.TicketComments)
                                                      .ThenInclude(tc => tc.User)
                                                   .FirstOrDefaultAsync(t => t.Id == ticketId && t.Project!.CompanyId == companyId);
@@ -170,5 +173,46 @@ namespace OlympusBugTracker.Services
         }
 
         #endregion
+
+        #region Ticket Attachments
+
+        public async Task<TicketAttachment> AddTicketAttachment(TicketAttachment attachment, int companyId)
+        {
+            using ApplicationDbContext context = contextFactory.CreateDbContext();
+
+            Ticket? ticket = await context.Tickets.FirstOrDefaultAsync(t => t.Id == attachment.TicketId && t.Project!.CompanyId == companyId);
+
+            if (ticket is not null)
+            {
+                attachment.Created = DateTimeOffset.Now;
+
+                context.TicketAttachments.Add(attachment);
+                await context.SaveChangesAsync();
+
+                return attachment;
+            }
+            else
+            {
+                throw new ArgumentException("Ticket not found");
+            }
+        }
+
+        public async Task DeleteTicketAttachment(int attachmentId, int companyId)
+        {
+            using ApplicationDbContext context = contextFactory.CreateDbContext();
+
+            TicketAttachment? attachment = await context.TicketAttachments.Include(a => a.Upload)
+                                                                         .FirstOrDefaultAsync(a => a.Id == attachmentId && a.Ticket!.Project!.CompanyId == companyId);
+
+            if (attachment is not null)
+            {
+                context.Remove(attachment);
+                context.Remove(attachment.Upload!);
+                await context.SaveChangesAsync();
+            }
+        }
+
+        #endregion
+
     }
 }
