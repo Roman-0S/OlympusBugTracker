@@ -1,0 +1,163 @@
+﻿@page "/company/edit/{companyId:int}"
+@rendermode InteractiveServer
+@attribute [Authorize(Roles = "Admin")]
+
+@using Microsoft.AspNetCore.Authorization
+@using OlympusBugTracker.Client.Helpers
+
+@inject ICompanyDTOService CompanyService
+@inject NavigationManager Nav
+
+
+
+
+@if (company is not null)
+{
+
+    <EditForm Model="company" OnValidSubmit="HandleSubmit" >
+
+        <DataAnnotationsValidator />
+
+        <div class="mb-2">
+
+            <img class="img-fluid" src="@(string.IsNullOrEmpty(company.ImageURL) ? ImageHelper.DefaultCompanyImage : company.ImageURL)" />
+
+            <InputFile OnChange="OnFileChange" class="form-control mt-3" accept=".png, .jpg, .jpeg, .svg" />
+
+            <span class="text-danger">@imageError</span>
+
+        </div>
+
+        <div class="mb-2">
+
+            <label class="form-label" for="companyName">Company Name</label>
+
+            <InputText class="form-control" @bind-Value="company.Name" id="companyName" />
+
+            <ValidationMessage For="() => company.Name" />
+
+        </div>
+
+        <div class="flex-fill vstack">
+
+            <label class="form-label" for="companyDescription">Company Description</label>
+
+            <TinyMCE.Blazor.Editor ScriptSrc="/tinymce/tinymce.min.js" @bind-Value="company.Description" Field="() => company.Description" ClassName="rich-text-editor" Conf="editorConfig" />
+
+        </div>
+
+        <div class="hstack gap-2 mt-4">
+
+            <button class="btn btn-sm btn-primary">Save</button>
+
+            <a href="/company" class="btn btn-sm btn-outline-secondary">Cancel</a>
+
+        </div>
+
+    </EditForm>
+
+}
+
+
+
+
+
+@code {
+
+    #region parameters
+
+    [Parameter, EditorRequired]
+    public int CompanyId { get; set; }
+
+    [CascadingParameter]
+    public Task<AuthenticationState>? AuthStateTask { get; set; }
+
+    #endregion
+
+
+    #region state
+
+    private CompanyDTO? company;
+
+    private string? imageError;
+
+    // tinyMCE config
+    private static readonly Dictionary<string, object> editorConfig = new()
+    {
+        { "toolbar", "undo redo | bold italic underline | link codesample " },
+        { "plugins", "anchor autolink link charmap preview table codesample" },
+        { "default_link_target", "_blank" },
+        { "link_assume_external_targets", true },
+        { "link_context_toolbar", true },
+        { "codesample_languages", new object[] {
+                new { text = "HTML/XML", value = "markup" },
+                new { text = "JavaScript", value = "javascript" },
+                new { text = "CSS", value = "css" },
+                new { text = "C#", value = "csharp" },
+                new { text = "Razor", value = "razor" },
+                new { text = "JSON", value = "json" },
+    }
+        },
+        { "codesample_global_prismjs", true },
+        { "promotion", false },
+        { "height", "400px" },
+    };
+
+    private UserInfo? userInfo;
+
+    #endregion
+
+
+    #region methods
+
+    protected override async Task OnInitializedAsync()
+    {
+        userInfo = await UserInfoHelper.GetUserInfoAsync(AuthStateTask);
+
+        company = await CompanyService.GetCompanyByIdAsync(CompanyId);
+    }
+
+    private async Task OnFileChange(InputFileChangeEventArgs changeEvent)
+    {
+        if (changeEvent.File is null)
+        {
+            company!.ImageURL = ImageHelper.DefaultCompanyImage;
+        }
+        else if (changeEvent.File.Size > ImageHelper.MaxFileSize)
+        {
+            imageError = "Images must be less than 5 MB";
+        }
+        else
+        {
+            try
+            {
+                company!.ImageURL = await ImageHelper.GetDataUrl(changeEvent.File);
+
+                imageError = null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                imageError = "Could not read the selected file. Please select a different image";
+            }
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        try
+        {
+            await CompanyService.UpdateCompanyAsync(company!, userInfo!.UserId);
+
+            Nav.NavigateTo("/company");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            throw;
+        }
+    }
+
+    #endregion
+
+}

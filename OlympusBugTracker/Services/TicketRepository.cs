@@ -158,7 +158,6 @@ namespace OlympusBugTracker.Services
             }
         }
 
-
         public async Task UpdateCommentAsync(TicketComment comment, int companyId, string userId)
         {
             using ApplicationDbContext context = contextFactory.CreateDbContext();

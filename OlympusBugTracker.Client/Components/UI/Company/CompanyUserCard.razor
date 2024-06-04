@@ -1,0 +1,77 @@
+﻿@using static OlympusBugTracker.Client.Models.Enums
+
+
+
+
+@if (User is not null)
+{
+
+    <EditForm Model="User" OnValidSubmit="HandleSubmit">
+
+        <h5>@User.FullName - @User.Role</h5>
+
+        <div class="hstack gap-3">
+
+            <div>
+
+                <label class="form-label">Change Role?</label>
+
+                <InputSelect @bind-Value="User.Role" class="form-control">
+
+                    @foreach(Roles role in Enum.GetValues(typeof(Roles)))
+                    {
+                        <option value="@role">@role.GetDisplayName()</option>
+                    }
+
+                </InputSelect>
+
+            </div>
+
+            <div>
+
+                <button class="btn btn-sm btn-primary">Save</button>
+
+            </div>
+
+        </div>
+
+
+    </EditForm>
+
+}
+
+
+
+
+
+
+@code {
+
+    #region parameters
+
+    [Parameter, EditorRequired]
+    public UserDTO? User { get; set; }
+
+    [Parameter, EditorRequired]
+    public EventCallback<UserDTO> OnSubmit { get; set; }
+
+    #endregion
+
+
+    #region state
+
+
+
+    #endregion
+
+
+    #region methods
+
+    private async Task HandleSubmit()
+    {
+        await OnSubmit.InvokeAsync(User);
+    }
+
+    #endregion
+
+}

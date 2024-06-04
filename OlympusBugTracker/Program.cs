@@ -50,9 +50,11 @@ builder.Services.AddSingleton<IEmailSender, SendGridService>();
 
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<ITicketRepository, TicketRepository>();
+builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
 
 builder.Services.AddScoped<IProjectDTOService, ProjectDTOService>();
 builder.Services.AddScoped<ITicketDTOService, TicketDTOService>();
+builder.Services.AddScoped<ICompanyDTOService, CompanyDTOService>();
 
 
 var app = builder.Build();
