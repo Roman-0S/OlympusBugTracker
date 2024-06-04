@@ -18,6 +18,8 @@ namespace OlympusBugTracker.Client.Models
 
         public string ImageURL { get; set; } = ImageHelper.DefaultProfilePicture;
 
+        public string? Role { get; set; }
+
         [Required]
         public string? Email { get; set; }
 

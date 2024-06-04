@@ -1,0 +1,71 @@
+﻿@page "/company"
+@using OlympusBugTracker.Client.Helpers
+@rendermode InteractiveServer
+
+@inject ICompanyDTOService CompanyService
+
+
+
+@if (company is not null)
+{
+    <div>
+
+        <img src="@company.ImageURL" />
+
+        <div class="vstack gap-3 mt-4">
+
+            <h1>@company.Name</h1>
+
+            <p>@company.Description</p>
+
+            <ul>
+
+                @foreach (UserDTO user in company.Users)
+                {
+                    <li>@user.FullName</li>
+                }
+
+            </ul>
+
+        </div>
+
+    </div>
+}
+
+
+
+
+
+@code {
+
+    #region parameters
+
+    [CascadingParameter]
+    public Task<AuthenticationState>? AuthStateTask { get; set; }
+
+    #endregion
+
+
+    #region state
+
+    private UserInfo? userInfo;
+
+    private CompanyDTO? company;
+
+    #endregion
+
+
+    #region methods
+
+    protected override async Task OnInitializedAsync()
+    {
+        userInfo = await UserInfoHelper.GetUserInfoAsync(AuthStateTask);
+
+        
+
+        company!.Users = [.. await CompanyService.GetCompanyMembersAsync(CompanyId)];
+    }
+
+    #endregion
+
+}

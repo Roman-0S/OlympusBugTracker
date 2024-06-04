@@ -1,17 +1,19 @@
-﻿
-
-@if (Attachment is not null)
+﻿@if (Attachment is not null)
 {
 
     <div class="col-6 mb-4">
 
         <div class="vstack">
 
-            @{
-                string? extension = Path.GetExtension(Attachment.FileName)?.Trim('.') ?? "default";
-            }
+            <a href="@Attachment.AttachmentURL">
 
-            <img src="@($"png/{extension}.png")" class="fileTypeLogo mb-4" />
+                @{
+                    string? extension = Path.GetExtension(Attachment.FileName)?.Trim('.') ?? "default";
+                }
+
+                <img src="@($"png/{extension}.png")" class="fileTypeLogo mb-4" />
+
+            </a>
 
             <p class="text-muted m-0">Uploaded by @Attachment.User?.FullName</p>
 

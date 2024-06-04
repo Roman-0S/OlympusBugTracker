@@ -7,10 +7,10 @@
         <tr>
 
             <th scope="row">@Ticket.Priority</th>
-            <td>@Ticket.Status</td>
+            <td> <a href="ticket/@Ticket.Id" class="text-decoration-none">@Ticket.Title</a> </td>
             <td>@Ticket.Type</td>
             <td>@Ticket.Project?.Name</td>
-            <td> <a href="ticket/@Ticket.Id" class="text-decoration-none">@Ticket.Title</a> </td>
+            <td>@Ticket.Status</td>
             <td>@Ticket.Created</td>
             <td>@Ticket.Updated</td>
             <td>@Ticket.TicketComments.Count()</td>
@@ -38,10 +38,10 @@
         <tr>
 
             <th scope="row">@Ticket.Priority</th>
-            <td>@Ticket.Status</td>
+            <td>@Ticket.Title</td>
             <td>@Ticket.Type</td>
             <td>@Ticket.Project?.Name</td>
-            <td>@Ticket.Title</td>
+            <td>@Ticket.Status</td>
             <td>@Ticket.Created</td>
             <td>@Ticket.Updated</td>
             <td>@Ticket.TicketComments.Count()</td>
