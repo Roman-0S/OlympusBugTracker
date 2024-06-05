@@ -34,6 +34,13 @@ namespace OlympusBugTracker.Services
             return members;
         }
 
+        public async Task<string> GetUserRoleAsync(string userId, int companyId)
+        {
+            string? role = await repository.GetUserRoleAsync(userId, companyId);
+
+            return role;
+        }
+
         public async Task<IEnumerable<UserDTO>> GetUsersInRoleAsync(string roleName, int companyId)
         {
             IEnumerable<ApplicationUser> users = await repository.GetUsersInRoleAsync(roleName, companyId);

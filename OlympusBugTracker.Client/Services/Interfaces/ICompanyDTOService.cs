@@ -6,6 +6,8 @@ namespace OlympusBugTracker.Client.Services.Interfaces
     {
         Task<IEnumerable<UserDTO>> GetCompanyMembersAsync(int companyId);
 
+        Task<string> GetUserRoleAsync(string userId, int companyId);
+
         Task<IEnumerable<UserDTO>> GetUsersInRoleAsync(string roleName, int companyId);
 
         Task<CompanyDTO?> GetCompanyByIdAsync(int companyId);
