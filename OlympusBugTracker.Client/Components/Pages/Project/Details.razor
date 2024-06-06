@@ -78,18 +78,15 @@
                         <tr>
                             <th scope="col">Priority</th>
                             <th scope="col">Title</th>
-                            <th scope="col">Type</th>
                             <th scope="col">Project</th>
                             <th scope="col">Status</th>
                             <th scope="col">Created</th>
-                            <th scope="col">Updated</th>
-                            <th scope="col">Comments</th>
                             <th scope="col" colspan="2" class="text-center">Modify</th>
                         </tr>
                     </thead>
                     <tbody class="table-striped table-hover">
 
-                        @foreach (TicketDTO ticket in project.Tickets)
+                        @foreach (TicketDTO ticket in project.Tickets.Where(t => !t.Archived).OrderByDescending(t => t.Created))
                         {
                             <TicketRow Ticket="ticket" UserInfo="userInfo" OnArchive="HandleArchive" OnRestore="HandleRestore" />
                         }
@@ -109,18 +106,15 @@
                         <tr>
                             <th scope="col">Priority</th>
                             <th scope="col">Title</th>
-                            <th scope="col">Type</th>
                             <th scope="col">Project</th>
                             <th scope="col">Status</th>
                             <th scope="col">Created</th>
-                            <th scope="col">Updated</th>
-                            <th scope="col">Comments</th>
                             <th scope="col" colspan="2" class="text-center">Modify</th>
                         </tr>
                     </thead>
                     <tbody class="table-striped table-hover">
 
-                        @foreach (TicketDTO ticket in tickets)
+                        @foreach (TicketDTO ticket in project.Tickets.Where(t => t.Archived).OrderByDescending(t => t.Created))
                         {
                             <TicketRow Ticket="ticket" UserInfo="userInfo" OnArchive="HandleArchive" OnRestore="HandleRestore" />
                         }
@@ -152,24 +146,28 @@
 
                     <p>@projectManager?.FullName</p>
 
-                    <InputSelect @bind-Value="selectedProjectManager">
+                    <form @onsubmit="HandleAssign">
 
-                        <option value="">Select a Project Manager</option>
+                        <InputSelect @bind-Value="selectedProjectManager">
 
-                        @foreach (UserDTO projectManager in projectManagers)
-                        {
-                            <option value="@projectManager.Id">@projectManager.FullName</option>
-                        }
+                            <option value="">Select a Project Manager</option>
 
-                    </InputSelect>
+                            @foreach (UserDTO projectManager in projectManagers)
+                            {
+                                <option value="@projectManager.Id">@projectManager.FullName</option>
+                            }
 
-                    <div class="hstack gap-2 ms-2">
+                        </InputSelect>
 
-                        <button class="btn btn-sm btn-primary ms-2" @onclick="HandleAssign">Save</button>
+                        <div class="hstack gap-2 ms-2">
 
-                        <button class="btn btn-sm btn-ouline-danger" @onclick="RemoveManager">Remove</button>
+                            <button class="btn btn-sm btn-primary ms-2">Save</button>
 
-                    </div>
+                        </div>
+
+                    </form>
+
+
 
                 </div>
 
@@ -253,7 +251,7 @@
 
                         <button class="btn btn-sm btn-danger" data-bs-dismiss="modal" @onclick="HandleRemoveMember">Remove Member</button>
 
-                        <button class="btn btn-sm btn-secondary" data-bs-dismiss="modal" aria-label="Close" >Close</button>
+                        <button class="btn btn-sm btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
 
                     </div>
 
@@ -350,7 +348,7 @@
     {
         showArchived = true;
 
-        tickets = await TicketService.GetArchivedTicketsAsync(userInfo!.CompanyId);
+        project = await ProjectService.GetProjectByIdAsync(Id, userInfo!.CompanyId);
     }
 
     public async Task HandleArchive(int ticketId)
@@ -391,13 +389,6 @@
 
             projectMembers = await ProjectService.GetProjectMembersAsync(Id, userInfo!.CompanyId);
         }
-    }
-
-    private async Task RemoveManager()
-    {
-        await ProjectService.RemoveProjectManagerAsync(Id, userInfo!.UserId);
-
-        projectMembers = await ProjectService.GetProjectMembersAsync(Id, userInfo!.CompanyId);
     }
 
     private async Task HandleAddMember()

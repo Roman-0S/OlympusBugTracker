@@ -41,6 +41,8 @@ namespace OlympusBugTracker.Services
             using ApplicationDbContext context = contextFactory.CreateDbContext();
 
             Ticket? ticket = await context.Tickets.Include(t => t.Project)
+                                                  .Include(t => t.DeveloperUser)
+                                                  .Include(t => t.SubmitterUser)
                                                   .Include(t => t.TicketAttachments)
                                                      .ThenInclude(ta => ta.User)
                                                   .Include(t => t.TicketComments)

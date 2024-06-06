@@ -64,6 +64,10 @@ namespace OlympusBugTracker.Services
                 ticket.Priority = ticketDTO.Priority;
                 ticket.Type = ticketDTO.Type;
                 ticket.Status = ticketDTO.Status;
+                ticket.SubmitterUserId = ticketDTO.SubmitterUserId;
+                ticket.DeveloperUserId = ticketDTO.DeveloperUserId;
+
+                ticket.DeveloperUser = null;
 
                 await repository.UpdateTicketAsync(ticket, companyId, userId);
             }

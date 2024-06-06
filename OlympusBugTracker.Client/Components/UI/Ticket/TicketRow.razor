@@ -8,13 +8,9 @@
 
             <th scope="row">@Ticket.Priority</th>
             <td> <a href="ticket/@Ticket.Id" class="text-decoration-none">@Ticket.Title</a> </td>
-            <td>@Ticket.Type</td>
             <td>@Ticket.Project?.Name</td>
             <td>@Ticket.Status</td>
             <td>@Ticket.Created</td>
-            <td>@Ticket.Updated</td>
-            <td>@Ticket.TicketComments.Count()</td>
-
             <td>
                 <button class="btn btn-outline-danger btn-sm" @onclick="HandleArchive">
                     <i class="ai ai-archive"></i>
@@ -39,13 +35,9 @@
 
             <th scope="row">@Ticket.Priority</th>
             <td>@Ticket.Title</td>
-            <td>@Ticket.Type</td>
             <td>@Ticket.Project?.Name</td>
             <td>@Ticket.Status</td>
             <td>@Ticket.Created</td>
-            <td>@Ticket.Updated</td>
-            <td>@Ticket.TicketComments.Count()</td>
-
             <td>
                 <button class="btn btn-outline-primary btn-sm" @onclick="HandleRestore">
                     <i class="ai ai-check"></i>

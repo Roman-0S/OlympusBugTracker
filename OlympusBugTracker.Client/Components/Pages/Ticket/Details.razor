@@ -4,8 +4,10 @@
 @using OlympusBugTracker.Client.Components.UI.Ticket_Attachments
 @using OlympusBugTracker.Client.Components.UI.Ticket_Comments
 @using OlympusBugTracker.Client.Helpers
+@using static OlympusBugTracker.Client.Models.Enums
 
 @inject ITicketDTOService TicketService
+@inject IProjectDTOService ProjectService
 
 
 
@@ -54,6 +56,45 @@
 
             </div>
 
+            <div class="mt-4">
+
+                @if (projectManager?.Id == userInfo?.UserId || userInfo!.Roles.Contains("Admin"))
+                {
+
+                    <AuthorizeView Roles="Admin, ProjectManager">
+
+                        <h5>Assign a Developer</h5>
+
+                        <p>@ticket.DeveloperUser?.FullName</p>
+
+                        <form @onsubmit="HandleAssign">
+
+                            <InputSelect @bind-Value="ticket.DeveloperUserId">
+
+                                <option value="">Select a Developer</option>
+
+                                @foreach (UserDTO developer in developers)
+                                {
+                                    if (developer.Role == nameof(Roles.Developer))
+                                    {
+                                        <option value="@developer.Id">@developer.FullName</option>
+                                    }
+                                }
+
+                            </InputSelect>
+
+                            <button class="btn btn-sm btn-primary">Assign Developer</button>
+
+                        </form>
+
+
+                    </AuthorizeView>
+
+                }
+
+
+            </div>
+
         </div>
 
     </div>
@@ -84,6 +125,10 @@
 
     private TicketDTO? ticket;
 
+    private IEnumerable<UserDTO> developers = [];
+
+    private UserDTO? projectManager;
+
     #endregion
 
 
@@ -96,6 +141,10 @@
             userInfo = await UserInfoHelper.GetUserInfoAsync(AuthStateTask);
 
             ticket = await TicketService.GetTicketByIdAsync(Id, userInfo!.CompanyId);
+
+            projectManager = await ProjectService.GetProjectManagerAsync(ticket!.ProjectId, userInfo!.CompanyId);
+
+            developers = await ProjectService.GetProjectMembersAsync(ticket!.ProjectId, userInfo!.CompanyId);
         }
         catch (Exception ex)
         {
@@ -129,6 +178,16 @@
         {
             Console.WriteLine(ex);
             throw;
+        }
+    }
+
+    private async Task HandleAssign()
+    {
+        if (ticket!.DeveloperUserId is not null)
+        {
+            await TicketService.UpdateTicketAsync(ticket, userInfo!.CompanyId, userInfo!.UserId);
+
+            ticket = await TicketService.GetTicketByIdAsync(Id, userInfo!.CompanyId);
         }
     }
 
