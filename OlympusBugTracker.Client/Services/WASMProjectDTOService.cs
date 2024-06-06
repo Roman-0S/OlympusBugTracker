@@ -13,6 +13,8 @@ namespace OlympusBugTracker.Client.Services
             _httpClient = httpClient;
         }
 
+        #region Project
+
         public async Task<ProjectDTO> AddProjectAsync(ProjectDTO projectDTO, int companyId)
         {
             HttpResponseMessage response = await _httpClient.PostAsJsonAsync<ProjectDTO>($"api/projects", projectDTO);
@@ -62,6 +64,43 @@ namespace OlympusBugTracker.Client.Services
 
             response.EnsureSuccessStatusCode();
         }
+
+
+        #endregion
+
+        #region Project Managers
+
+        public Task<IEnumerable<UserDTO>> GetProjectMembersAsync(int projectId, int companyId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<UserDTO?> GetProjectManagerAsync(int projectId, int companyId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task AddMemberToProjectAsync(int projectId, string memberId, string managerId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task RemoveMemberFromProjectAsync(int projectId, string memberId, string managerId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task AssignProjectManagerAsync(int projectId, string memberId, string adminId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task RemoveProjectManagerAsync(int projectId, string adminId)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
 
     }
 }

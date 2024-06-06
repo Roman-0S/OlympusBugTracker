@@ -1,10 +1,12 @@
 ﻿@page "/project/{id:int}"
 @rendermode InteractiveServer
 
+@using OlympusBugTracker.Client.Components.UI.Ticket
 @using OlympusBugTracker.Client.Helpers
 @using static OlympusBugTracker.Client.Models.Enums
 
 @inject IProjectDTOService ProjectService
+@inject ITicketDTOService TicketService
 @inject ICompanyDTOService CompanyService
 @inject NavigationManager Nav
 
@@ -25,11 +27,160 @@
 
             <p>@project.Priority</p>
 
+            <hr />
+
+            <h1 class="mt-3">Tickets</h1>
+
+            <div class="hstack gap-2 mb-3">
+
+                @if (!showArchived)
+                {
+
+                    <div>
+
+                        <button class="btn btn-outline-primary btn-sm" disabled>
+                            Tickets
+                        </button>
+
+                        <button class="btn btn-outline-primary btn-sm" @onclick="ShowArchived">
+                            Archived Tickets
+                        </button>
+
+                    </div>
+
+                }
+                else
+                {
+
+                    <div>
+
+                        <button class="btn btn-outline-primary btn-sm" @onclick="ShowTickets">
+                            Tickets
+                        </button>
+
+                        <button class="btn btn-outline-primary btn-sm" disabled>
+                            Archived Tickets
+                        </button>
+
+                    </div>
+
+                }
+
+            </div>
+
+            @if (!showArchived)
+            {
+
+                <h5>All Tickets</h5>
+
+                <table class="table table-responsive border border-dark">
+                    <thead>
+                        <tr>
+                            <th scope="col">Priority</th>
+                            <th scope="col">Title</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Project</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Created</th>
+                            <th scope="col">Updated</th>
+                            <th scope="col">Comments</th>
+                            <th scope="col" colspan="2" class="text-center">Modify</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-striped table-hover">
+
+                        @foreach (TicketDTO ticket in tickets)
+                        {
+                            <TicketRow Ticket="ticket" UserInfo="userInfo" OnArchive="HandleArchive" OnRestore="HandleRestore" />
+                        }
+
+                    </tbody>
+
+                </table>
+
+            }
+            else
+            {
+
+                <h5>Archived Tickets</h5>
+
+                <table class="table table-responsive border border-dark">
+                    <thead>
+                        <tr>
+                            <th scope="col">Priority</th>
+                            <th scope="col">Title</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Project</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Created</th>
+                            <th scope="col">Updated</th>
+                            <th scope="col">Comments</th>
+                            <th scope="col" colspan="2" class="text-center">Modify</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-striped table-hover">
+
+                        @foreach (TicketDTO ticket in tickets)
+                        {
+                            <TicketRow Ticket="ticket" UserInfo="userInfo" OnArchive="HandleArchive" OnRestore="HandleRestore" />
+                        }
+
+                    </tbody>
+
+                </table>
+
+            }
+
         </div>
 
         <div class="col-md-4">
 
+            <div class="vstack">
 
+                @foreach (UserDTO member in project.Users)
+                {
+                    <p>@member.FullName - @member.Role</p>
+                }
+
+            </div>
+
+            <AuthorizeView Roles="Admin">
+
+                <h5>Assign a Project Manager</h5>
+
+                <InputSelect @bind-Value="selectedProjectManager">
+
+                    <option value="">Select a Project Manager</option>
+
+                    @foreach (UserDTO projectManager in projectManagers)
+                    {
+                        <option value="@projectManager.Id">@projectManager.FullName</option>
+                    }
+
+                </InputSelect>
+
+                <button class="btn btn-sm btn-primary ms-2" @onclick="HandleAssign">Save</button>
+
+            </AuthorizeView>
+
+            <AuthorizeView Roles="Admin, ProjectManager">
+
+                <h5>Add a Member</h5>
+
+                <InputSelect @bind-Value="selectedMember">
+
+                    <option value="">Select a Member</option>
+
+                    @foreach (UserDTO member in company?.Users!)
+                    {
+                        <option value="@member.Id">@member.FullName</option>
+                    }
+
+                </InputSelect>
+
+                <button class="btn btn-sm btn-primary ms-2" @onclick="HandleAdd">Save</button>
+
+            </AuthorizeView>
 
         </div>
 
@@ -61,6 +212,18 @@
 
     IEnumerable<UserDTO> projectManagers = [];
 
+    private string? selectedProjectManager;
+
+    private IEnumerable<UserDTO> projectMembers = [];
+
+    private CompanyDTO? company;
+
+    private string? selectedMember;
+
+    IEnumerable<TicketDTO> tickets = [];
+
+    private bool showArchived;
+
     #endregion
 
 
@@ -74,7 +237,13 @@
 
             project = await ProjectService.GetProjectByIdAsync(Id, userInfo!.CompanyId);
 
+            projectMembers = await ProjectService.GetProjectMembersAsync(Id, userInfo!.CompanyId);
+
+            tickets = await TicketService.GetAllTicketsAsync(userInfo!.CompanyId);
+
             projectManagers = await CompanyService.GetUsersInRoleAsync(nameof(Roles.ProjectManager), userInfo!.CompanyId);
+
+            company = await CompanyService.GetCompanyByIdAsync(userInfo!.CompanyId);
         }
         catch (Exception ex)
         {
@@ -85,6 +254,70 @@
         if (project is null)
         {
             Nav.NavigateTo("/projects");
+        }
+    }
+
+    private async Task ShowTickets()
+    {
+        showArchived = false;
+
+        tickets = await TicketService.GetAllTicketsAsync(userInfo!.CompanyId);
+    }
+
+    private async Task ShowArchived()
+    {
+        showArchived = true;
+
+        tickets = await TicketService.GetArchivedTicketsAsync(userInfo!.CompanyId);
+    }
+
+    public async Task HandleArchive(int ticketId)
+    {
+        try
+        {
+            await TicketService.ArchiveTicketAsync(ticketId, userInfo!.CompanyId);
+
+            await ShowTickets();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            throw;
+        }
+    }
+
+    private async Task HandleRestore(int ticketId)
+    {
+        try
+        {
+            await TicketService.RestoreTicketAsync(ticketId, userInfo!.CompanyId);
+
+            await ShowArchived();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            throw;
+        }
+    }
+
+    private async Task HandleAssign()
+    {
+        if (selectedProjectManager is not null)
+        {
+            await ProjectService.AssignProjectManagerAsync(Id, selectedProjectManager, userInfo!.UserId);
+
+            projectMembers = await ProjectService.GetProjectMembersAsync(Id, userInfo!.CompanyId);
+        }
+    }
+
+    private async Task HandleAdd()
+    {
+        if (selectedMember is not null)
+        {
+            await ProjectService.AddMemberToProjectAsync(Id, selectedMember, userInfo!.UserId);
+
+            projectMembers = await ProjectService.GetProjectMembersAsync(Id, userInfo!.CompanyId);
         }
     }
 

@@ -48,7 +48,7 @@ namespace OlympusBugTracker.Services
         {
             using ApplicationDbContext context = contextFactory.CreateDbContext();
 
-            Project? project = await context.Projects.Where(p => p.CompanyId == companyId).FirstOrDefaultAsync(p => p.Id == projectId);
+            Project? project = await context.Projects.Include(p => p.Tickets).Where(p => p.CompanyId == companyId).FirstOrDefaultAsync(p => p.Id == projectId);
 
             return project;
         }
