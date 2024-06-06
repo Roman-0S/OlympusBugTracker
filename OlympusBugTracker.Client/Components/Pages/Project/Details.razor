@@ -1,5 +1,5 @@
 ﻿@page "/project/{id:int}"
-@rendermode InteractiveServer
+@rendermode InteractiveAuto
 
 @using OlympusBugTracker.Client.Components.UI.Ticket
 @using OlympusBugTracker.Client.Helpers
@@ -17,7 +17,7 @@
 
     <div class="row">
 
-        <div class="col-md-8">
+        <div class="col-md-8 table-responsive">
 
             <h1>@project.Name</h1>
 
@@ -73,7 +73,7 @@
 
                 <h5>All Tickets</h5>
 
-                <table class="table table-responsive border border-dark">
+                <table class="table border border-dark">
                     <thead>
                         <tr>
                             <th scope="col">Priority</th>
@@ -89,7 +89,7 @@
                     </thead>
                     <tbody class="table-striped table-hover">
 
-                        @foreach (TicketDTO ticket in tickets)
+                        @foreach (TicketDTO ticket in project.Tickets)
                         {
                             <TicketRow Ticket="ticket" UserInfo="userInfo" OnArchive="HandleArchive" OnRestore="HandleRestore" />
                         }
@@ -104,7 +104,7 @@
 
                 <h5>Archived Tickets</h5>
 
-                <table class="table table-responsive border border-dark">
+                <table class="table border border-dark">
                     <thead>
                         <tr>
                             <th scope="col">Priority</th>
@@ -137,50 +137,130 @@
 
             <div class="vstack">
 
-                @foreach (UserDTO member in project.Users)
+                @foreach (UserDTO member in projectMembers)
                 {
                     <p>@member.FullName - @member.Role</p>
                 }
 
             </div>
 
+
             <AuthorizeView Roles="Admin">
+                <div class="mb-4">
 
-                <h5>Assign a Project Manager</h5>
+                    <h5>Assign a Project Manager</h5>
 
-                <InputSelect @bind-Value="selectedProjectManager">
+                    <p>@projectManager?.FullName</p>
 
-                    <option value="">Select a Project Manager</option>
+                    <InputSelect @bind-Value="selectedProjectManager">
 
-                    @foreach (UserDTO projectManager in projectManagers)
-                    {
-                        <option value="@projectManager.Id">@projectManager.FullName</option>
-                    }
+                        <option value="">Select a Project Manager</option>
 
-                </InputSelect>
+                        @foreach (UserDTO projectManager in projectManagers)
+                        {
+                            <option value="@projectManager.Id">@projectManager.FullName</option>
+                        }
 
-                <button class="btn btn-sm btn-primary ms-2" @onclick="HandleAssign">Save</button>
+                    </InputSelect>
+
+                    <div class="hstack gap-2 ms-2">
+
+                        <button class="btn btn-sm btn-primary ms-2" @onclick="HandleAssign">Save</button>
+
+                        <button class="btn btn-sm btn-ouline-danger" @onclick="RemoveManager">Remove</button>
+
+                    </div>
+
+                </div>
+
+
 
             </AuthorizeView>
 
             <AuthorizeView Roles="Admin, ProjectManager">
 
-                <h5>Add a Member</h5>
+                <div>
 
-                <InputSelect @bind-Value="selectedMember">
+                    <h5>Add a Member</h5>
 
-                    <option value="">Select a Member</option>
+                    <InputSelect @bind-Value="selectedMember">
 
-                    @foreach (UserDTO member in company?.Users!)
-                    {
-                        <option value="@member.Id">@member.FullName</option>
-                    }
+                        <option value="">Select a Member</option>
 
-                </InputSelect>
+                        @foreach (UserDTO member in companyMembers)
+                        {
+                            bool shouldNotDisplay = projectMembers.Any(pm => pm.Id == member.Id);
 
-                <button class="btn btn-sm btn-primary ms-2" @onclick="HandleAdd">Save</button>
+                            if (!shouldNotDisplay)
+                            {
+                                if (member.Role == nameof(Roles.Developer) || member.Role == nameof(Roles.Submitter))
+                                {
+                                    <option value="@member.Id">@member.FullName - @member.Role</option>
+                                }
+                            }
+
+                        }
+
+                    </InputSelect>
+
+                    <button class="btn btn-sm btn-primary ms-2" @onclick="HandleAddMember">Save</button>
+
+                    <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modalId">Remove a Member</button>
+
+                </div>
+
 
             </AuthorizeView>
+
+        </div>
+
+    </div>
+
+    <div class="modal fade" id="modalId" tabindex="-1" role="dialog">
+
+        <div class="modal-dialog modal-dialog-centered" role="document">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title">Remove a Member</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <p>Select a member to remove.</p>
+
+                    <InputSelect @bind-Value="selectedMember">
+
+                        <option value="">Select a Member</option>
+
+                        @foreach (UserDTO member in companyMembers)
+                        {
+                            bool shouldDisplay = projectMembers.Any(pm => pm.Id == member.Id);
+
+                            if (shouldDisplay)
+                            {
+                                if (member.Role == nameof(Roles.Developer) || member.Role == nameof(Roles.Submitter))
+                                {
+                                    <option value="@member.Id">@member.FullName - @member.Role</option>
+                                }
+                            }
+                        }
+
+                    </InputSelect>
+
+                    <div class="hstack gap-2 mt-4">
+
+                        <button class="btn btn-sm btn-danger" data-bs-dismiss="modal" @onclick="HandleRemoveMember">Remove Member</button>
+
+                        <button class="btn btn-sm btn-secondary" data-bs-dismiss="modal" aria-label="Close" >Close</button>
+
+                    </div>
+
+
+                </div>
+
+            </div>
 
         </div>
 
@@ -212,11 +292,13 @@
 
     IEnumerable<UserDTO> projectManagers = [];
 
+    private UserDTO? projectManager;
+
     private string? selectedProjectManager;
 
     private IEnumerable<UserDTO> projectMembers = [];
 
-    private CompanyDTO? company;
+    private IEnumerable<UserDTO> companyMembers = [];
 
     private string? selectedMember;
 
@@ -239,11 +321,11 @@
 
             projectMembers = await ProjectService.GetProjectMembersAsync(Id, userInfo!.CompanyId);
 
-            tickets = await TicketService.GetAllTicketsAsync(userInfo!.CompanyId);
-
             projectManagers = await CompanyService.GetUsersInRoleAsync(nameof(Roles.ProjectManager), userInfo!.CompanyId);
 
-            company = await CompanyService.GetCompanyByIdAsync(userInfo!.CompanyId);
+            projectManager = await ProjectService.GetProjectManagerAsync(Id, userInfo!.CompanyId);
+
+            companyMembers = await CompanyService.GetCompanyMembersAsync(userInfo!.CompanyId);
         }
         catch (Exception ex)
         {
@@ -261,7 +343,7 @@
     {
         showArchived = false;
 
-        tickets = await TicketService.GetAllTicketsAsync(userInfo!.CompanyId);
+        project = await ProjectService.GetProjectByIdAsync(Id, userInfo!.CompanyId);
     }
 
     private async Task ShowArchived()
@@ -311,13 +393,34 @@
         }
     }
 
-    private async Task HandleAdd()
+    private async Task RemoveManager()
+    {
+        await ProjectService.RemoveProjectManagerAsync(Id, userInfo!.UserId);
+
+        projectMembers = await ProjectService.GetProjectMembersAsync(Id, userInfo!.CompanyId);
+    }
+
+    private async Task HandleAddMember()
     {
         if (selectedMember is not null)
         {
             await ProjectService.AddMemberToProjectAsync(Id, selectedMember, userInfo!.UserId);
 
             projectMembers = await ProjectService.GetProjectMembersAsync(Id, userInfo!.CompanyId);
+
+            selectedMember = null;
+        }
+    }
+
+    private async Task HandleRemoveMember()
+    {
+        if (selectedMember is not null)
+        {
+            await ProjectService.RemoveMemberFromProjectAsync(Id, selectedMember, userInfo!.UserId);
+
+            projectMembers = await ProjectService.GetProjectMembersAsync(Id, userInfo!.CompanyId);
+
+            selectedMember = null;
         }
     }
 

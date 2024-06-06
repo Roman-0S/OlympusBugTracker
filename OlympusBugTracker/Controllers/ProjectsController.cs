@@ -22,6 +22,8 @@ namespace OlympusBugTracker.Controllers
             _projectService = projectService;
         }
 
+        #region Project
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProjectDTO>>> GetAllProjects()
         {
@@ -217,6 +219,181 @@ namespace OlympusBugTracker.Controllers
                 throw;
             }
         }
+
+        #endregion
+
+        #region Project Manager
+
+        [HttpGet("{projectId:int}/members")]
+        public async Task<ActionResult<IEnumerable<UserDTO>>> GetProjectMembers([FromRoute] int projectId)
+        {
+            try
+            {
+                if (_companyId is null) return BadRequest();
+
+                ProjectDTO? project = await _projectService.GetProjectByIdAsync(projectId, _companyId.Value);
+
+                if (project is not null)
+                {
+                    IEnumerable<UserDTO> members = await _projectService.GetProjectMembersAsync(projectId, _companyId.Value);
+
+                    return Ok(members);
+                }
+                else
+                {
+                    return NotFound();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
+        }
+
+
+        [HttpGet("{projectId:int}/manager")]
+        public async Task<ActionResult<UserDTO>> GetProjectManager([FromRoute] int projectId)
+        {
+            try
+            {
+                if (_companyId is null) return BadRequest();
+
+                UserDTO? manager = await _projectService.GetProjectManagerAsync(projectId, _companyId.Value);
+
+                if (manager is not null)
+                {
+                    return Ok(manager);
+                }
+                else
+                {
+                    return NotFound();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
+        }
+
+
+        [HttpPut("{projectId:int}/Add/Member")]
+        public async Task<IActionResult> AddProjectMember([FromRoute] int projectId, [FromBody] string memberId)
+        {
+            try
+            {
+                if (_companyId is null) return BadRequest();
+
+                bool isAdmin = User.IsInRole("Admin");
+                bool isPM = User.IsInRole("ProjectManager");
+
+                if (isAdmin || isPM)
+                {
+                    await _projectService.AddMemberToProjectAsync(projectId, memberId, _userId);
+
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
+        }
+
+
+        [HttpPut("{projectId:int}/Remove/Member")]
+        public async Task<IActionResult> RemoveProjectMember([FromRoute] int projectId, [FromBody] string memberId)
+        {
+            try
+            {
+                if (_companyId is null) return BadRequest();
+
+                bool isAdmin = User.IsInRole("Admin");
+                bool isPM = User.IsInRole("ProjectManager");
+
+                if (isAdmin || isPM)
+                {
+                    await _projectService.RemoveMemberFromProjectAsync(projectId, memberId, _userId);
+
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
+        }
+
+
+        [HttpPut("{projectId:int}/Assign/Manager")]
+        public async Task<IActionResult> AssignProjectManager([FromRoute] int projectId, [FromBody] string managerId)
+        {
+            try
+            {
+                if (_companyId is null) return BadRequest();
+
+                bool isAdmin = User.IsInRole("Admin");
+
+                if (isAdmin)
+                {
+                    await _projectService.AssignProjectManagerAsync(projectId, managerId, _userId);
+
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
+        }
+
+
+        [HttpPut("{projectId:int}/Remove/Manager")]
+        public async Task<IActionResult> RemoveProjectManager([FromRoute] int projectId)
+        {
+            try
+            {
+                if (_companyId is null) return BadRequest();
+
+                bool isAdmin = User.IsInRole("Admin");
+
+                if (isAdmin)
+                {
+                    await _projectService.RemoveProjectManagerAsync(projectId, _userId);
+
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
+        }
+
+        #endregion
 
     }
 }

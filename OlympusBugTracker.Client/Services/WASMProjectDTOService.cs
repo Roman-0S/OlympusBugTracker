@@ -70,34 +70,49 @@ namespace OlympusBugTracker.Client.Services
 
         #region Project Managers
 
-        public Task<IEnumerable<UserDTO>> GetProjectMembersAsync(int projectId, int companyId)
+        public async Task<IEnumerable<UserDTO>> GetProjectMembersAsync(int projectId, int companyId)
         {
-            throw new NotImplementedException();
+            IEnumerable<UserDTO> members = await _httpClient.GetFromJsonAsync<IEnumerable<UserDTO>>($"api/projects/{projectId}/members") ?? [];
+            
+            return members;
         }
 
-        public Task<UserDTO?> GetProjectManagerAsync(int projectId, int companyId)
+        public async Task<UserDTO?> GetProjectManagerAsync(int projectId, int companyId)
         {
-            throw new NotImplementedException();
+            HttpResponseMessage response = await _httpClient.GetAsync($"api/projects/{projectId}/manager");
+            
+            if (response.IsSuccessStatusCode)
+            {
+                UserDTO? manager = await response.Content.ReadFromJsonAsync<UserDTO?>();
+
+                return manager;
+            }
+
+            return null;
         }
 
-        public Task AddMemberToProjectAsync(int projectId, string memberId, string managerId)
+        public async Task AddMemberToProjectAsync(int projectId, string memberId, string managerId)
         {
-            throw new NotImplementedException();
+            HttpResponseMessage response = await _httpClient.PutAsJsonAsync($"api/projects/{projectId}/add/member", memberId);
+            response.EnsureSuccessStatusCode();
         }
 
-        public Task RemoveMemberFromProjectAsync(int projectId, string memberId, string managerId)
+        public async Task RemoveMemberFromProjectAsync(int projectId, string memberId, string managerId)
         {
-            throw new NotImplementedException();
+            HttpResponseMessage response = await _httpClient.PutAsJsonAsync($"api/projects/{projectId}/remove/member", memberId);
+            response.EnsureSuccessStatusCode();
         }
 
-        public Task AssignProjectManagerAsync(int projectId, string memberId, string adminId)
+        public async Task AssignProjectManagerAsync(int projectId, string memberId, string adminId)
         {
-            throw new NotImplementedException();
+            HttpResponseMessage response = await _httpClient.PutAsJsonAsync($"api/projects/{projectId}/assign/manager", memberId);
+            response.EnsureSuccessStatusCode();
         }
 
-        public Task RemoveProjectManagerAsync(int projectId, string adminId)
+        public async Task RemoveProjectManagerAsync(int projectId, string adminId)
         {
-            throw new NotImplementedException();
+            HttpResponseMessage response = await _httpClient.PutAsJsonAsync($"api/projects/{projectId}/remove/manager", "");
+            response.EnsureSuccessStatusCode();
         }
 
         #endregion
