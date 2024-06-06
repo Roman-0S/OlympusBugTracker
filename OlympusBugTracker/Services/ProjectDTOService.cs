@@ -1,12 +1,18 @@
-﻿using OlympusBugTracker.Client.Models;
+﻿using Microsoft.AspNetCore.Authorization.Infrastructure;
+using OlympusBugTracker.Client.Models;
 using OlympusBugTracker.Client.Services.Interfaces;
+using OlympusBugTracker.Data;
 using OlympusBugTracker.Models;
 using OlympusBugTracker.Services.Interfaces;
+using static OlympusBugTracker.Client.Models.Enums;
 
 namespace OlympusBugTracker.Services
 {
-    public class ProjectDTOService(IProjectRepository repository) : IProjectDTOService
+    public class ProjectDTOService(IProjectRepository repository, ICompanyRepository companyRepository) : IProjectDTOService
     {
+
+        #region Project
+
         public async Task<ProjectDTO> AddProjectAsync(ProjectDTO projectDTO, int companyId)
         {
             Project project = new()
@@ -69,6 +75,61 @@ namespace OlympusBugTracker.Services
         {
             await repository.RestoreProjectAsync(projectId, companyId);
         }
+
+
+        #endregion
+
+        #region Project Managers
+
+        public async Task<IEnumerable<UserDTO>> GetProjectMembersAsync(int projectId, int companyId)
+        {
+            IEnumerable<ApplicationUser> members = await repository.GetProjectMembersAsync(projectId, companyId);
+
+            List<UserDTO> membersDTO = [];
+
+            foreach(ApplicationUser member in members)
+            {
+                UserDTO userDTO = member.ToDTO();
+                userDTO.Role = await companyRepository.GetUserRoleAsync(member.Id, companyId);
+                membersDTO.Add(userDTO);
+            }
+
+            return membersDTO;
+        }
+
+        public async Task<UserDTO?> GetProjectManagerAsync(int projectId, int companyId)
+        {
+            ApplicationUser? projectManager = await repository.GetProjectManagerAsync(projectId, companyId);
+
+            if (projectManager is null) return null;
+
+            UserDTO userDTO = projectManager.ToDTO();
+            userDTO.Role = nameof(Roles.ProjectManager);
+
+            return userDTO;
+        }
+
+        public async Task AddMemberToProjectAsync(int projectId, string memberId, string managerId)
+        {
+            await repository.AddMemberToProjectAsync(projectId, memberId, managerId);
+        }
+
+        public async Task RemoveMemberFromProjectAsync(int projectId, string memberId, string managerId)
+        {
+            await repository.RemoveMemberFromProjectAsync(projectId, memberId, managerId);
+        }
+
+        public async Task AssignProjectManagerAsync(int projectId, string memberId, string adminId)
+        {
+            await repository.AssignProjectManagerAsync(projectId, memberId, adminId);
+        }
+
+        public async Task RemoveProjectManagerAsync(int projectId, string adminId)
+        {
+            await repository.RemoveProjectManagerAsync(projectId, adminId);
+        }
+
+        #endregion
 
     }
 }

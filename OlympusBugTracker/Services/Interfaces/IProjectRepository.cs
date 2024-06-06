@@ -1,4 +1,5 @@
-﻿using OlympusBugTracker.Models;
+﻿using OlympusBugTracker.Data;
+using OlympusBugTracker.Models;
 
 namespace OlympusBugTracker.Services.Interfaces
 {
@@ -25,7 +26,17 @@ namespace OlympusBugTracker.Services.Interfaces
 
         #region Project Members
 
+        Task<IEnumerable<ApplicationUser>> GetProjectMembersAsync(int projectId, int companyId);
 
+        Task<ApplicationUser?> GetProjectManagerAsync(int projectId, int companyId);
+
+        Task AddMemberToProjectAsync(int projectId, string userId, string managerId);
+
+        Task RemoveMemberFromProjectAsync(int projectId, string userId, string managerId);
+
+        Task AssignProjectManagerAsync(int projectId, string userId, string adminId);
+
+        Task RemoveProjectManagerAsync(int projectId, string adminId);
 
         #endregion
 

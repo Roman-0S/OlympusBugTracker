@@ -1,22 +1,40 @@
 ﻿@page "/project/{id:int}"
-@rendermode InteractiveAuto
+@rendermode InteractiveServer
 
 @using OlympusBugTracker.Client.Helpers
+@using static OlympusBugTracker.Client.Models.Enums
 
 @inject IProjectDTOService ProjectService
+@inject ICompanyDTOService CompanyService
 @inject NavigationManager Nav
 
 
 
 @if (project is not null)
 {
-    <h1>@project.Name</h1>
 
-    <p>@((MarkupString)project.Description!)</p>
+    <div class="row">
 
-    <p>@project.StartDate - @project.EndDate</p>
+        <div class="col-md-8">
 
-    <p>@project.Priority</p>
+            <h1>@project.Name</h1>
+
+            <p>@((MarkupString)project.Description!)</p>
+
+            <p>@project.StartDate - @project.EndDate</p>
+
+            <p>@project.Priority</p>
+
+        </div>
+
+        <div class="col-md-4">
+
+
+
+        </div>
+
+    </div>
+
 }
 
 
@@ -41,6 +59,8 @@
 
     private ProjectDTO? project;
 
+    IEnumerable<UserDTO> projectManagers = [];
+
     #endregion
 
 
@@ -53,6 +73,8 @@
             userInfo = await UserInfoHelper.GetUserInfoAsync(AuthStateTask);
 
             project = await ProjectService.GetProjectByIdAsync(Id, userInfo!.CompanyId);
+
+            projectManagers = await CompanyService.GetUsersInRoleAsync(nameof(Roles.ProjectManager), userInfo!.CompanyId);
         }
         catch (Exception ex)
         {
