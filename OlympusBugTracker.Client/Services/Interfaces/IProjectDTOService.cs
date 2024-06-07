@@ -25,6 +25,8 @@ namespace OlympusBugTracker.Client.Services.Interfaces
 
         #region Project Manager
 
+        Task<IEnumerable<ProjectDTO>> GetMemberProjectsAsync(string userId, int companyId);
+
         Task<IEnumerable<UserDTO>> GetProjectMembersAsync(int projectId, int companyId);
 
         Task<UserDTO?> GetProjectManagerAsync(int projectId, int companyId);

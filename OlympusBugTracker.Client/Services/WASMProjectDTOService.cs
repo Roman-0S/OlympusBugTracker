@@ -70,6 +70,11 @@ namespace OlympusBugTracker.Client.Services
 
         #region Project Managers
 
+        public Task<IEnumerable<ProjectDTO>> GetMemberProjectsAsync(string userId, int companyId)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<IEnumerable<UserDTO>> GetProjectMembersAsync(int projectId, int companyId)
         {
             IEnumerable<UserDTO> members = await _httpClient.GetFromJsonAsync<IEnumerable<UserDTO>>($"api/projects/{projectId}/members") ?? [];
@@ -114,6 +119,7 @@ namespace OlympusBugTracker.Client.Services
             HttpResponseMessage response = await _httpClient.PutAsJsonAsync($"api/projects/{projectId}/remove/manager", "");
             response.EnsureSuccessStatusCode();
         }
+
 
         #endregion
 

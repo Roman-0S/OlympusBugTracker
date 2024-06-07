@@ -1,5 +1,5 @@
 ﻿@page "/projects"
-@rendermode InteractiveAuto
+@rendermode InteractiveServer
 
 @using OlympusBugTracker.Client.Helpers
 @using OlympusBugTracker.Client.Services.Interfaces
@@ -11,20 +11,86 @@
 
 <div>
 
-    <div class="hstack justify-content-between gap-2 mb-3">
+    @if (!showMember)
+    {
 
-        @if (!showArchived)
-        {
+        <div class="hstack justify-content-between gap-2 mb-3">
+
+            @if (!showArchived)
+            {
+
+                <div>
+
+                    <button class="btn btn-outline-primary btn-sm" disabled>
+                        Projects
+                    </button>
+
+                    <button class="btn btn-outline-primary btn-sm" @onclick="ShowArchived">
+                        Archived Projects
+                    </button>
+
+                </div>
+
+            }
+            else
+            {
+
+                <div>
+
+                    <button class="btn btn-outline-primary btn-sm" @onclick="ShowProjects">
+                        Projects
+                    </button>
+
+                    <button class="btn btn-outline-primary btn-sm" disabled>
+                        Archived Projects
+                    </button>
+
+                </div>
+
+            }
 
             <div>
 
-                <button class="btn btn-outline-primary btn-sm" disabled>
-                    Projects
-                </button>
+                <a href="/project/create" class="btn btn-primary btn-sm">
+                    Add Project
+                </a>
 
-                <button class="btn btn-outline-primary btn-sm" @onclick="ShowArchived">
-                    Archived Projects
-                </button>
+            </div>
+
+        </div>
+
+        @if (!showArchived)
+        {
+            <div class="hstack gap-3">
+
+                <h1>Projects</h1>
+
+                @if (userInfo!.Roles.Contains("Admin"))
+                {
+
+                }
+                else
+                {
+
+                    <div class="form-check form-switch">
+
+                        <input type="checkbox" class="form-check-input" role="switch" id="showMemberProjects" @onclick="ShowMemberProjects" />
+                        <label class="form-check-label" for="showMemberProjects">Show My Projects</label>
+
+                    </div>
+
+                }
+
+
+            </div>
+
+
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4 pb-sm-3 pb-md-4 pb-xl-5 mb-5">
+
+                @foreach (ProjectDTO project in projects)
+                {
+                    <ProjectCard Project="project" OnArchive="HandleArchive" OnRecover="HandleRecover" />
+                }
 
             </div>
 
@@ -32,62 +98,163 @@
         else
         {
 
-            <div>
+            <div class="hstack gap-3">
 
-                <button class="btn btn-outline-primary btn-sm" @onclick="ShowProjects">
-                    Projects
-                </button>
+                <h1>Archived Projects</h1>
 
-                <button class="btn btn-outline-primary btn-sm" disabled>
-                    Archived Projects
-                </button>
+                @if (userInfo!.Roles.Contains("Admin"))
+                {
+
+                }
+                else
+                {
+
+                    <div class="form-check form-switch">
+
+                        <input type="checkbox" class="form-check-input" role="switch" id="showMemberProjects" @onclick="ShowMemberProjects" />
+                        <label class="form-check-label" for="showMemberProjects">Show My Projects</label>
+
+                    </div>
+
+                }
+
+
+            </div>
+
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4 pb-sm-3 pb-md-4 pb-xl-5 mb-5">
+
+                @foreach (ProjectDTO project in projects)
+                {
+                    <ProjectCard Project="project" OnRecover="HandleRecover" OnArchive="HandleArchive" />
+                }
 
             </div>
 
         }
 
-        <div>
-
-            <a href="/project/create" class="btn btn-primary btn-sm">
-                Add Project
-            </a>
-
-        </div>
-
-    </div>
-
-    @if (!showArchived)
-    {
-
-        <h1>Projects</h1>
-
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4 pb-sm-3 pb-md-4 pb-xl-5 mb-5">
-
-            @foreach (ProjectDTO project in projects)
-            {
-                <ProjectCard Project="project" OnArchive="HandleArchive" OnRecover="HandleRecover" />
-            }
-
-        </div>
-
     }
     else
     {
 
-        <h1>Archived Projects</h1>
+        <div class="hstack justify-content-between gap-2 mb-3">
 
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4 pb-sm-3 pb-md-4 pb-xl-5 mb-5">
-
-            @foreach (ProjectDTO project in projects)
+            @if (!showArchived)
             {
-                <ProjectCard Project="project" OnRecover="HandleRecover" OnArchive="HandleArchive" />
+
+                <div>
+
+                    <button class="btn btn-outline-primary btn-sm" disabled>
+                        Projects
+                    </button>
+
+                    <button class="btn btn-outline-primary btn-sm" @onclick="ShowArchived">
+                        Archived Projects
+                    </button>
+
+                </div>
+
             }
+            else
+            {
+
+                <div>
+
+                    <button class="btn btn-outline-primary btn-sm" @onclick="ShowProjects">
+                        Projects
+                    </button>
+
+                    <button class="btn btn-outline-primary btn-sm" disabled>
+                        Archived Projects
+                    </button>
+
+                </div>
+
+            }
+
+            <div>
+
+                <a href="/project/create" class="btn btn-primary btn-sm">
+                    Add Project
+                </a>
+
+            </div>
 
         </div>
 
+        @if (!showArchived)
+        {
+            <div class="hstack gap-3">
+
+                <h1>My Projects</h1>
+
+                @if (userInfo!.Roles.Contains("Admin"))
+                {
+
+                }
+                else
+                {
+
+                    <div class="form-check form-switch">
+
+                        <input type="checkbox" class="form-check-input" role="switch" id="showMemberProjects" checked @onclick="ShowMemberProjects" />
+                        <label class="form-check-label" for="showMemberProjects">Show My Projects</label>
+
+                    </div>
+
+                }
+
+
+            </div>
+
+
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4 pb-sm-3 pb-md-4 pb-xl-5 mb-5">
+
+                @foreach (ProjectDTO project in projects)
+                {
+                    <ProjectCard Project="project" OnArchive="HandleArchive" OnRecover="HandleRecover" />
+                }
+
+            </div>
+
+        }
+        else
+        {
+
+            <div class="hstack gap-3">
+
+                <h1>My Archived Projects</h1>
+
+                @if (userInfo!.Roles.Contains("Admin"))
+                {
+
+                }
+                else
+                {
+
+                    <div class="form-check form-switch">
+
+                        <input type="checkbox" class="form-check-input" role="switch" id="showMemberProjects" checked @onclick="ShowMemberProjects" />
+                        <label class="form-check-label" for="showMemberProjects">Show My Projects</label>
+
+                    </div>
+
+                }
+
+
+            </div>
+
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4 pb-sm-3 pb-md-4 pb-xl-5 mb-5">
+
+                @foreach (ProjectDTO project in projects)
+                {
+                    <ProjectCard Project="project" OnRecover="HandleRecover" OnArchive="HandleArchive" />
+                }
+
+            </div>
+
+        }
+
     }
-
-
 
 
 </div>
@@ -110,19 +277,29 @@
 
     private bool showArchived;
 
+    private bool showMember;
+
     #endregion
 
 
     #region methods
 
-    // get projects
     protected override async Task OnInitializedAsync()
     {
         try
         {
             userInfo = await UserInfoHelper.GetUserInfoAsync(AuthStateTask);
 
-            projects = await ProjectService.GetAllProjectsAsync(userInfo!.CompanyId);
+            if (userInfo!.Roles.Contains("Admin"))
+            {
+                projects = await ProjectService.GetAllProjectsAsync(userInfo!.CompanyId);
+            }
+            else
+            {
+                projects = await ProjectService.GetMemberProjectsAsync(userInfo.UserId, userInfo!.CompanyId);
+
+                showMember = true;
+            }
 
         }
         catch (Exception ex)
@@ -136,14 +313,64 @@
     {
         showArchived = false;
 
-        projects = await ProjectService.GetAllProjectsAsync(userInfo!.CompanyId);
+        if (!showMember)
+        {
+            projects = await ProjectService.GetAllProjectsAsync(userInfo!.CompanyId);
+        }
+        else
+        {
+            projects = await ProjectService.GetMemberProjectsAsync(userInfo!.UserId, userInfo!.CompanyId);
+        }
     }
 
     private async Task ShowArchived()
     {
         showArchived = true;
 
-        projects = await ProjectService.GetArchivedProjectsAsync(userInfo!.CompanyId);
+        if (!showMember)
+        {
+            projects = await ProjectService.GetArchivedProjectsAsync(userInfo!.CompanyId);
+        }
+        else
+        {
+            projects = await ProjectService.GetMemberProjectsAsync(userInfo!.UserId, userInfo!.CompanyId);
+
+            projects = projects.Where(p => p.Archived);
+        }
+    }
+
+    private async Task ShowMemberProjects()
+    {
+        if (!showMember)
+        {
+
+            if (!showArchived)
+            {
+                projects = await ProjectService.GetMemberProjectsAsync(userInfo!.UserId, userInfo!.CompanyId);
+            }
+            else
+            {
+                projects = await ProjectService.GetMemberProjectsAsync(userInfo!.UserId, userInfo!.CompanyId);
+
+                projects = projects.Where(p => p.Archived);
+            }
+
+        }
+        else
+        {
+
+            if (!showArchived)
+            {
+                projects = await ProjectService.GetAllProjectsAsync(userInfo!.CompanyId);
+            }
+            else
+            {
+                projects = await ProjectService.GetArchivedProjectsAsync(userInfo!.CompanyId);
+            }
+
+        }
+
+        showMember = !showMember;
     }
 
     private async Task HandleArchive(int projectId)

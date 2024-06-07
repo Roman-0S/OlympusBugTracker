@@ -81,6 +81,13 @@ namespace OlympusBugTracker.Services
 
         #region Project Managers
 
+        public async Task<IEnumerable<ProjectDTO>> GetMemberProjectsAsync(string userId, int companyId)
+        {
+            IEnumerable<Project> projects = await repository.GetMemberProjectsAsync(userId, companyId);
+
+            return projects.Select(p => p.ToDTO());
+        }
+
         public async Task<IEnumerable<UserDTO>> GetProjectMembersAsync(int projectId, int companyId)
         {
             IEnumerable<ApplicationUser> members = await repository.GetProjectMembersAsync(projectId, companyId);

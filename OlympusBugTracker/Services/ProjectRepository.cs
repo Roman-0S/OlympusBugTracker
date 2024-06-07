@@ -104,6 +104,15 @@ namespace OlympusBugTracker.Services
 
         #region Project Managers
 
+        public async Task<IEnumerable<Project>> GetMemberProjectsAsync(string userId, int companyId)
+        {
+            using ApplicationDbContext context = contextFactory.CreateDbContext();
+
+            IEnumerable<Project> projects = await context.Projects.Where(p => p.CompanyId == companyId && p.Users.Any(u => u.Id == userId)).OrderByDescending(p => p.Created).ToListAsync();
+
+            return projects;
+        }
+
         public async Task<IEnumerable<ApplicationUser>> GetProjectMembersAsync(int projectId, int companyId)
         {
             using ApplicationDbContext context = contextFactory.CreateDbContext();
