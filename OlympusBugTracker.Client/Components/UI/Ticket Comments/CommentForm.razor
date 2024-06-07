@@ -1,31 +1,43 @@
 ﻿@inject NavigationManager Nav
 
+
+
+
+
 @if (Comment is not null)
 {
 
-    <div>
+    <AuthorizeView>
 
-        <EditForm Model="Comment" OnValidSubmit="HandleSubmit">
+        @if (context.User.IsInRole("Admin") || UserInfo?.UserId == ProjectManager?.Id || UserInfo?.UserId == Ticket?.SubmitterUserId || UserInfo?.UserId == Ticket?.DeveloperUserId)
+        {
 
-            <div class="flex-fill vstack">
+            <h2>Leave a comment</h2>
 
-                <TinyMCE.Blazor.Editor ScriptSrc="/tinymce/tinymce.min.js" @bind-Value="Comment.Content" Field="() => Comment.Content" ClassName="rich-text-editor" Conf="editorConfig" />
+            <EditForm Context="editFormContext" Model="Comment" OnValidSubmit="HandleSubmit">
 
-                <div class="text-end mt-3">
-                    <button class="btn btn-sm btn-primary"><i class="ai ai-circle-check"></i></button>
+                <div class="flex-fill vstack">
+
+                    <TinyMCE.Blazor.Editor ScriptSrc="/tinymce/tinymce.min.js" @bind-Value="Comment.Content" Field="() => Comment.Content" ClassName="rich-text-editor" Conf="editorConfig" />
+
+                    <div class="text-end mt-3">
+                        <button class="btn btn-sm btn-primary"><i class="ai ai-circle-check"></i></button>
+                    </div>
+
                 </div>
 
-            </div>
 
+            </EditForm>
 
-        </EditForm>
+        }
+        else
+        {
+            // not authorized to comment
+        }
 
-    </div>
+    </AuthorizeView>
 
 }
-
-
-
 
 
 
@@ -37,6 +49,15 @@
 
     [Parameter, EditorRequired]
     public TicketCommentDTO? Comment { get; set; }
+
+    [Parameter, EditorRequired]
+    public UserInfo? UserInfo { get; set; }
+
+    [Parameter, EditorRequired]
+    public TicketDTO? Ticket { get; set; }
+
+    [Parameter, EditorRequired]
+    public UserDTO? ProjectManager { get; set; }
 
     #endregion
 

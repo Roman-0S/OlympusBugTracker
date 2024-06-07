@@ -1,19 +1,37 @@
-﻿@inject ITicketDTOService TicketService
+﻿@using Microsoft.AspNetCore.Authorization
+
+@inject ITicketDTOService TicketService
+@attribute [Authorize]
 
 
-<EditForm Model="attachment" OnValidSubmit="HandleSubmit" class="vstack gap-1">
+<AuthorizeView>
 
-    <label class="form-label">Make an attachment</label>
+    @if (context.User.IsInRole("Admin") || UserInfo?.UserId == ProjectManager?.Id || UserInfo?.UserId == Ticket?.SubmitterUserId || UserInfo?.UserId == Ticket?.DeveloperUserId)
+    {
+        <h1>Attachments</h1>
 
-    <InputFile OnChange="a => newFile = a.File" />
+        <EditForm Context="editFormContext" Model="attachment" OnValidSubmit="HandleSubmit" class="vstack gap-1">
 
-    <label class="form-label mt-3">Attachment Description</label>
+            <label class="form-label">Make an attachment</label>
 
-    <InputText @bind-Value="attachment!.Description" class="form-control" placeholder="Description" />
+            <InputFile OnChange="a => newFile = a.File" />
 
-    <button class="btn btn-sm btn-primary">Upload</button>
+            <label class="form-label mt-3">Attachment Description</label>
 
-</EditForm>
+            <InputText @bind-Value="attachment!.Description" class="form-control" placeholder="Description" />
+
+            <button class="btn btn-sm btn-primary">Upload</button>
+
+        </EditForm>
+
+    }
+    else
+    {
+        // you can't create an attachment
+    }
+
+</AuthorizeView>
+
 
 
 
@@ -29,6 +47,12 @@
 
     [Parameter]
     public EventCallback OnUpload { get; set; }
+
+    [Parameter, EditorRequired]
+    public TicketDTO? Ticket { get; set; }
+
+    [Parameter, EditorRequired]
+    public UserDTO? ProjectManager { get; set; }
 
     #endregion
 
@@ -79,10 +103,10 @@
 
             newFile = null;
             attachment = new()
-            {
-                UserId = UserInfo!.UserId,
-                TicketId = TicketId,
-            };
+                {
+                    UserId = UserInfo!.UserId,
+                    TicketId = TicketId,
+                };
 
             await OnUpload.InvokeAsync();
         }

@@ -1,6 +1,7 @@
 ﻿@using OlympusBugTracker.Client.Helpers
 
 @inject ITicketDTOService ticketService
+@inject IProjectDTOService ProjectService
 
 
 
@@ -11,19 +12,11 @@
     {
         <div class="pt-4 pt-xl-5 mt-4">
 
-            <h2>Leave a comment</h2>
-
-            <CommentForm OnSubmit="HandleSubmit" Comment="new TicketCommentDTO()" />
+            <CommentForm OnSubmit="HandleSubmit" Comment="new TicketCommentDTO()" UserInfo="userInfo" Ticket="ticket" ProjectManager="projectManager" />
 
             <div>
 
                 <h2 class="h1 py-lg-1 py-xl-3">No comments yet</h2>
-
-                <div class="d-flex justify-content-center align-items-center mt-5">
-
-                    <h4 class="text-secondary-emphasis bolder">Leave a comment!</h4>
-
-                </div>
 
             </div>
 
@@ -36,9 +29,7 @@
         <!-- Comments -->
         <div class="pt-4 pt-xl-5 mt-4">
 
-            <h2>Leave a comment</h2>
-
-            <CommentForm OnSubmit="HandleSubmit" Comment="new TicketCommentDTO()" />
+            <CommentForm OnSubmit="HandleSubmit" Comment="new TicketCommentDTO()" UserInfo="userInfo" Ticket="ticket" ProjectManager="projectManager" />
 
             <h2 class="h1 py-lg-1 py-xl-3">@Comments.Count() comments</h2>
 
@@ -76,6 +67,10 @@
 
     private UserInfo? userInfo;
 
+    private TicketDTO? ticket;
+
+    private UserDTO? projectManager;
+
     #endregion
 
 
@@ -86,6 +81,10 @@
         try
         {
             userInfo = await UserInfoHelper.GetUserInfoAsync(AuthStateTask);
+
+            ticket = await ticketService.GetTicketByIdAsync(TicketId, userInfo!.CompanyId);
+
+            projectManager = await ProjectService.GetProjectManagerAsync(ticket!.ProjectId, userInfo!.CompanyId);
         }
         catch (Exception ex)
         {

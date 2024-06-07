@@ -1,22 +1,38 @@
 ﻿@page "/ticket/edit/{id:int}"
 @rendermode InteractiveAuto
+@attribute [Authorize]
 
+@using Microsoft.AspNetCore.Authorization
 @using OlympusBugTracker.Client.Components.UI.Ticket
 @using OlympusBugTracker.Client.Helpers
 
 @inject ITicketDTOService TicketService
+@inject IProjectDTOService ProjectService
 @inject NavigationManager Nav
 
 
 <PageTitle>Bug Tracker | Edit a Ticket</PageTitle>
 
 
+<AuthorizeView>
 
-<div>
+    @if (context.User.IsInRole("Admin") || userInfo?.UserId == projectManager?.Id || userInfo?.UserId == ticket?.SubmitterUserId || userInfo?.UserId == ticket?.DeveloperUserId)
+    {
 
-    <TicketForm Ticket="ticket" OnSubmit="HandleSubmit" Projects="projects" />
+        <div>
 
-</div>
+            <TicketForm Ticket="ticket" OnSubmit="HandleSubmit" Projects="projects" />
+
+        </div>
+
+    }
+    else
+    {
+        // display that they aren't allowed to edit the ticket
+    }
+
+</AuthorizeView>
+
 
 
 
@@ -44,6 +60,8 @@
 
     private IEnumerable<ProjectDTO>? projects;
 
+    private UserDTO? projectManager;
+
     #endregion
 
 
@@ -61,6 +79,8 @@
             }
 
             ticket = await TicketService.GetTicketByIdAsync(Id, userInfo!.CompanyId);
+
+            projectManager = await ProjectService.GetProjectManagerAsync(ticket!.ProjectId, userInfo!.CompanyId);
         }
         catch (Exception ex)
         {
