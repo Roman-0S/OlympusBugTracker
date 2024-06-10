@@ -1,11 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using OlympusBugTracker.Data;
 using OlympusBugTracker.Models;
 using OlympusBugTracker.Services.Interfaces;
+using static OlympusBugTracker.Client.Models.Enums;
 
 namespace OlympusBugTracker.Services
 {
-    public class TicketRepository(IDbContextFactory<ApplicationDbContext> contextFactory) : ITicketRepository
+    public class TicketRepository(IDbContextFactory<ApplicationDbContext> contextFactory, IServiceProvider serviceProvider) : ITicketRepository
     {
 
         #region Tickets
@@ -34,6 +37,52 @@ namespace OlympusBugTracker.Services
                                                                .ToListAsync();
 
             return tickets;
+        }
+
+        public async Task<IEnumerable<Ticket>> GetUserTicketsAsync(string userId, int companyId)
+        {
+            using ApplicationDbContext context = contextFactory.CreateDbContext();
+            using IServiceScope scope = serviceProvider.CreateScope();
+            UserManager<ApplicationUser> userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+            ApplicationUser? user = await userManager.FindByIdAsync(userId);
+
+            if (user is null) return [];
+
+            IList<string> currentRoles = await userManager.GetRolesAsync(user);
+
+            if (currentRoles.Any(r => r == nameof(Roles.ProjectManager)))
+            {
+                IEnumerable<Ticket> tickets = await context.Tickets.Include(t => t.Project)
+                                                                      .ThenInclude(p => p!.Users)
+                                                                   .Where(t => t.Project!.CompanyId == companyId && t.Project.Users.Any(u => u.Id == user.Id))
+                                                                   .OrderByDescending(t => t.Created)
+                                                                   .ToListAsync();
+
+                return tickets;
+            }
+            else if (currentRoles.Any(r => r == nameof(Roles.Developer)))
+            {
+                IEnumerable<Ticket> tickets = await context.Tickets.Include(t => t.Project)
+                                                                      .ThenInclude(p => p!.Users)
+                                                                   .Where(t => t.Project!.CompanyId == companyId && t.DeveloperUserId == user.Id || t.SubmitterUserId == user.Id)
+                                                                   .OrderByDescending(t => t.Created)
+                                                                   .ToListAsync();
+
+                return tickets;
+            }
+            else
+            {
+                IEnumerable<Ticket> tickets = await context.Tickets.Include(t => t.Project)
+                                                                      .ThenInclude(p => p!.Users)
+                                                                   .Where(t => t.Project!.CompanyId == companyId && t.SubmitterUserId == user.Id)
+                                                                   .OrderByDescending(t => t.Created)
+                                                                   .ToListAsync();
+
+                return tickets;
+            }
+
+
         }
 
         public async Task<Ticket?> GetTicketByIdAsync(int ticketId, int companyId)
@@ -212,6 +261,7 @@ namespace OlympusBugTracker.Services
                 await context.SaveChangesAsync();
             }
         }
+
 
         #endregion
 

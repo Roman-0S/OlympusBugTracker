@@ -1,5 +1,5 @@
 ﻿@page "/tickets"
-@rendermode InteractiveServer
+@rendermode InteractiveAuto
 
 @using OlympusBugTracker.Client.Components.UI.Ticket
 @using OlympusBugTracker.Client.Helpers
@@ -9,107 +9,219 @@
 
 <div>
 
-    <div class="hstack justify-content-between gap-2 mb-3">
+    @if (isAdmin)
+    {
+
+        <div class="hstack justify-content-between gap-2 mb-3">
+
+            @if (!showArchived)
+            {
+
+                <div>
+
+                    <button class="btn btn-outline-primary btn-sm" disabled>
+                        Tickets
+                    </button>
+
+                    <button class="btn btn-outline-primary btn-sm" @onclick="ShowArchived">
+                        Archived Tickets
+                    </button>
+
+                </div>
+
+            }
+            else
+            {
+
+                <div>
+
+                    <button class="btn btn-outline-primary btn-sm" @onclick="ShowTickets">
+                        Tickets
+                    </button>
+
+                    <button class="btn btn-outline-primary btn-sm" disabled>
+                        Archived Tickets
+                    </button>
+
+                </div>
+
+            }
+
+            <div>
+
+                <a href="/ticket/create" class="btn btn-primary btn-sm">
+                    Add Ticket
+                </a>
+
+            </div>
+
+        </div>
 
         @if (!showArchived)
         {
 
-            <div>
+            <h1>Tickets</h1>
 
-                <button class="btn btn-outline-primary btn-sm" disabled>
-                    Tickets
-                </button>
+            <table class="table table-responsive border border-dark">
+                <thead>
+                    <tr>
+                        <th scope="col">Priority</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Project</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Created</th>
+                        <th scope="col" colspan="2" class="text-center">Modify</th>
+                    </tr>
+                </thead>
+                <tbody class="table-striped table-hover">
 
-                <button class="btn btn-outline-primary btn-sm" @onclick="ShowArchived">
-                    Archived Tickets
-                </button>
+                    @foreach (TicketDTO ticket in tickets)
+                    {
+                        <TicketRow Ticket="ticket" UserInfo="userInfo" OnArchive="HandleArchive" OnRestore="HandleRestore" />
+                    }
 
-            </div>
+                </tbody>
+
+            </table>
 
         }
         else
         {
 
-            <div>
+            <h1>Archived Tickets</h1>
 
-                <button class="btn btn-outline-primary btn-sm" @onclick="ShowTickets">
-                    Tickets
-                </button>
+            <table class="table table-responsive border border-dark">
+                <thead>
+                    <tr>
+                        <th scope="col">Priority</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Project</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Created</th>
+                        <th scope="col" colspan="2" class="text-center">Modify</th>
+                    </tr>
+                </thead>
+                <tbody class="table-striped table-hover">
 
-                <button class="btn btn-outline-primary btn-sm" disabled>
-                    Archived Tickets
-                </button>
+                    @foreach (TicketDTO ticket in tickets)
+                    {
+                        <TicketRow Ticket="ticket" UserInfo="userInfo" OnArchive="HandleArchive" OnRestore="HandleRestore" />
+                    }
 
-            </div>
+                </tbody>
+
+            </table>
 
         }
-
-        <div>
-
-            <a href="/ticket/create" class="btn btn-primary btn-sm">
-                Add Ticket
-            </a>
-
-        </div>
-
-    </div>
-
-    @if (!showArchived)
-    {
-        
-        <h1>Tickets</h1>
-
-        <table class="table table-responsive border border-dark">
-            <thead>
-                <tr>
-                    <th scope="col">Priority</th>
-                    <th scope="col">Title</th>
-                    <th scope="col">Project</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Created</th>
-                    <th scope="col" colspan="2" class="text-center">Modify</th>
-                </tr>
-            </thead>
-            <tbody class="table-striped table-hover">
-
-                @foreach (TicketDTO ticket in tickets)
-                {
-                    <TicketRow Ticket="ticket" UserInfo="userInfo" OnArchive="HandleArchive" OnRestore="HandleRestore" />
-                }
-
-            </tbody>
-
-        </table>
 
     }
     else
     {
 
-        <h1>Archived Tickets</h1>
+        <div class="hstack justify-content-between gap-2 mb-3">
 
-        <table class="table table-responsive border border-dark">
-            <thead>
-                <tr>
-                    <th scope="col">Priority</th>
-                    <th scope="col">Title</th>
-                    <th scope="col">Project</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Created</th>
-                    <th scope="col" colspan="2" class="text-center">Modify</th>
-                </tr>
-            </thead>
-            <tbody class="table-striped table-hover">
+            @if (!showArchived)
+            {
 
-                @foreach (TicketDTO ticket in tickets)
-                {
-                    <TicketRow Ticket="ticket" UserInfo="userInfo" OnArchive="HandleArchive" OnRestore="HandleRestore" />
-                }
+                <div>
 
-            </tbody>
+                    <button class="btn btn-outline-primary btn-sm" disabled>
+                        Tickets
+                    </button>
 
-        </table>
+                    <button class="btn btn-outline-primary btn-sm" @onclick="ShowArchived">
+                        Archived Tickets
+                    </button>
+
+                </div>
+
+            }
+            else
+            {
+
+                <div>
+
+                    <button class="btn btn-outline-primary btn-sm" @onclick="ShowTickets">
+                        Tickets
+                    </button>
+
+                    <button class="btn btn-outline-primary btn-sm" disabled>
+                        Archived Tickets
+                    </button>
+
+                </div>
+
+            }
+
+            <div>
+
+                <a href="/ticket/create" class="btn btn-primary btn-sm">
+                    Add Ticket
+                </a>
+
+            </div>
+
+        </div>
+
+        @if (!showArchived)
+        {
+
+            <h1>My Tickets</h1>
+
+            <table class="table table-responsive border border-dark">
+                <thead>
+                    <tr>
+                        <th scope="col">Priority</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Project</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Created</th>
+                        <th scope="col" colspan="2" class="text-center">Modify</th>
+                    </tr>
+                </thead>
+                <tbody class="table-striped table-hover">
+
+                    @foreach (TicketDTO ticket in tickets)
+                    {
+                        <TicketRow Ticket="ticket" UserInfo="userInfo" OnArchive="HandleArchive" OnRestore="HandleRestore" />
+                    }
+
+                </tbody>
+
+            </table>
+
+        }
+        else
+        {
+
+            <h1>My Archived Tickets</h1>
+
+            <table class="table table-responsive border border-dark">
+                <thead>
+                    <tr>
+                        <th scope="col">Priority</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Project</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Created</th>
+                        <th scope="col" colspan="2" class="text-center">Modify</th>
+                    </tr>
+                </thead>
+                <tbody class="table-striped table-hover">
+
+                    @foreach (TicketDTO ticket in tickets)
+                    {
+                        <TicketRow Ticket="ticket" UserInfo="userInfo" OnArchive="HandleArchive" OnRestore="HandleRestore" />
+                    }
+
+                </tbody>
+
+            </table>
+
+        }
 
     }
+
 
 
 </div>
@@ -135,6 +247,8 @@
 
     private bool showArchived;
 
+    private bool isAdmin;
+
     #endregion
 
 
@@ -146,7 +260,18 @@
         {
             userInfo = await UserInfoHelper.GetUserInfoAsync(AuthStateTask);
 
-            tickets = await TicketService.GetAllTicketsAsync(userInfo!.CompanyId);
+            if (userInfo!.Roles.Contains("Admin"))
+            {
+                isAdmin = true;
+
+                tickets = await TicketService.GetAllTicketsAsync(userInfo!.CompanyId);
+            }
+            else
+            {
+                tickets = await TicketService.GetUserTicketsAsync(userInfo!.UserId, userInfo!.CompanyId);
+                tickets = tickets.Where(t => !t.Archived);
+            }
+
         }
         catch (Exception ex)
         {
@@ -159,14 +284,32 @@
     {
         showArchived = false;
 
-        tickets = await TicketService.GetAllTicketsAsync(userInfo!.CompanyId);
+        if (isAdmin)
+        {
+            tickets = await TicketService.GetAllTicketsAsync(userInfo!.CompanyId);
+        }
+        else
+        {
+            tickets = await TicketService.GetUserTicketsAsync(userInfo!.UserId, userInfo!.CompanyId);
+            tickets = tickets.Where(t => !t.Archived);
+        }
+
     }
 
     private async Task ShowArchived()
     {
         showArchived = true;
 
-        tickets = await TicketService.GetArchivedTicketsAsync(userInfo!.CompanyId);
+        if (isAdmin)
+        {
+            tickets = await TicketService.GetArchivedTicketsAsync(userInfo!.CompanyId);
+        }
+        else
+        {
+            tickets = await TicketService.GetUserTicketsAsync(userInfo!.UserId, userInfo!.CompanyId);
+            tickets = tickets.Where(t => t.Archived);
+        }
+
     }
 
     public async Task HandleArchive(int ticketId)

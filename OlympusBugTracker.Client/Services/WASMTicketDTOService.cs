@@ -30,6 +30,13 @@ namespace OlympusBugTracker.Client.Services
             return tickets;
         }
 
+        public async Task<IEnumerable<TicketDTO>> GetUserTicketsAsync(string userId, int companyId)
+        {
+            IEnumerable<TicketDTO> tickets = await _httpClient.GetFromJsonAsync<IEnumerable<TicketDTO>>("api/tickets/member") ?? [];
+
+            return tickets;
+        }
+
         public async Task<TicketDTO?> GetTicketByIdAsync(int ticketId, int companyId)
         {
             TicketDTO? ticket = await _httpClient.GetFromJsonAsync<TicketDTO>($"api/tickets/ticket/{ticketId}");

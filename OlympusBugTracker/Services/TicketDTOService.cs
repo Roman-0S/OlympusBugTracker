@@ -46,6 +46,13 @@ namespace OlympusBugTracker.Services
             return tickets.Select(t => t.ToDTO());
         }
 
+        public async Task<IEnumerable<TicketDTO>> GetUserTicketsAsync(string userId, int companyId)
+        {
+            IEnumerable<Ticket> tickets = await repository.GetUserTicketsAsync(userId, companyId);
+
+            return tickets.Select(t => t.ToDTO());
+        }
+
         public async Task<TicketDTO?> GetTicketByIdAsync(int ticketId, int companyId)
         {
             Ticket? ticket = await repository.GetTicketByIdAsync(ticketId, companyId);

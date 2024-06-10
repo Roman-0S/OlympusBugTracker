@@ -10,6 +10,8 @@ namespace OlympusBugTracker.Client.Services.Interfaces
 
         Task<IEnumerable<TicketDTO>> GetArchivedTicketsAsync(int companyId);
 
+        Task<IEnumerable<TicketDTO>> GetUserTicketsAsync(string userId, int companyId);
+
         Task<TicketDTO?> GetTicketByIdAsync(int ticketId, int companyId);
 
         Task<TicketDTO> AddTicketAsync(TicketDTO ticketDTO, int companyId);

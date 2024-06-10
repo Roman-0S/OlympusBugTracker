@@ -77,6 +77,30 @@ namespace OlympusBugTracker.Controllers
         }
 
 
+        [HttpGet("member")]
+        public async Task<ActionResult<IEnumerable<TicketDTO>>> GetUserTickets()
+        {
+            try
+            {
+                if (_companyId is not null)
+                {
+                    IEnumerable<TicketDTO> tickets = await _ticketService.GetUserTicketsAsync(_userId, _companyId.Value);
+
+                    return Ok(tickets);
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
+        }
+
+
         [HttpGet("ticket/{ticketId:int}")]
         public async Task<ActionResult<TicketDTO>> GetTicketById([FromRoute] int ticketId)
         {

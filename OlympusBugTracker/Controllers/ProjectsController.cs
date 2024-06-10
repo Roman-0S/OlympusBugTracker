@@ -48,6 +48,7 @@ namespace OlympusBugTracker.Controllers
             }
         }
 
+
         [HttpGet("archived")]
         public async Task<ActionResult<IEnumerable<ProjectDTO>>> GetArchivedProjects()
         {
@@ -70,6 +71,31 @@ namespace OlympusBugTracker.Controllers
                 throw;
             }
         }
+
+
+        [HttpGet("member")]
+        public async Task<ActionResult<IEnumerable<ProjectDTO>>> GetMemberProjects()
+        {
+            try
+            {
+                if (_companyId is not null)
+                {
+                    IEnumerable<ProjectDTO> projects = await _projectService.GetMemberProjectsAsync(_userId, _companyId.Value);
+
+                    return Ok(projects);
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
+        }
+
 
         [HttpGet("project/{projectId:int}")]
         public async Task<ActionResult<ProjectDTO>> GetProjectById([FromRoute] int projectId)
@@ -101,6 +127,7 @@ namespace OlympusBugTracker.Controllers
             }
         }
 
+
         [HttpPost]
         public async Task<ActionResult<ProjectDTO>> AddProject([FromBody] ProjectDTO projectDTO)
         {
@@ -123,6 +150,7 @@ namespace OlympusBugTracker.Controllers
                 throw;
             }
         }
+
 
         [HttpPut("{projectId:int}")]
         public async Task<IActionResult> UpdateProject([FromRoute] int projectId, [FromBody] ProjectDTO projectDTO)
@@ -156,6 +184,7 @@ namespace OlympusBugTracker.Controllers
             }
         }
 
+
         [HttpPut("archive/{projectId:int}")]
         public async Task<IActionResult> ArchiveProject([FromRoute] int projectId)
         {
@@ -187,6 +216,7 @@ namespace OlympusBugTracker.Controllers
                 throw;
             }
         }
+
 
         [HttpPut("restore/{projectId:int}")]
         public async Task<IActionResult> RestoreProject([FromRoute] int projectId)
@@ -251,7 +281,6 @@ namespace OlympusBugTracker.Controllers
                 throw;
             }
         }
-
 
         [HttpGet("{projectId:int}/manager")]
         public async Task<ActionResult<UserDTO>> GetProjectManager([FromRoute] int projectId)
