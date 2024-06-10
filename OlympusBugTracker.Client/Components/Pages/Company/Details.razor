@@ -1,6 +1,7 @@
 ﻿@page "/company"
 @using OlympusBugTracker.Client.Components.UI.Company
 @using OlympusBugTracker.Client.Helpers
+@using static OlympusBugTracker.Client.Models.Enums
 @rendermode InteractiveAuto
 
 @inject ICompanyDTOService CompanyService
@@ -11,30 +12,139 @@
 {
     <div>
 
-        <div class="text-end">
+        <section class="py-5 mt-2 mt-sm-3 mt-md-0 pt-md-2">
+            <h2 class="h1 text-center pt-lg-3 pb-3 pb-md-4 mb-0 mb-sm-2 mb-lg-3">Company Information</h2>
+            <div class="row align-items-lg-center">
 
-            <a href="/company/edit/@company.Id" class="btn btn-sm btn-outline-primary">Edit Company</a>
+                <div class="col-md-6 col-lg-5 pb-2 pb-lg-0 mb-4 mb-md-0">
+                    <div>
+                        <div class="mb-n3 mb-lg-n2 mb-xl-1">
+                            <h3>
+                                @company.Name
+                            </h3>
+                            <div>
+                                @((MarkupString)company.Description!)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-7 col-xl-6 offset-xl-1">
+                    <div class="ps-lg-4 ps-xl-0">
+                        <div class="binded-content">
+                            <div class="binded-item active">
+                                <img class="rounded-5" src="@(string.IsNullOrEmpty(company.ImageURL) ? ImageHelper.DefaultCompanyImage : company.ImageURL)" alt="Image">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <AuthorizeView Roles="Admin">
+
+            <div class="text-end mb-5">
+
+                <a href="/company/edit/@company.Id" class="btn btn-sm btn-outline-primary">Edit Company</a>
+
+            </div>
+
+        </AuthorizeView>
+
+
+        <section class="container py-5 mb-lg-3 mb-xl-4 mt-xl-3 my-xxl-5">
+
+            <h2 class="h1 text-center pt-2 pt-sm-3 pt-md-4 pt-lg-5 mt-xl-2 mb-5">Our Team</h2>
+
+            <div class="mb-4 mb-lg-5 pb-4 px-3" data-simplebar>
+
+                <div class="row row-cols-lg-4 flex-nowrap flex-lg-wrap gy-lg-5 mx-n3">
+
+                    @foreach (UserDTO user in company.Users.OrderBy(u => u.Role))
+                    {
+
+                        <div class="col">
+
+                            <div class="d-block text-center" style="min-width: 210px;">
+
+                                <img class="rounded-circle" src="@(string.IsNullOrEmpty(user.ImageURL) ? ImageHelper.DefaultProfilePicture : user.ImageURL)" width="120" alt="Avatar">
+
+                                <h3 class="h5 pt-4 mb-1">@user.FullName</h3>
+
+                                @foreach (Roles role in Enum.GetValues(typeof(Roles)))
+                                {
+                                    if (user.Role == role.ToString())
+                                    {
+                                        <p class="text-body-secondary mb-0">@role.GetDisplayName()</p>
+                                    }
+                                }
+
+                            </div>
+
+                        </div>
+
+                    }
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <AuthorizeView Roles="Admin">
+
+            <div class="text-end mb-5">
+
+                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalId">Manage Member Roles</button>
+
+            </div>
+
+        </AuthorizeView>
+
+
+        <div class="modal fade" id="modalId" tabindex="-1" role="dialog">
+
+            <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+
+                <div class="modal-content">
+
+                    <div class="modal-header">
+
+                        <h4 class="modal-title">Manage Member Roles</h4>
+
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                    </div>
+
+                    <div class="modal-body">
+
+                        <div class="row row-cols-lg-3 flex-nowrap flex-lg-wrap gy-lg-5 mx-n3">
+
+                            @foreach (UserDTO user in company.Users.OrderBy(u => u.Role))
+                            {
+                                <div class="col">
+
+                                    <CompanyUserCard User="user" OnSubmit="HandleSubmit" />
+
+                                </div>
+                            }
+
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer flex-column flex-sm-row">
+
+                        <button type="button" class="btn btn-outline-secondary ms-auto" data-bs-dismiss="modal">Close</button>
+
+                    </div>
+
+                </div>
+
+            </div>
 
         </div>
 
-        <img src="@(string.IsNullOrEmpty(company.ImageURL) ? ImageHelper.DefaultCompanyImage : company.ImageURL)" />
-
-        <div class="vstack gap-3 mt-4">
-
-            <h1>@company.Name</h1>
-
-            <p>@((MarkupString)company.Description!)</p>
-
-            <ul>
-
-                @foreach (UserDTO user in company.Users)
-                {
-                    <CompanyUserCard User="user" OnSubmit="HandleSubmit" />
-                }
-
-            </ul>
-
-        </div>
 
     </div>
 }

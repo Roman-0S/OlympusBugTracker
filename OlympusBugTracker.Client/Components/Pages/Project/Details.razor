@@ -17,17 +17,82 @@
 
     <div class="row">
 
-        <div class="col-md-8 table-responsive">
+        <div class="col-12">
 
-            <h1>@project.Name</h1>
+            <div class="row">
 
-            <p>@((MarkupString)project.Description!)</p>
+                <div class="col-md-8">
 
-            <p>@project.StartDate - @project.EndDate</p>
+                    <h1>@project.Name</h1>
 
-            <p>@project.Priority</p>
+                    <p>@((MarkupString)project.Description!)</p>
 
-            <hr />
+                    <p>@project.StartDate - @project.EndDate</p>
+
+                    <p>@project.Priority</p>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <div class="vstack">
+
+                        <h5>Project Members</h5>
+
+                        @foreach (UserDTO member in projectMembers.OrderBy(pm => pm.Role))
+                        {
+                            foreach (Roles role in Enum.GetValues(typeof(Roles)))
+                            {
+                                if (member.Role == role.ToString())
+                                {
+                                    <p>@member.FullName - @role.GetDisplayName()</p>
+                                }
+                            }
+                        }
+
+                    </div>
+
+                    <AuthorizeView Roles="Admin">
+
+                        <div class="mb-4">
+
+                            <h5>Assign a Project Manager</h5>
+
+                            <button class="btn btn-sm btn-primary ms-2" data-bs-toggle="modal" data-bs-target="#assignManager">Assign a Manager</button>
+
+                        </div>
+
+                    </AuthorizeView>
+
+                    <AuthorizeView Roles="Admin, ProjectManager">
+
+                        <div>
+
+                            <h5>Add a Member</h5>
+
+                            <div class="hstack gap-2">
+
+                                <button class="btn btn-sm btn-primary ms-2" data-bs-toggle="modal" data-bs-target="#addMember">Add a Member</button>
+
+                                <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#removeMember">Remove a Member</button>
+
+                            </div>
+
+
+                        </div>
+
+                    </AuthorizeView>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+
+        <div class="col-12 table-responsive">
 
             <h1 class="mt-3">Tickets</h1>
 
@@ -127,59 +192,73 @@
 
         </div>
 
-        <div class="col-md-4">
+    </div>
 
-            <div class="vstack">
+    <div class="modal fade" id="assignManager" tabindex="-1" role="dialog">
 
-                @foreach (UserDTO member in projectMembers)
-                {
-                    <p>@member.FullName - @member.Role</p>
-                }
+        <div class="modal-dialog modal-dialog-centered" role="document">
 
-            </div>
+            <div class="modal-content">
 
+                <div class="modal-header">
 
-            <AuthorizeView Roles="Admin">
-                <div class="mb-4">
+                    <h4 class="modal-title">Assign a Project Manager</h4>
 
-                    <h5>Assign a Project Manager</h5>
-
-                    <p>@projectManager?.FullName</p>
-
-                    <form @onsubmit="HandleAssign">
-
-                        <InputSelect @bind-Value="selectedProjectManager">
-
-                            <option value="">Select a Project Manager</option>
-
-                            @foreach (UserDTO projectManager in projectManagers)
-                            {
-                                <option value="@projectManager.Id">@projectManager.FullName</option>
-                            }
-
-                        </InputSelect>
-
-                        <div class="hstack gap-2 ms-2">
-
-                            <button class="btn btn-sm btn-primary ms-2">Save</button>
-
-                        </div>
-
-                    </form>
-
-
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 
                 </div>
 
+                <div class="modal-body">
 
+                    @if (projectManager is not null)
+                    {
+                        <p>Current: @projectManager.FullName</p>
+                    }
 
-            </AuthorizeView>
+                    <InputSelect @bind-Value="selectedProjectManager">
 
-            <AuthorizeView Roles="Admin, ProjectManager">
+                        <option value="">Select a Project Manager</option>
 
-                <div>
+                        @foreach (UserDTO projectManager in projectManagers)
+                        {
+                            <option value="@projectManager.Id">@projectManager.FullName</option>
+                        }
 
-                    <h5>Add a Member</h5>
+                    </InputSelect>
+
+                </div>
+
+                <div class="modal-footer hstack gap-2 text-end">
+
+                    <button class="btn btn-sm btn-primary ms-2" data-bs-dismiss="modal" @onclick="HandleAssign">Save</button>
+
+                    <button class="btn btn-sm btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="modal fade" id="addMember" tabindex="-1" role="dialog">
+
+        <div class="modal-dialog modal-dialog-centered" role="document">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h4 class="modal-title">Add a Member</h4>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <p>Select a member to add.</p>
 
                     <InputSelect @bind-Value="selectedMember">
 
@@ -201,20 +280,23 @@
 
                     </InputSelect>
 
-                    <button class="btn btn-sm btn-primary ms-2" @onclick="HandleAddMember">Save</button>
+                </div>
 
-                    <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modalId">Remove a Member</button>
+                <div class="modal-footer hstack gap-2 text-end">
+
+                    <button class="btn btn-sm btn-primary ms-2" data-bs-dismiss="modal" @onclick="HandleAddMember">Save</button>
+
+                    <button class="btn btn-sm btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
 
                 </div>
 
-
-            </AuthorizeView>
+            </div>
 
         </div>
 
     </div>
 
-    <div class="modal fade" id="modalId" tabindex="-1" role="dialog">
+    <div class="modal fade" id="removeMember" tabindex="-1" role="dialog">
 
         <div class="modal-dialog modal-dialog-centered" role="document">
 
@@ -247,14 +329,13 @@
 
                     </InputSelect>
 
-                    <div class="hstack gap-2 mt-4">
+                </div>
 
-                        <button class="btn btn-sm btn-danger" data-bs-dismiss="modal" @onclick="HandleRemoveMember">Remove Member</button>
+                <div class="modal-footer hstack gap-2 text-end">
 
-                        <button class="btn btn-sm btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                    <button class="btn btn-sm btn-danger" data-bs-dismiss="modal" @onclick="HandleRemoveMember">Remove Member</button>
 
-                    </div>
-
+                    <button class="btn btn-sm btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
 
                 </div>
 

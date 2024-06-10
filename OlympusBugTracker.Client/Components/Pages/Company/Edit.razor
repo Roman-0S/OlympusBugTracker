@@ -14,35 +14,47 @@
 @if (company is not null)
 {
 
-    <EditForm Model="company" OnValidSubmit="HandleSubmit" >
+    <EditForm Model="company" OnValidSubmit="HandleSubmit">
 
         <DataAnnotationsValidator />
 
-        <div class="mb-2">
+        <div class="row row-cols-md-2 mt-5">
 
-            <img class="img-fluid" src="@(string.IsNullOrEmpty(company.ImageURL) ? ImageHelper.DefaultCompanyImage : company.ImageURL)" />
+            <div class="col">
 
-            <InputFile OnChange="OnFileChange" class="form-control mt-3" accept=".png, .jpg, .jpeg, .svg" />
+                <div class="mb-2">
 
-            <span class="text-danger">@imageError</span>
+                    <label class="form-label" for="companyName">Company Name</label>
 
-        </div>
+                    <InputText class="form-control" @bind-Value="company.Name" id="companyName" />
 
-        <div class="mb-2">
+                    <ValidationMessage For="() => company.Name" />
 
-            <label class="form-label" for="companyName">Company Name</label>
+                </div>
 
-            <InputText class="form-control" @bind-Value="company.Name" id="companyName" />
+                <div class="flex-fill vstack">
 
-            <ValidationMessage For="() => company.Name" />
+                    <label class="form-label" for="companyDescription">Company Description</label>
 
-        </div>
+                    <TinyMCE.Blazor.Editor ScriptSrc="/tinymce/tinymce.min.js" @bind-Value="company.Description" Field="() => company.Description" ClassName="rich-text-editor" Conf="editorConfig" />
 
-        <div class="flex-fill vstack">
+                </div>
 
-            <label class="form-label" for="companyDescription">Company Description</label>
+            </div>
 
-            <TinyMCE.Blazor.Editor ScriptSrc="/tinymce/tinymce.min.js" @bind-Value="company.Description" Field="() => company.Description" ClassName="rich-text-editor" Conf="editorConfig" />
+            <div class="col">
+
+                <div>
+
+                    <img class="img-fluid" src="@(string.IsNullOrEmpty(company.ImageURL) ? ImageHelper.DefaultCompanyImage : company.ImageURL)" />
+
+                    <InputFile OnChange="OnFileChange" class="form-control mt-3" accept=".png, .jpg, .jpeg, .svg" />
+
+                    <span class="text-danger">@imageError</span>
+
+                </div>
+
+            </div>
 
         </div>
 

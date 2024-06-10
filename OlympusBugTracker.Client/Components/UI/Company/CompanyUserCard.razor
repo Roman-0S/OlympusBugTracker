@@ -8,26 +8,26 @@
 
     <EditForm Model="User" OnValidSubmit="HandleSubmit">
 
-        <h5>@User.FullName - @User.Role</h5>
+        @foreach (Roles role in Enum.GetValues(typeof(Roles)))
+        {
+            if (User.Role == role.ToString())
+            {
+                <h5>@User.FullName - @role.GetDisplayName()</h5>
+            }
+        }
 
         <div class="hstack gap-3">
 
-            <div>
+            <div class="input-group">
 
-                <label class="form-label">Change Role?</label>
+                <InputSelect @bind-Value="User.Role" class="form-control mx-2">
 
-                <InputSelect @bind-Value="User.Role" class="form-control">
-
-                    @foreach(Roles role in Enum.GetValues(typeof(Roles)))
+                    @foreach (Roles role in Enum.GetValues(typeof(Roles)))
                     {
                         <option value="@role">@role.GetDisplayName()</option>
                     }
 
                 </InputSelect>
-
-            </div>
-
-            <div>
 
                 <button class="btn btn-sm btn-primary">Save</button>
 

@@ -28,19 +28,23 @@
                     </div>
                 </a>
 
-                <div class="ms-4 mb-4 hstack gap-3">
+                <AuthorizeView Roles="Admin, ProjectManager">
 
-                    <button class="btn btn-sm btn-danger" @onclick="HandleArchive">
-                        <i class="ai ai-archive"></i>
-                        &nbsp; Archive
-                    </button>
+                    <div class="ms-4 mb-4 hstack gap-3">
 
-                    <a href="/project/edit/@Project.Id" class="btn btn-sm btn-primary">
-                        <i class="ai ai-edit"></i>
-                        &nbsp; Edit
-                    </a>
+                        <button class="btn btn-sm btn-danger" @onclick="HandleArchive">
+                            <i class="ai ai-archive"></i>
+                            &nbsp; Archive
+                        </button>
 
-                </div>
+                        <a href="/project/edit/@Project.Id" class="btn btn-sm btn-primary">
+                            <i class="ai ai-edit"></i>
+                            &nbsp; Edit
+                        </a>
+
+                    </div>
+
+                </AuthorizeView>
 
             </div>
 
@@ -71,14 +75,18 @@
                     </div>
                 </a>
 
-                <div class="ms-4 mb-4">
+                <AuthorizeView Roles="Admin, ProjectManager">
 
-                    <button class="btn btn-sm btn-primary" @onclick="HandleRecover">
-                        <i class="ai ai-check"></i>
-                        &nbsp; Recover
-                    </button>
+                    <div class="ms-4 mb-4">
 
-                </div>
+                        <button class="btn btn-sm btn-primary" @onclick="HandleRecover">
+                            <i class="ai ai-check"></i>
+                            &nbsp; Recover
+                        </button>
+
+                    </div>
+
+                </AuthorizeView>
 
             </div>
 

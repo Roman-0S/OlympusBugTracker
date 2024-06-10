@@ -5,6 +5,7 @@
 @using OlympusBugTracker.Client.Services.Interfaces
 
 @inject IProjectDTOService ProjectService
+@inject NavigationManager Nav
 
 <PageTitle>BugTracker | Projects</PageTitle>
 
@@ -49,13 +50,18 @@
 
             }
 
-            <div>
+            <AuthorizeView Roles="Admin, ProjectManager">
 
-                <a href="/project/create" class="btn btn-primary btn-sm">
-                    Add Project
-                </a>
+                <div>
 
-            </div>
+                    <a href="/project/create" class="btn btn-primary btn-sm">
+                        Add Project
+                    </a>
+
+                </div>
+
+            </AuthorizeView>
+
 
         </div>
 
@@ -75,7 +81,7 @@
                     <div class="form-check form-switch">
 
                         <input type="checkbox" class="form-check-input" role="switch" id="showMemberProjects" @onclick="ShowMemberProjects" />
-                        <label class="form-check-label" for="showMemberProjects">Show My Projects</label>
+                        <label class="form-check-label" for="showMemberProjects">My Projects</label>
 
                     </div>
 
@@ -84,15 +90,29 @@
 
             </div>
 
+            @if (!(projects.Count() == 0))
+            {
 
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4 pb-sm-3 pb-md-4 pb-xl-5 mb-5">
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4 pb-sm-3 pb-md-4 pb-xl-5 mb-5">
 
-                @foreach (ProjectDTO project in projects)
-                {
-                    <ProjectCard Project="project" OnArchive="HandleArchive" OnRecover="HandleRecover" />
-                }
+                    @foreach (ProjectDTO project in projects)
+                    {
+                        <ProjectCard Project="project" OnArchive="HandleArchive" OnRecover="HandleRecover" />
+                    }
 
-            </div>
+                </div>
+
+            }
+            else
+            {
+
+                <div class="d-flex justify-content-center mt-5">
+
+                    <h5 class="text-secondary-emphasis bolder">There are no current projects.</h5>
+
+                </div>
+
+            }
 
         }
         else
@@ -112,23 +132,37 @@
                     <div class="form-check form-switch">
 
                         <input type="checkbox" class="form-check-input" role="switch" id="showMemberProjects" @onclick="ShowMemberProjects" />
-                        <label class="form-check-label" for="showMemberProjects">Show My Projects</label>
+                        <label class="form-check-label" for="showMemberProjects">My Projects</label>
 
                     </div>
 
                 }
 
-
             </div>
 
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4 pb-sm-3 pb-md-4 pb-xl-5 mb-5">
+            @if (!(projects.Count() == 0))
+            {
 
-                @foreach (ProjectDTO project in projects)
-                {
-                    <ProjectCard Project="project" OnRecover="HandleRecover" OnArchive="HandleArchive" />
-                }
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4 pb-sm-3 pb-md-4 pb-xl-5 mb-5">
 
-            </div>
+                    @foreach (ProjectDTO project in projects)
+                    {
+                        <ProjectCard Project="project" OnRecover="HandleRecover" OnArchive="HandleArchive" />
+                    }
+
+                </div>
+
+            }
+            else
+            {
+
+                <div class="d-flex justify-content-center mt-5">
+
+                    <h5 class="text-secondary-emphasis bolder">There are no archived projects.</h5>
+
+                </div>
+
+            }
 
         }
 
@@ -171,13 +205,17 @@
 
             }
 
-            <div>
+            <AuthorizeView Roles="ProjectManager">
 
-                <a href="/project/create" class="btn btn-primary btn-sm">
-                    Add Project
-                </a>
+                <div>
 
-            </div>
+                    <a href="/project/create" class="btn btn-primary btn-sm">
+                        Add Project
+                    </a>
+
+                </div>
+
+            </AuthorizeView>
 
         </div>
 
@@ -187,34 +225,39 @@
 
                 <h1>My Projects</h1>
 
-                @if (userInfo!.Roles.Contains("Admin"))
-                {
+                <div class="form-check form-switch">
 
-                }
-                else
-                {
+                    <input type="checkbox" class="form-check-input" role="switch" id="showMemberProjects" checked @onclick="ShowMemberProjects" />
+                    <label class="form-check-label" for="showMemberProjects">My Projects</label>
 
-                    <div class="form-check form-switch">
-
-                        <input type="checkbox" class="form-check-input" role="switch" id="showMemberProjects" checked @onclick="ShowMemberProjects" />
-                        <label class="form-check-label" for="showMemberProjects">Show My Projects</label>
-
-                    </div>
-
-                }
-
+                </div>
 
             </div>
 
+            @if (!(projects.Count() == 0))
+            {
 
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4 pb-sm-3 pb-md-4 pb-xl-5 mb-5">
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4 pb-sm-3 pb-md-4 pb-xl-5 mb-5">
 
-                @foreach (ProjectDTO project in projects)
-                {
-                    <ProjectCard Project="project" OnArchive="HandleArchive" OnRecover="HandleRecover" />
-                }
+                    @foreach (ProjectDTO project in projects)
+                    {
+                        <ProjectCard Project="project" OnArchive="HandleArchive" OnRecover="HandleRecover" />
+                    }
 
-            </div>
+                </div>
+
+            }
+            else
+            {
+
+                <div class="d-flex justify-content-center mt-5">
+
+                    <h5 class="text-secondary-emphasis bolder">You aren't assigned to any ongoing projects.</h5>
+
+                </div>
+
+            }
+
 
         }
         else
@@ -224,33 +267,38 @@
 
                 <h1>My Archived Projects</h1>
 
-                @if (userInfo!.Roles.Contains("Admin"))
-                {
+                <div class="form-check form-switch">
 
-                }
-                else
-                {
+                    <input type="checkbox" class="form-check-input" role="switch" id="showMemberProjects" checked @onclick="ShowMemberProjects" />
+                    <label class="form-check-label" for="showMemberProjects">My Projects</label>
 
-                    <div class="form-check form-switch">
-
-                        <input type="checkbox" class="form-check-input" role="switch" id="showMemberProjects" checked @onclick="ShowMemberProjects" />
-                        <label class="form-check-label" for="showMemberProjects">Show My Projects</label>
-
-                    </div>
-
-                }
-
+                </div>
 
             </div>
 
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4 pb-sm-3 pb-md-4 pb-xl-5 mb-5">
+            @if (!(projects.Count() == 0))
+            {
 
-                @foreach (ProjectDTO project in projects)
-                {
-                    <ProjectCard Project="project" OnRecover="HandleRecover" OnArchive="HandleArchive" />
-                }
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4 pb-sm-3 pb-md-4 pb-xl-5 mb-5">
 
-            </div>
+                    @foreach (ProjectDTO project in projects)
+                    {
+                        <ProjectCard Project="project" OnRecover="HandleRecover" OnArchive="HandleArchive" />
+                    }
+
+                </div>
+
+            }
+            else
+            {
+
+                <div class="d-flex justify-content-center mt-5">
+
+                    <h5 class="text-secondary-emphasis bolder">No Archived Projects</h5>
+
+                </div>
+
+            }
 
         }
 
@@ -320,6 +368,8 @@
         else
         {
             projects = await ProjectService.GetMemberProjectsAsync(userInfo!.UserId, userInfo!.CompanyId);
+
+            projects = projects.Where(p => !p.Archived);
         }
     }
 
@@ -341,7 +391,9 @@
 
     private async Task ShowMemberProjects()
     {
-        if (!showMember)
+        showMember = !showMember;
+
+        if (showMember)
         {
 
             if (!showArchived)
@@ -369,8 +421,6 @@
             }
 
         }
-
-        showMember = !showMember;
     }
 
     private async Task HandleArchive(int projectId)

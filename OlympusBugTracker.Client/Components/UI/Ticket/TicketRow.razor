@@ -10,7 +10,7 @@
             <td> <a href="ticket/@Ticket.Id" class="text-decoration-none">@Ticket.Title</a> </td>
             <td>@Ticket.Project?.Name</td>
             <td>@Ticket.Status</td>
-            <td>@Ticket.Created</td>
+            <td>@Ticket.Created.ToString("d")</td>
             <td>
                 <button class="btn btn-outline-danger btn-sm" @onclick="HandleArchive">
                     <i class="ai ai-archive"></i>
@@ -37,7 +37,7 @@
             <td>@Ticket.Title</td>
             <td>@Ticket.Project?.Name</td>
             <td>@Ticket.Status</td>
-            <td>@Ticket.Created</td>
+            <td>@Ticket.Created.ToString("d")</td>
             <td>
                 <button class="btn btn-outline-primary btn-sm" @onclick="HandleRestore">
                     <i class="ai ai-check"></i>
