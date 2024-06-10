@@ -1,8 +1,13 @@
 ﻿@page "/project/create"
-@using OlympusBugTracker.Client.Helpers
 @rendermode InteractiveAuto
+@attribute [Authorize(Roles = "Admin, ProjectManager")]
+
+@using Microsoft.AspNetCore.Authorization
+@using OlympusBugTracker.Client.Helpers
 
 @inject IProjectDTOService ProjectService
+@inject ICompanyDTOService CompanyService
+@inject NavigationManager Nav
 
 
 
@@ -43,6 +48,8 @@
         try
         {
             userInfo = await UserInfoHelper.GetUserInfoAsync(AuthStateTask);
+
+            if (userInfo is null) Nav.NavigateTo("/Account/Login");
         }
         catch (Exception ex)
         {
@@ -55,8 +62,15 @@
     {
         try
         {
-            await ProjectService.AddProjectAsync(project, userInfo!.CompanyId);
-    }
+            ProjectDTO projectAdded = await ProjectService.AddProjectAsync(project, userInfo!.CompanyId);
+
+            if (userInfo.Roles.Contains("ProjectManager"))
+            {
+                await ProjectService.AssignProjectManagerAsync(projectAdded.Id, userInfo!.UserId, userInfo!.UserId);
+            }
+
+            Nav.NavigateTo($"project/{projectAdded.Id}");
+        }
         catch (Exception ex)
         {
             Console.WriteLine(ex);

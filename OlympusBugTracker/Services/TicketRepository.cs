@@ -55,7 +55,7 @@ namespace OlympusBugTracker.Services
             {
                 IEnumerable<Ticket> tickets = await context.Tickets.Include(t => t.Project)
                                                                       .ThenInclude(p => p!.Users)
-                                                                   .Where(t => t.Project!.CompanyId == companyId && t.Project.Users.Any(u => u.Id == user.Id))
+                                                                   .Where(t => t.Project!.CompanyId == companyId && (t.Project.Users.Any(u => u.Id == user.Id) || t.SubmitterUserId == user.Id))
                                                                    .OrderByDescending(t => t.Created)
                                                                    .ToListAsync();
 
@@ -65,7 +65,7 @@ namespace OlympusBugTracker.Services
             {
                 IEnumerable<Ticket> tickets = await context.Tickets.Include(t => t.Project)
                                                                       .ThenInclude(p => p!.Users)
-                                                                   .Where(t => t.Project!.CompanyId == companyId && t.DeveloperUserId == user.Id || t.SubmitterUserId == user.Id)
+                                                                   .Where(t => t.Project!.CompanyId == companyId && (t.DeveloperUserId == user.Id || t.SubmitterUserId == user.Id))
                                                                    .OrderByDescending(t => t.Created)
                                                                    .ToListAsync();
 
