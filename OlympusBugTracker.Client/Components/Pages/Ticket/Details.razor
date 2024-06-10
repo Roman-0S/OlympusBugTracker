@@ -8,6 +8,7 @@
 
 @inject ITicketDTOService TicketService
 @inject IProjectDTOService ProjectService
+@inject NavigationManager Nav
 
 
 
@@ -135,6 +136,8 @@
         try
         {
             userInfo = await UserInfoHelper.GetUserInfoAsync(AuthStateTask);
+
+            if (userInfo is null) Nav.NavigateTo("/Account/Login");
 
             ticket = await TicketService.GetTicketByIdAsync(Id, userInfo!.CompanyId);
 

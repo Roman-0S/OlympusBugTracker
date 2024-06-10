@@ -1,6 +1,9 @@
 ﻿@page "/project/edit/{id:int}"
-@using OlympusBugTracker.Client.Helpers
 @rendermode InteractiveAuto
+@attribute [Authorize(Roles = "Admin, ProjectManager")]
+
+@using Microsoft.AspNetCore.Authorization
+@using OlympusBugTracker.Client.Helpers
 
 @inject IProjectDTOService ProjectService
 @inject NavigationManager Nav
@@ -50,7 +53,20 @@
         {
             userInfo = await UserInfoHelper.GetUserInfoAsync(AuthStateTask);
 
+            if (userInfo is null) Nav.NavigateTo("/Account/Login");
+
             project = await ProjectService.GetProjectByIdAsync(Id, userInfo!.CompanyId);
+
+            if (project is null)
+            {
+                Nav.NavigateTo("/projects");
+            }
+
+            if (userInfo.Roles.Contains("ProjectManager"))
+            {
+                if (!project!.Users.Any(u => u.Id == userInfo!.UserId)) Nav.NavigateTo("/projects");
+            }
+
         }
         catch (Exception ex)
         {
@@ -58,10 +74,6 @@
             throw;
         }
 
-        if (project is null)
-        {
-            Nav.NavigateTo("/projects");
-        }
     }
 
     private async Task HandleSubmit(ProjectDTO project)

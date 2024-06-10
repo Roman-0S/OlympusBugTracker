@@ -1,6 +1,8 @@
 ﻿@page "/project/{id:int}"
 @rendermode InteractiveAuto
+@attribute [Authorize]
 
+@using Microsoft.AspNetCore.Authorization
 @using OlympusBugTracker.Client.Components.UI.Ticket
 @using OlympusBugTracker.Client.Helpers
 @using static OlympusBugTracker.Client.Models.Enums
@@ -66,20 +68,25 @@
 
                     <AuthorizeView Roles="Admin, ProjectManager">
 
-                        <div>
+                        @if (userInfo!.Roles.Contains("Admin") || project.Users.Any(u => u.Id == userInfo!.UserId))
+                        {
 
-                            <h5>Add a Member</h5>
+                            <div>
 
-                            <div class="hstack gap-2">
+                                <h5>Add a Member</h5>
 
-                                <button class="btn btn-sm btn-primary ms-2" data-bs-toggle="modal" data-bs-target="#addMember">Add a Member</button>
+                                <div class="hstack gap-2">
 
-                                <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#removeMember">Remove a Member</button>
+                                    <button class="btn btn-sm btn-primary ms-2" data-bs-toggle="modal" data-bs-target="#addMember">Add a Member</button>
+
+                                    <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#removeMember">Remove a Member</button>
+
+                                </div>
+
 
                             </div>
 
-
-                        </div>
+                        }
 
                     </AuthorizeView>
 
@@ -395,6 +402,8 @@
         try
         {
             userInfo = await UserInfoHelper.GetUserInfoAsync(AuthStateTask);
+
+            if (userInfo is null) Nav.NavigateTo("/Account/Login");
 
             project = await ProjectService.GetProjectByIdAsync(Id, userInfo!.CompanyId);
 

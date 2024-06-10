@@ -5,6 +5,7 @@
 @using OlympusBugTracker.Client.Helpers
 
 @inject ITicketDTOService TicketService
+@inject NavigationManager Nav
 
 
 <div>
@@ -259,6 +260,8 @@
         try
         {
             userInfo = await UserInfoHelper.GetUserInfoAsync(AuthStateTask);
+
+            if (userInfo is null) Nav.NavigateTo("/Account/Login");
 
             if (userInfo!.Roles.Contains("Admin"))
             {

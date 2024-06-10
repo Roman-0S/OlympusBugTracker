@@ -30,19 +30,24 @@
 
                 <AuthorizeView Roles="Admin, ProjectManager">
 
-                    <div class="ms-4 mb-4 hstack gap-3">
+                    @if (Project.Users.Any(u => u.Id == UserInfo!.UserId) || UserInfo!.Roles.Contains("Admin"))
+                    {
 
-                        <button class="btn btn-sm btn-danger" @onclick="HandleArchive">
-                            <i class="ai ai-archive"></i>
-                            &nbsp; Archive
-                        </button>
+                        <div class="ms-4 mb-4 hstack gap-3">
 
-                        <a href="/project/edit/@Project.Id" class="btn btn-sm btn-primary">
-                            <i class="ai ai-edit"></i>
-                            &nbsp; Edit
-                        </a>
+                            <button class="btn btn-sm btn-danger" @onclick="HandleArchive">
+                                <i class="ai ai-archive"></i>
+                                &nbsp; Archive
+                            </button>
 
-                    </div>
+                            <a href="/project/edit/@Project.Id" class="btn btn-sm btn-primary">
+                                <i class="ai ai-edit"></i>
+                                &nbsp; Edit
+                            </a>
+
+                        </div>
+
+                    }
 
                 </AuthorizeView>
 
@@ -77,14 +82,19 @@
 
                 <AuthorizeView Roles="Admin, ProjectManager">
 
-                    <div class="ms-4 mb-4">
+                    @if (Project.Users.Any(u => u.Id == UserInfo!.UserId) || UserInfo!.Roles.Contains("Admin"))
+                    {
 
-                        <button class="btn btn-sm btn-primary" @onclick="HandleRecover">
-                            <i class="ai ai-check"></i>
-                            &nbsp; Recover
-                        </button>
+                        <div class="ms-4 mb-4">
 
-                    </div>
+                            <button class="btn btn-sm btn-primary" @onclick="HandleRecover">
+                                <i class="ai ai-check"></i>
+                                &nbsp; Recover
+                            </button>
+
+                        </div>
+
+                    }
 
                 </AuthorizeView>
 
@@ -106,6 +116,9 @@
 
     [Parameter, EditorRequired]
     public ProjectDTO? Project { get; set; }
+
+    [Parameter, EditorRequired]
+    public UserInfo? UserInfo { get; set; }
 
     [Parameter, EditorRequired]
     public EventCallback<int> OnArchive { get; set; }

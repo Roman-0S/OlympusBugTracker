@@ -1,6 +1,8 @@
 ﻿@page "/ticket/create"
+@attribute [Authorize]
 @rendermode InteractiveAuto
 
+@using Microsoft.AspNetCore.Authorization
 @using OlympusBugTracker.Client.Components.UI.Ticket
 @using OlympusBugTracker.Client.Helpers
 
@@ -51,12 +53,14 @@
         {
             userInfo = await UserInfoHelper.GetUserInfoAsync(AuthStateTask);
 
-            if (userInfo is null)
-            {
-                Nav.NavigateTo("/tickets");
-            }
+            if (userInfo is null) Nav.NavigateTo("/Account/Login");
 
             projects = await ProjectService.GetAllProjectsAsync(userInfo!.CompanyId);
+
+            if (userInfo!.Roles.Contains("Submitter") || userInfo!.Roles.Contains("Developer") || userInfo!.Roles.Contains("ProjectManager"))
+            {
+                projects = projects.Where(p => p.Users.Any(u => u.Id == userInfo!.UserId));
+            }
         }
         catch (Exception ex)
         {

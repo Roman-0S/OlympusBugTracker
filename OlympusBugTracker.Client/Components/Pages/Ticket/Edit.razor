@@ -26,10 +26,6 @@
         </div>
 
     }
-    else
-    {
-        // display that they aren't allowed to edit the ticket
-    }
 
 </AuthorizeView>
 
@@ -73,14 +69,17 @@
         {
             userInfo = await UserInfoHelper.GetUserInfoAsync(AuthStateTask);
 
-            if (userInfo is null)
-            {
-                Nav.NavigateTo("/tickets");
-            }
+            if (userInfo is null) Nav.NavigateTo("/Account/Login");
 
             ticket = await TicketService.GetTicketByIdAsync(Id, userInfo!.CompanyId);
 
             projectManager = await ProjectService.GetProjectManagerAsync(ticket!.ProjectId, userInfo!.CompanyId);
+
+            if (!(userInfo.Roles.Contains("Admin") || userInfo?.UserId == projectManager?.Id || userInfo?.UserId == ticket?.SubmitterUserId || userInfo?.UserId == ticket?.DeveloperUserId))
+            {
+                Nav.NavigateTo("/tickets");
+            }
+
         }
         catch (Exception ex)
         {

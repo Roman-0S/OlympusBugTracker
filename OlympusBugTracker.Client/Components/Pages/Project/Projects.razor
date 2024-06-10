@@ -97,7 +97,7 @@
 
                     @foreach (ProjectDTO project in projects)
                     {
-                        <ProjectCard Project="project" OnArchive="HandleArchive" OnRecover="HandleRecover" />
+                        <ProjectCard Project="project" UserInfo="userInfo" OnArchive="HandleArchive" OnRecover="HandleRecover" />
                     }
 
                 </div>
@@ -147,7 +147,7 @@
 
                     @foreach (ProjectDTO project in projects)
                     {
-                        <ProjectCard Project="project" OnRecover="HandleRecover" OnArchive="HandleArchive" />
+                        <ProjectCard Project="project" UserInfo="userInfo" OnRecover="HandleRecover" OnArchive="HandleArchive" />
                     }
 
                 </div>
@@ -241,7 +241,7 @@
 
                     @foreach (ProjectDTO project in projects)
                     {
-                        <ProjectCard Project="project" OnArchive="HandleArchive" OnRecover="HandleRecover" />
+                        <ProjectCard Project="project" UserInfo="userInfo" OnArchive="HandleArchive" OnRecover="HandleRecover" />
                     }
 
                 </div>
@@ -283,7 +283,7 @@
 
                     @foreach (ProjectDTO project in projects)
                     {
-                        <ProjectCard Project="project" OnRecover="HandleRecover" OnArchive="HandleArchive" />
+                        <ProjectCard Project="project" UserInfo="userInfo" OnRecover="HandleRecover" OnArchive="HandleArchive" />
                     }
 
                 </div>
@@ -338,6 +338,8 @@
         {
             userInfo = await UserInfoHelper.GetUserInfoAsync(AuthStateTask);
 
+            if (userInfo is null) Nav.NavigateTo("/Account/Login");
+
             if (userInfo!.Roles.Contains("Admin"))
             {
                 projects = await ProjectService.GetAllProjectsAsync(userInfo!.CompanyId);
@@ -345,6 +347,8 @@
             else
             {
                 projects = await ProjectService.GetMemberProjectsAsync(userInfo.UserId, userInfo!.CompanyId);
+
+                projects = projects.Where(p => !p.Archived);
 
                 showMember = true;
             }
@@ -399,6 +403,8 @@
             if (!showArchived)
             {
                 projects = await ProjectService.GetMemberProjectsAsync(userInfo!.UserId, userInfo!.CompanyId);
+
+                projects = projects.Where(p => !p.Archived);
             }
             else
             {

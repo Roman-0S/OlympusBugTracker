@@ -30,7 +30,7 @@ namespace OlympusBugTracker.Services
         {
             using ApplicationDbContext context = contextFactory.CreateDbContext();
 
-            IEnumerable<Project> projects = await context.Projects.Where(p => p.CompanyId == companyId && !p.Archived).OrderByDescending(p => p.Created).ToListAsync();
+            IEnumerable<Project> projects = await context.Projects.Include(p => p.Users).Where(p => p.CompanyId == companyId && !p.Archived).OrderByDescending(p => p.Created).ToListAsync();
 
             return projects;
         }
@@ -39,7 +39,7 @@ namespace OlympusBugTracker.Services
         {
             using ApplicationDbContext context = contextFactory.CreateDbContext();
 
-            IEnumerable<Project> projects = await context.Projects.Where(p => p.CompanyId == companyId && p.Archived).OrderByDescending(p => p.Created).ToListAsync();
+            IEnumerable<Project> projects = await context.Projects.Include(p => p.Users).Where(p => p.CompanyId == companyId && p.Archived).OrderByDescending(p => p.Created).ToListAsync();
 
             return projects;
         }
@@ -48,7 +48,7 @@ namespace OlympusBugTracker.Services
         {
             using ApplicationDbContext context = contextFactory.CreateDbContext();
 
-            Project? project = await context.Projects.Include(p => p.Tickets).Where(p => p.CompanyId == companyId).FirstOrDefaultAsync(p => p.Id == projectId);
+            Project? project = await context.Projects.Include(p => p.Tickets).Include(p => p.Users).Where(p => p.CompanyId == companyId).FirstOrDefaultAsync(p => p.Id == projectId);
 
             return project;
         }
@@ -108,7 +108,7 @@ namespace OlympusBugTracker.Services
         {
             using ApplicationDbContext context = contextFactory.CreateDbContext();
 
-            IEnumerable<Project> projects = await context.Projects.Where(p => p.CompanyId == companyId && p.Users.Any(u => u.Id == userId)).OrderByDescending(p => p.Created).ToListAsync();
+            IEnumerable<Project> projects = await context.Projects.Include(p => p.Users).Where(p => p.CompanyId == companyId && p.Users.Any(u => u.Id == userId)).OrderByDescending(p => p.Created).ToListAsync();
 
             return projects;
         }

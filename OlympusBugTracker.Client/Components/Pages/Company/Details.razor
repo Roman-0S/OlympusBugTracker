@@ -1,10 +1,12 @@
 ﻿@page "/company"
+@rendermode InteractiveAuto
+
 @using OlympusBugTracker.Client.Components.UI.Company
 @using OlympusBugTracker.Client.Helpers
 @using static OlympusBugTracker.Client.Models.Enums
-@rendermode InteractiveAuto
 
 @inject ICompanyDTOService CompanyService
+@inject NavigationManager Nav
 
 
 
@@ -177,6 +179,8 @@
     protected override async Task OnInitializedAsync()
     {
         userInfo = await UserInfoHelper.GetUserInfoAsync(AuthStateTask);
+
+        if (userInfo is null) Nav.NavigateTo("/Account/Login");
 
         company = await CompanyService.GetCompanyByIdAsync(userInfo!.CompanyId);
 
