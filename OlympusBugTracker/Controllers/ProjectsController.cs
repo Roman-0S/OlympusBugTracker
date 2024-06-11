@@ -129,6 +129,7 @@ namespace OlympusBugTracker.Controllers
 
 
         [HttpPost]
+        [Authorize(Roles = "Admin, ProjectManager")]
         public async Task<ActionResult<ProjectDTO>> AddProject([FromBody] ProjectDTO projectDTO)
         {
             try
@@ -155,22 +156,15 @@ namespace OlympusBugTracker.Controllers
         [HttpPut("{projectId:int}")]
         public async Task<IActionResult> UpdateProject([FromRoute] int projectId, [FromBody] ProjectDTO projectDTO)
         {
+            if (projectId != projectDTO.Id) return BadRequest();
+
             try
             {
                 if (_companyId is not null)
                 {
-                    ProjectDTO? projectToUpdate = await _projectService.GetProjectByIdAsync(projectId, _companyId.Value);
+                    await _projectService.UpdateProjectAsync(projectDTO, _companyId.Value);
 
-                    if (projectToUpdate is not null)
-                    {
-                        await _projectService.UpdateProjectAsync(projectDTO, _companyId.Value);
-
-                        return Ok();
-                    }
-                    else
-                    {
-                        return NotFound();
-                    }
+                    return Ok();
                 }
                 else
                 {

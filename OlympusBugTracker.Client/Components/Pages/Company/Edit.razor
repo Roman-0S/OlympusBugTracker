@@ -126,6 +126,8 @@
     {
         userInfo = await UserInfoHelper.GetUserInfoAsync(AuthStateTask);
 
+        if (userInfo is null) Nav.NavigateTo("/Account/Login");
+
         company = await CompanyService.GetCompanyByIdAsync(CompanyId);
     }
 

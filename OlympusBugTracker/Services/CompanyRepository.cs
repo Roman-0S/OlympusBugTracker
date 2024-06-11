@@ -7,7 +7,7 @@ using static OlympusBugTracker.Client.Models.Enums;
 
 namespace OlympusBugTracker.Services
 {
-    public class CompanyRepository(IDbContextFactory<ApplicationDbContext> contextFactory, IServiceProvider serviceProvider) : ICompanyRepository
+    public class CompanyRepository(IDbContextFactory<ApplicationDbContext> contextFactory, IServiceProvider serviceProvider, IProjectRepository projectRepository) : ICompanyRepository
     {
         public async Task AddUserToRoleAsync(string userId, string roleName, string adminId)
         {
@@ -32,6 +32,16 @@ namespace OlympusBugTracker.Services
                     if (!string.IsNullOrEmpty(currentRole))
                     {
                         await userManager.RemoveFromRoleAsync(user, currentRole);
+                    }
+
+                    if (roleName == nameof(Roles.ProjectManager))
+                    {
+                        IEnumerable<Project> projects = await projectRepository.GetMemberProjectsAsync(user.Id, user.CompanyId);
+
+                        foreach (Project project in projects)
+                        {
+                            await projectRepository.RemoveMemberFromProjectAsync(project.Id, user.Id, admin.Id);
+                        }
                     }
 
                     await userManager.AddToRoleAsync(user, roleName);

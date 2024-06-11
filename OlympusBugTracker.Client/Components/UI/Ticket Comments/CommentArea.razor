@@ -35,7 +35,7 @@
 
             @foreach (TicketCommentDTO comment in Comments)
             {
-                <CommentCard Comment="comment" UserInfo="userInfo" OnDelete="HandleDelete" OnEdit="HandleEdit" />
+                <CommentCard Comment="comment" UserInfo="userInfo" Ticket="ticket" ProjectManager="projectManager" OnDelete="HandleDelete" OnEdit="HandleEdit" />
             }
 
         </div>

@@ -1,6 +1,6 @@
 ﻿@if (Comment is not null)
 {
-    @if (Comment.UserId == UserInfo?.UserId)
+    @if (Comment.UserId == UserInfo?.UserId || UserInfo!.Roles.Contains("Admin") || UserInfo.Roles.Contains("ProjectManager") && ProjectManager?.Id == UserInfo.UserId)
     {
 
         @if (status == Status.Viewing)
@@ -26,7 +26,12 @@
 
                     <div class="hstack justify-content-end gap-2">
 
-                        <button class="btn btn-sm btn-primary" @onclick="() => status = Status.Editing"><i class="ai ai-pencil"></i></button>
+                        @if (Comment.UserId == UserInfo?.UserId)
+                        {
+
+                            <button class="btn btn-sm btn-primary" @onclick="() => status = Status.Editing"><i class="ai ai-pencil"></i></button>
+
+                        }
 
                         <button class="btn btn-sm btn-outline-danger" @onclick="() => status = Status.Deleting"><i class="ai ai-cross-alt"></i></button>
 
@@ -58,7 +63,7 @@
 
                 </div>
 
-                <CommentForm OnSubmit="HandleSubmit" Comment="Comment" />
+                <CommentForm OnSubmit="HandleSubmit" Comment="Comment" Ticket="Ticket" ProjectManager="ProjectManager" UserInfo="UserInfo" />
 
             </div>
 
@@ -143,6 +148,12 @@
 
     [Parameter, EditorRequired]
     public TicketCommentDTO? Comment { get; set; }
+
+    [Parameter, EditorRequired]
+    public UserDTO? ProjectManager { get; set; }
+
+    [Parameter, EditorRequired]
+    public TicketDTO? Ticket { get; set; }
 
     [Parameter, EditorRequired]
     public EventCallback<int> OnDelete { get; set; }

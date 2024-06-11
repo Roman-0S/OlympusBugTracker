@@ -62,6 +62,10 @@ namespace OlympusBugTracker.Services
                 project.EndDate = projectDTO.EndDate;
                 project.Priority = projectDTO.Priority;
 
+                project.Company = null;
+                project.Tickets = [];
+                project.Users = [];
+
                 await repository.UpdateProjectAsync(project, companyId);
             }
         }

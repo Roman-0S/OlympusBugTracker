@@ -145,7 +145,7 @@
 
                 <h5>All Tickets</h5>
 
-                <table class="table border border-dark">
+                <table class="table table-bordered border border-dark table-striped">
                     <thead>
                         <tr>
                             <th scope="col">Priority</th>
@@ -153,10 +153,15 @@
                             <th scope="col">Project</th>
                             <th scope="col">Status</th>
                             <th scope="col">Created</th>
-                            <th scope="col" colspan="2" class="text-center">Modify</th>
+
+                            @if (project.Users.Any(u => u.Id == userInfo!.UserId) || userInfo!.Roles.Contains("Admin"))
+                            {
+                                <th scope="col" colspan="2" class="text-center">Modify</th>
+                            }
+
                         </tr>
                     </thead>
-                    <tbody class="table-striped table-hover">
+                    <tbody>
 
                         @foreach (TicketDTO ticket in project.Tickets.Where(t => !t.Archived).OrderByDescending(t => t.Created))
                         {
@@ -173,7 +178,7 @@
 
                 <h5>Archived Tickets</h5>
 
-                <table class="table border border-dark">
+                <table class="table table-bordered border border-dark table-striped">
                     <thead>
                         <tr>
                             <th scope="col">Priority</th>
@@ -181,10 +186,15 @@
                             <th scope="col">Project</th>
                             <th scope="col">Status</th>
                             <th scope="col">Created</th>
-                            <th scope="col" colspan="2" class="text-center">Modify</th>
+
+                            @if ((project.Users.Any(u => u.Id == userInfo!.UserId) && userInfo!.Roles.Contains("ProjectManager")) || userInfo!.Roles.Contains("Admin"))
+                            {
+                                <th scope="col" colspan="2" class="text-center">Modify</th>
+                            }
+
                         </tr>
                     </thead>
-                    <tbody class="table-striped table-hover">
+                    <tbody>
 
                         @foreach (TicketDTO ticket in project.Tickets.Where(t => t.Archived).OrderByDescending(t => t.Created))
                         {

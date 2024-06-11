@@ -15,7 +15,7 @@ namespace OlympusBugTracker.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
 
-        private string _userId => _userManager.GetUserId(User)!; 
+        private string _userId => _userManager.GetUserId(User)!;
 
         private int? _companyId => User.FindFirst("CompanyId") != null ? int.Parse(User.FindFirst("CompanyId")!.Value) : null;
 
@@ -159,22 +159,15 @@ namespace OlympusBugTracker.Controllers
         [HttpPut("{ticketId:int}")]
         public async Task<IActionResult> UpdateTicket([FromRoute] int ticketId, [FromBody] TicketDTO ticket)
         {
+            if (ticketId != ticket.Id) return BadRequest();
+
             try
             {
                 if (_companyId is not null)
                 {
-                    TicketDTO? ticketToUpdate = await _ticketService.GetTicketByIdAsync(ticketId, _companyId.Value);
+                    await _ticketService.UpdateTicketAsync(ticket, _companyId.Value, _userId);
 
-                    if (ticketToUpdate is not null)
-                    {
-                        await _ticketService.UpdateTicketAsync(ticket, _companyId.Value, _userId);
-
-                        return Ok();
-                    }
-                    else
-                    {
-                        return NotFound();
-                    }
+                    return Ok();
                 }
                 else
                 {

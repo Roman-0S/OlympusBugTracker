@@ -122,7 +122,7 @@
 
                         <div class="row row-cols-lg-3 flex-nowrap flex-lg-wrap gy-lg-5 mx-n3">
 
-                            @foreach (UserDTO user in company.Users.OrderBy(u => u.Role))
+                            @foreach (UserDTO user in company.Users.Where(u => u.Role != nameof(Roles.Admin)).OrderBy(u => u.Role))
                             {
                                 <div class="col">
 

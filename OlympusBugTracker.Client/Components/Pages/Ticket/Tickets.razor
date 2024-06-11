@@ -63,7 +63,7 @@
 
             <h1>Tickets</h1>
 
-            <table class="table table-responsive border border-dark">
+            <table class="table table-bordered table-responsive border border-dark table-striped">
                 <thead>
                     <tr>
                         <th scope="col">Priority</th>
@@ -74,7 +74,7 @@
                         <th scope="col" colspan="2" class="text-center">Modify</th>
                     </tr>
                 </thead>
-                <tbody class="table-striped table-hover">
+                <tbody>
 
                     @foreach (TicketDTO ticket in tickets)
                     {
@@ -91,7 +91,7 @@
 
             <h1>Archived Tickets</h1>
 
-            <table class="table table-responsive border border-dark">
+            <table class="table table-bordered table-responsive border border-dark table-striped">
                 <thead>
                     <tr>
                         <th scope="col">Priority</th>
@@ -102,7 +102,7 @@
                         <th scope="col" colspan="2" class="text-center">Modify</th>
                     </tr>
                 </thead>
-                <tbody class="table-striped table-hover">
+                <tbody>
 
                     @foreach (TicketDTO ticket in tickets)
                     {
@@ -169,7 +169,7 @@
 
             <h1>My Tickets</h1>
 
-            <table class="table table-responsive border border-dark">
+            <table class="table table-bordered table-responsive border border-dark table-striped">
                 <thead>
                     <tr>
                         <th scope="col">Priority</th>
@@ -180,7 +180,7 @@
                         <th scope="col" colspan="2" class="text-center">Modify</th>
                     </tr>
                 </thead>
-                <tbody class="table-striped table-hover">
+                <tbody>
 
                     @foreach (TicketDTO ticket in tickets)
                     {
@@ -197,7 +197,7 @@
 
             <h1>My Archived Tickets</h1>
 
-            <table class="table table-responsive border border-dark">
+            <table class="table table-bordered table-responsive border border-dark table-striped">
                 <thead>
                     <tr>
                         <th scope="col">Priority</th>
@@ -208,7 +208,7 @@
                         <th scope="col" colspan="2" class="text-center">Modify</th>
                     </tr>
                 </thead>
-                <tbody class="table-striped table-hover">
+                <tbody>
 
                     @foreach (TicketDTO ticket in tickets)
                     {

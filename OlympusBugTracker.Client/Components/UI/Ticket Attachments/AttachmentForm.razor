@@ -1,4 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Authorization
+@using OlympusBugTracker.Client.Helpers
 
 @inject ITicketDTOService TicketService
 @attribute [Authorize]
@@ -8,6 +9,8 @@
 
     @if (context.User.IsInRole("Admin") || UserInfo?.UserId == ProjectManager?.Id || UserInfo?.UserId == Ticket?.SubmitterUserId || UserInfo?.UserId == Ticket?.DeveloperUserId)
     {
+        <hr />
+
         <h1>Attachments</h1>
 
         <EditForm Context="editFormContext" Model="attachment" OnValidSubmit="HandleSubmit" class="vstack gap-1">
@@ -24,10 +27,6 @@
 
         </EditForm>
 
-    }
-    else
-    {
-        // you can't create an attachment
     }
 
 </AuthorizeView>
@@ -79,19 +78,20 @@
 
         if (newFile is not null)
         {
-            Stream stream = newFile.OpenReadStream();
-
-            MemoryStream ms = new();
-
-            await stream.CopyToAsync(ms);
-
-            byte[] fileData = ms.ToArray();
-            string fileType = newFile.ContentType;
-
-            attachment!.FileName = newFile.Name;
 
             try
             {
+                Stream stream = newFile.OpenReadStream(ImageHelper.MaxFileSize);
+
+                MemoryStream ms = new();
+
+                await stream.CopyToAsync(ms);
+
+                byte[] fileData = ms.ToArray();
+                string fileType = newFile.ContentType;
+
+                attachment!.FileName = newFile.Name;
+
                 await TicketService.AddTicketAttachment(attachment, fileData, fileType, UserInfo!.CompanyId);
             }
             catch (Exception ex)

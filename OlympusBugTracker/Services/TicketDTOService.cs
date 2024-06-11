@@ -71,10 +71,13 @@ namespace OlympusBugTracker.Services
                 ticket.Priority = ticketDTO.Priority;
                 ticket.Type = ticketDTO.Type;
                 ticket.Status = ticketDTO.Status;
-                ticket.SubmitterUserId = ticketDTO.SubmitterUserId;
                 ticket.DeveloperUserId = ticketDTO.DeveloperUserId;
 
+                ticket.Project = null;
                 ticket.DeveloperUser = null;
+                ticket.SubmitterUser = null;
+                ticket.TicketComments = [];
+                ticket.TicketAttachments = [];
 
                 await repository.UpdateTicketAsync(ticket, companyId, userId);
             }

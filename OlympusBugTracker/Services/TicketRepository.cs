@@ -90,6 +90,7 @@ namespace OlympusBugTracker.Services
             using ApplicationDbContext context = contextFactory.CreateDbContext();
 
             Ticket? ticket = await context.Tickets.Include(t => t.Project)
+                                                     .ThenInclude(p => p!.Users)
                                                   .Include(t => t.DeveloperUser)
                                                   .Include(t => t.SubmitterUser)
                                                   .Include(t => t.TicketAttachments)
@@ -120,7 +121,7 @@ namespace OlympusBugTracker.Services
         {
             using ApplicationDbContext context = contextFactory.CreateDbContext();
 
-            bool shouldUpdate = await context.Tickets.AnyAsync(t => t.Id == ticket.Id);
+            bool shouldUpdate = await context.Tickets.AnyAsync(t => t.Id == ticket.Id && t.Project!.CompanyId == companyId);
 
             if (shouldUpdate)
             {

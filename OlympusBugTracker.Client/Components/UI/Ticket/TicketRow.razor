@@ -11,19 +11,40 @@
             <td>@Ticket.Project?.Name</td>
             <td>@Ticket.Status</td>
             <td>@Ticket.Created.ToString("d")</td>
-            <td>
-                <button class="btn btn-outline-danger btn-sm" @onclick="HandleArchive">
-                    <i class="ai ai-archive"></i>
-                    &nbsp;Archive
-                </button>
-            </td>
 
-            <td>
-                <a href="/ticket/edit/@Ticket.Id" class="btn btn-primary btn-sm">
-                    <i class="ai ai-edit"></i>
-                    &nbsp;Edit
-                </a>
-            </td>
+            @if (UserInfo!.Roles.Contains("Admin") || Ticket.Project!.Users.Any(u => u.Id == UserInfo.UserId))
+            {
+
+                @if (UserInfo!.Roles.Contains("Admin") || (Ticket.Project!.Users.Any(u => u.Id == UserInfo.UserId) && UserInfo.Roles.Contains("ProjectManager")))
+                {
+
+                    <td class="text-center">
+                        <button class="btn btn-outline-danger btn-sm" @onclick="HandleArchive">
+                            <i class="ai ai-archive"></i>
+                            &nbsp;Archive
+                        </button>
+                    </td>
+
+                }
+
+
+                @if (UserInfo!.Roles.Contains("Admin") || (Ticket.Project!.Users.Any(u => u.Id == UserInfo.UserId) && UserInfo.Roles.Contains("ProjectManager")) || UserInfo.UserId == Ticket.SubmitterUserId || UserInfo.UserId == Ticket.DeveloperUserId)
+                {
+
+                    <td class="text-center">
+                        <a href="/ticket/edit/@Ticket.Id" class="btn btn-primary btn-sm">
+                            <i class="ai ai-edit"></i>
+                            &nbsp;Edit
+                        </a>
+                    </td>
+
+                }
+                else
+                {
+                    <td>&nbsp;</td>
+                }
+
+            }
 
         </tr>
 
@@ -38,12 +59,18 @@
             <td>@Ticket.Project?.Name</td>
             <td>@Ticket.Status</td>
             <td>@Ticket.Created.ToString("d")</td>
-            <td>
-                <button class="btn btn-outline-primary btn-sm" @onclick="HandleRestore">
-                    <i class="ai ai-check"></i>
-                    &nbsp;Restore
-                </button>
-            </td>
+
+            @if (UserInfo!.Roles.Contains("Admin") || (Ticket.Project!.Users.Any(u => u.Id == UserInfo.UserId) && UserInfo.Roles.Contains("ProjectManager")))
+            {
+
+                <td colspan="2" class="text-center">
+                    <button class="btn btn-outline-primary btn-sm" @onclick="HandleRestore">
+                        <i class="ai ai-check"></i>
+                        &nbsp;Restore
+                    </button>
+                </td>
+
+            }
 
         </tr>
 
