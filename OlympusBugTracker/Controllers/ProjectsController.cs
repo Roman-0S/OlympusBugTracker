@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OlympusBugTracker.Client.Models;
 using OlympusBugTracker.Client.Services.Interfaces;
+using OlympusBugTracker.Data;
 using OlympusBugTracker.Helpers.Extensions;
 
 namespace OlympusBugTracker.Controllers
@@ -12,14 +14,17 @@ namespace OlympusBugTracker.Controllers
     [Authorize]
     public class ProjectsController : ControllerBase
     {
-        private string _userId => User.GetUserId()!;
+        private readonly UserManager<ApplicationUser> _userManager;
+
+        private string _userId => _userManager.GetUserId(User)!;
         private int? _companyId => User.FindFirst("CompanyId") != null ? int.Parse(User.FindFirst("CompanyId")!.Value) : null;
 
         private readonly IProjectDTOService _projectService;
 
-        public ProjectsController(IProjectDTOService projectService)
+        public ProjectsController(IProjectDTOService projectService, UserManager<ApplicationUser> userManager)
         {
             _projectService = projectService;
+            _userManager = userManager;
         }
 
         #region Project
@@ -100,6 +105,8 @@ namespace OlympusBugTracker.Controllers
         [HttpGet("project/{projectId:int}")]
         public async Task<ActionResult<ProjectDTO>> GetProjectById([FromRoute] int projectId)
         {
+            ApplicationUser? user = await _userManager.GetUserAsync(User);
+
             try
             {
                 if (_companyId is not null)
@@ -132,6 +139,8 @@ namespace OlympusBugTracker.Controllers
         [Authorize(Roles = "Admin, ProjectManager")]
         public async Task<ActionResult<ProjectDTO>> AddProject([FromBody] ProjectDTO projectDTO)
         {
+            ApplicationUser? user = await _userManager.GetUserAsync(User);
+
             try
             {
                 if (_companyId is not null)
@@ -154,14 +163,24 @@ namespace OlympusBugTracker.Controllers
 
 
         [HttpPut("{projectId:int}")]
+        [Authorize(Roles = "Admin, ProjectManager")]
         public async Task<IActionResult> UpdateProject([FromRoute] int projectId, [FromBody] ProjectDTO projectDTO)
         {
             if (projectId != projectDTO.Id) return BadRequest();
+
+            ApplicationUser? user = await _userManager.GetUserAsync(User);
 
             try
             {
                 if (_companyId is not null)
                 {
+                    if (User.IsInRole("ProjectManager"))
+                    {
+                        UserDTO? projectManager = await _projectService.GetProjectManagerAsync(projectId, _companyId.Value);
+
+                        if (!projectDTO.Users.Any(u => u.Id == projectManager?.Id)) return BadRequest();
+                    }
+
                     await _projectService.UpdateProjectAsync(projectDTO, _companyId.Value);
 
                     return Ok();
@@ -180,8 +199,12 @@ namespace OlympusBugTracker.Controllers
 
 
         [HttpPut("archive/{projectId:int}")]
+        [Authorize(Roles = "Admin, ProjectManager")]
         public async Task<IActionResult> ArchiveProject([FromRoute] int projectId)
         {
+            ApplicationUser? user = await _userManager.GetUserAsync(User);
+
+
             try
             {
                 if (_companyId is not null)
@@ -190,6 +213,11 @@ namespace OlympusBugTracker.Controllers
 
                     if (projectToArchive is not null)
                     {
+                        if (User.IsInRole("ProjectManager"))
+                        {
+                            if (!projectToArchive.Users.Any(u => u.Id == user.Id)) return BadRequest();
+                        }
+
                         await _projectService.ArchiveProjectAsync(projectId, _companyId.Value);
 
                         return Ok();
@@ -213,8 +241,12 @@ namespace OlympusBugTracker.Controllers
 
 
         [HttpPut("restore/{projectId:int}")]
+        [Authorize(Roles = "Admin, ProjectManager")]
         public async Task<IActionResult> RestoreProject([FromRoute] int projectId)
         {
+            ApplicationUser? user = await _userManager.GetUserAsync(User);
+
+
             try
             {
                 if (_companyId is not null)
@@ -223,6 +255,11 @@ namespace OlympusBugTracker.Controllers
 
                     if (projectToRecover is not null)
                     {
+                        if (User.IsInRole("ProjectManager"))
+                        {
+                            if (!projectToRecover.Users.Any(u => u.Id == user.Id)) return BadRequest();
+                        }
+
                         await _projectService.RestoreProjectAsync(projectId, _companyId.Value);
 
                         return Ok();
@@ -304,25 +341,23 @@ namespace OlympusBugTracker.Controllers
 
 
         [HttpPut("{projectId:int}/Add/Member")]
+        [Authorize(Roles = "Admin, ProjectManager")]
         public async Task<IActionResult> AddProjectMember([FromRoute] int projectId, [FromBody] string memberId)
         {
             try
             {
                 if (_companyId is null) return BadRequest();
 
-                bool isAdmin = User.IsInRole("Admin");
-                bool isPM = User.IsInRole("ProjectManager");
-
-                if (isAdmin || isPM)
+                if (User.IsInRole("ProjectManager"))
                 {
-                    await _projectService.AddMemberToProjectAsync(projectId, memberId, _userId);
+                    UserDTO? projectManager = await _projectService.GetProjectManagerAsync(projectId, _companyId.Value);
 
-                    return Ok();
+                    if (projectManager?.Id != _userId) return BadRequest();
                 }
-                else
-                {
-                    return BadRequest();
-                }
+
+                await _projectService.AddMemberToProjectAsync(projectId, memberId, _userId);
+
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -333,25 +368,23 @@ namespace OlympusBugTracker.Controllers
 
 
         [HttpPut("{projectId:int}/Remove/Member")]
+        [Authorize(Roles = "Admin, ProjectManager")]
         public async Task<IActionResult> RemoveProjectMember([FromRoute] int projectId, [FromBody] string memberId)
         {
             try
             {
                 if (_companyId is null) return BadRequest();
 
-                bool isAdmin = User.IsInRole("Admin");
-                bool isPM = User.IsInRole("ProjectManager");
-
-                if (isAdmin || isPM)
+                if (User.IsInRole("ProjectManager"))
                 {
-                    await _projectService.RemoveMemberFromProjectAsync(projectId, memberId, _userId);
+                    UserDTO? projectManager = await _projectService.GetProjectManagerAsync(projectId, _companyId.Value);
 
-                    return Ok();
+                    if (projectManager?.Id != _userId) return BadRequest();
                 }
-                else
-                {
-                    return BadRequest();
-                }
+
+                await _projectService.RemoveMemberFromProjectAsync(projectId, memberId, _userId);
+
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -362,24 +395,16 @@ namespace OlympusBugTracker.Controllers
 
 
         [HttpPut("{projectId:int}/Assign/Manager")]
+        [Authorize(Roles = "Admin, ProjectManager")]
         public async Task<IActionResult> AssignProjectManager([FromRoute] int projectId, [FromBody] string managerId)
         {
             try
             {
                 if (_companyId is null) return BadRequest();
 
-                bool isAdmin = User.IsInRole("Admin");
+                await _projectService.AssignProjectManagerAsync(projectId, managerId, _userId);
 
-                if (isAdmin)
-                {
-                    await _projectService.AssignProjectManagerAsync(projectId, managerId, _userId);
-
-                    return Ok();
-                }
-                else
-                {
-                    return BadRequest();
-                }
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -390,24 +415,16 @@ namespace OlympusBugTracker.Controllers
 
 
         [HttpPut("{projectId:int}/Remove/Manager")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RemoveProjectManager([FromRoute] int projectId)
         {
             try
             {
                 if (_companyId is null) return BadRequest();
 
-                bool isAdmin = User.IsInRole("Admin");
+                await _projectService.RemoveProjectManagerAsync(projectId, _userId);
 
-                if (isAdmin)
-                {
-                    await _projectService.RemoveProjectManagerAsync(projectId, _userId);
-
-                    return Ok();
-                }
-                else
-                {
-                    return BadRequest();
-                }
+                return Ok();
             }
             catch (Exception ex)
             {
