@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OlympusBugTracker.Client.Models;
 using OlympusBugTracker.Client.Services.Interfaces;
@@ -11,6 +12,7 @@ namespace OlympusBugTracker.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class TicketsController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -137,16 +139,16 @@ namespace OlympusBugTracker.Controllers
         {
             try
             {
-                if (_companyId is not null)
-                {
-                    TicketDTO ticketAdded = await _ticketService.AddTicketAsync(ticket, _companyId.Value);
+                if (_companyId is null) return BadRequest();
 
-                    return Ok(ticketAdded);
-                }
-                else
+                if (!User.IsInRole("Admin"))
                 {
-                    return BadRequest();
+                    if (!ticket.Project!.Users.Any(u => u.Id == _userId)) return BadRequest();
                 }
+
+                TicketDTO ticketAdded = await _ticketService.AddTicketAsync(ticket, _companyId.Value);
+
+                return Ok(ticketAdded);
             }
             catch (Exception ex)
             {
@@ -163,16 +165,24 @@ namespace OlympusBugTracker.Controllers
 
             try
             {
-                if (_companyId is not null)
-                {
-                    await _ticketService.UpdateTicketAsync(ticket, _companyId.Value, _userId);
+                if (_companyId is null) return BadRequest();
 
-                    return Ok();
-                }
-                else
+                TicketDTO? ticketToUpdate = await _ticketService.GetTicketByIdAsync(ticketId, _companyId.Value);
+
+                if (User.IsInRole("ProjectManager"))
                 {
-                    return BadRequest();
+                    if (!ticket.Project!.Users.Any(u => u.Id == _userId)) return BadRequest();
                 }
+                else if (User.IsInRole("Developer") || User.IsInRole("Submitter"))
+                {
+                    if (ticket.DeveloperUserId != _userId && ticket.SubmitterUserId != _userId) return BadRequest();
+
+                    if (ticketToUpdate?.DeveloperUserId != ticket.DeveloperUserId) return BadRequest();
+                }
+
+                await _ticketService.UpdateTicketAsync(ticket, _companyId.Value, _userId);
+
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -183,29 +193,23 @@ namespace OlympusBugTracker.Controllers
 
 
         [HttpPut("archive/{ticketId:int}")]
+        [Authorize(Roles = "Admin, ProjectManager")]
         public async Task<IActionResult> ArchiveTicket([FromRoute] int ticketId)
         {
             try
             {
-                if (_companyId is not null)
+                if (_companyId is null) return BadRequest();
+
+                if (User.IsInRole("ProjectManager"))
                 {
                     TicketDTO? ticketToArchive = await _ticketService.GetTicketByIdAsync(ticketId, _companyId.Value);
 
-                    if (ticketToArchive is not null)
-                    {
-                        await _ticketService.ArchiveTicketAsync(ticketId, _companyId.Value);
+                    if (ticketToArchive is not null && !ticketToArchive.Project!.Users.Any(u => u.Id == _userId)) return BadRequest();
+                }
 
-                        return Ok();
-                    }
-                    else
-                    {
-                        return NotFound();
-                    }
-                }
-                else
-                {
-                    return BadRequest();
-                }
+                await _ticketService.ArchiveTicketAsync(ticketId, _companyId.Value);
+
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -216,29 +220,23 @@ namespace OlympusBugTracker.Controllers
 
 
         [HttpPut("restore/{ticketId:int}")]
+        [Authorize(Roles = "Admin, ProjectManager")]
         public async Task<IActionResult> RestoreTicket([FromRoute] int ticketId)
         {
             try
             {
-                if (_companyId is not null)
+                if (_companyId is null) return BadRequest();
+
+                if (User.IsInRole("ProjectManager"))
                 {
                     TicketDTO? ticketToRestore = await _ticketService.GetTicketByIdAsync(ticketId, _companyId.Value);
 
-                    if (ticketToRestore is not null)
-                    {
-                        await _ticketService.RestoreTicketAsync(ticketId, _companyId.Value);
+                    if (ticketToRestore is not null && !ticketToRestore.Project!.Users.Any(u => u.Id == _userId)) return BadRequest();
+                }
 
-                        return Ok();
-                    }
-                    else
-                    {
-                        return NotFound();
-                    }
-                }
-                else
-                {
-                    return BadRequest();
-                }
+                await _ticketService.RestoreTicketAsync(ticketId, _companyId.Value);
+
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -311,16 +309,24 @@ namespace OlympusBugTracker.Controllers
         {
             try
             {
-                if (_companyId is not null)
-                {
-                    await _ticketService.AddCommentAsync(commentDTO, _companyId.Value);
+                if (_companyId is null) return BadRequest();
 
-                    return Ok();
-                }
-                else
+                TicketDTO? ticket = await _ticketService.GetTicketByIdAsync(commentDTO.TicketId, _companyId.Value);
+
+                if (ticket is null) return NotFound();
+
+                if (User.IsInRole("ProjectManager"))
                 {
-                    return BadRequest();
+                    if (!ticket.Project!.Users.Any(u => u.Id == _userId)) return BadRequest();
                 }
+                else if (User.IsInRole("Developer") || User.IsInRole("Submitter"))
+                {
+                    if (ticket.DeveloperUserId != _userId && ticket.SubmitterUserId != _userId) return BadRequest();
+                }
+
+                await _ticketService.AddCommentAsync(commentDTO, _companyId.Value);
+
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -333,27 +339,21 @@ namespace OlympusBugTracker.Controllers
         [HttpPut("comment/{commentId:int}")]
         public async Task<IActionResult> UpdateComment([FromRoute] int commentId, [FromBody] TicketCommentDTO commentDTO)
         {
+            if (commentId != commentDTO.Id) return BadRequest();
+
             try
             {
-                if (_companyId is not null)
-                {
-                    TicketCommentDTO? comment = await _ticketService.GetCommentByIdAsync(commentId, _companyId.Value);
+                if (_companyId is null) return BadRequest();
 
-                    if (comment is not null)
-                    {
-                        await _ticketService.UpdateCommentAsync(commentDTO, _companyId.Value, _userId);
+                TicketCommentDTO? comment = await _ticketService.GetCommentByIdAsync(commentId, _companyId.Value);
 
-                        return Ok();
-                    }
-                    else
-                    {
-                        return NotFound();
-                    }
-                }
-                else
-                {
-                    return BadRequest();
-                }
+                if (comment is null) return NotFound();
+
+                if (comment.UserId != _userId) return BadRequest();
+
+                await _ticketService.UpdateCommentAsync(commentDTO, _companyId.Value, _userId);
+
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -368,32 +368,28 @@ namespace OlympusBugTracker.Controllers
         {
             try
             {
-                if (_companyId is not null)
-                {
-                    TicketCommentDTO? comment = await _ticketService.GetCommentByIdAsync(commentId, _companyId.Value);
+                if (_companyId is null) return BadRequest();
 
-                    if (comment is not null)
-                    {
-                        if (comment.UserId == _userId)
-                        {
-                            await _ticketService.DeleteCommentAsync(commentId, _companyId.Value);
+                TicketCommentDTO? comment = await _ticketService.GetCommentByIdAsync(commentId, _companyId.Value);
 
-                            return Ok();
-                        }
-                        else
-                        {
-                            return BadRequest();
-                        }
-                    }
-                    else
-                    {
-                        return NotFound();
-                    }
-                }
-                else
+                if (comment is null) return BadRequest();
+
+                TicketDTO? ticket = await _ticketService.GetTicketByIdAsync(comment.TicketId, _companyId.Value);
+
+                if (ticket is null) return BadRequest();
+
+                if (User.IsInRole("ProjectManager"))
                 {
-                    return BadRequest();
+                    if (!ticket.Project!.Users.Any(u => u.Id == _userId)) return BadRequest();
                 }
+                else if (User.IsInRole("Developer") || User.IsInRole("Submitter"))
+                {
+                    if (comment.UserId != _userId) return BadRequest();
+                }
+
+                await _ticketService.DeleteCommentAsync(commentId, _companyId.Value);
+
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -412,18 +408,21 @@ namespace OlympusBugTracker.Controllers
             try
             {
 
-                if (attachment.TicketId != Id || file is null)
-                {
-                    return BadRequest();
-                }
+                if (attachment.TicketId != Id || file is null) return BadRequest();
 
                 ApplicationUser? user = await _userManager.GetUserAsync(User);
 
                 TicketDTO? ticket = await _ticketService.GetTicketByIdAsync(Id, user!.CompanyId);
 
-                if (ticket is null)
+                if (ticket is null) return NotFound();
+
+                if (User.IsInRole("ProjectManager"))
                 {
-                    return NotFound();
+                    if (!ticket.Project!.Users.Any(u => u.Id == _userId)) return BadRequest();
+                }
+                else if (User.IsInRole("Developer") || User.IsInRole("Submitter"))
+                {
+                    if (ticket.DeveloperUserId != _userId && ticket.SubmitterUserId != _userId) return BadRequest();
                 }
 
                 attachment.UserId = user!.Id;
@@ -451,9 +450,26 @@ namespace OlympusBugTracker.Controllers
         [HttpDelete("attachments/{attachmentId}")]
         public async Task<IActionResult> DeleteTicketAttachment([FromRoute] int attachmentId)
         {
-            ApplicationUser? user = await _userManager.GetUserAsync(User);
+            if (_companyId is null) return BadRequest();
 
-            await _ticketService.DeleteTicketAttachment(attachmentId, user!.CompanyId);
+            TicketAttachmentDTO? ticketAttachment = await _ticketService.GetTicketAttachmentByIdAsync(attachmentId, _companyId.Value);
+
+            if (ticketAttachment is null) return NotFound();
+
+            TicketDTO? ticket = await _ticketService.GetTicketByIdAsync(ticketAttachment.TicketId, _companyId.Value);
+
+            if (ticket is null) return NotFound();
+
+            if (User.IsInRole("ProjectManager"))
+            {
+                if (!ticket.Project!.Users.Any(u => u.Id == _userId)) return BadRequest();
+            }
+            else if (User.IsInRole("Developer") || User.IsInRole("Submitter"))
+            {
+                if (ticketAttachment.UserId != _userId) return BadRequest();
+            }
+
+            await _ticketService.DeleteTicketAttachment(attachmentId, _companyId.Value);
 
             return NoContent();
         }

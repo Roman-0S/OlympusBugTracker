@@ -42,6 +42,8 @@ namespace OlympusBugTracker.Client.Services.Interfaces
 
         Task<TicketAttachmentDTO> AddTicketAttachment(TicketAttachmentDTO attachmentDTO, byte[] uploadData, string contentType, int companyId);
 
+        Task<TicketAttachmentDTO?> GetTicketAttachmentByIdAsync(int attachmentId, int companyId);
+
         Task DeleteTicketAttachment(int attachmentId, int companyId);
 
         #endregion

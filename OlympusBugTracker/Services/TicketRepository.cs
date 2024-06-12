@@ -248,6 +248,18 @@ namespace OlympusBugTracker.Services
             }
         }
 
+        public async Task<TicketAttachment?> GetTicketAttachmentByIdAsync(int attachmentId, int companyId)
+        {
+            using ApplicationDbContext context = contextFactory.CreateDbContext();
+
+            TicketAttachment? ticketAttachment = await context.TicketAttachments.Include(ta => ta.Ticket)
+                                                                                   .ThenInclude(t => t!.Project)
+                                                                                       .ThenInclude(p => p!.Users)
+                                                                                .FirstOrDefaultAsync(ta => ta.Ticket!.Project!.CompanyId == companyId && ta.Id == attachmentId);
+
+            return ticketAttachment;
+        }
+
         public async Task DeleteTicketAttachment(int attachmentId, int companyId)
         {
             using ApplicationDbContext context = contextFactory.CreateDbContext();

@@ -128,39 +128,24 @@ namespace OlympusBugTracker.Controllers
 
 
         [HttpPut]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateCompany([FromBody] CompanyDTO companyDTO)
         {
-            if (!User.IsInRole("Admin")) return BadRequest();
-
             try
             {
-                if (_companyId is not null)
-                {
-                    if (companyDTO.Id == _companyId.Value)
-                    {
-                        CompanyDTO? company = await _companyService.GetCompanyByIdAsync(_companyId.Value);
+                if (_companyId is null) return BadRequest();
 
-                        if (company is not null)
-                        {
-                            await _companyService.UpdateCompanyAsync(companyDTO, _userId);
+                if (companyDTO.Id != _companyId.Value) return BadRequest();
 
-                            return Ok();
-                        }
-                        else
-                        {
-                            return NotFound();
-                        }
-                    }
-                    else
-                    {
-                        return BadRequest();
-                    }
+                CompanyDTO? company = await _companyService.GetCompanyByIdAsync(_companyId.Value);
 
-                }
-                else
-                {
-                    return BadRequest();
-                }
+                if (company is null) return BadRequest();
+
+                if (!company.Users.Any(u => u.Id == _userId)) return BadRequest();
+
+                await _companyService.UpdateCompanyAsync(companyDTO, _userId);
+
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -171,24 +156,18 @@ namespace OlympusBugTracker.Controllers
 
 
         [HttpPut("members/member/role")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateUserRole([FromBody] UserDTO userDTO)
         {
-            if (string.IsNullOrEmpty(userDTO.Role)) return BadRequest();
-
-            if (!User.IsInRole("Admin")) return BadRequest();
+            if (userDTO.Role is null && userDTO.Role!.Contains("Admin")) return BadRequest();
 
             try
             {
-                if (_companyId is not null)
-                {
-                    await _companyService.UpdateUserRoleAsync(userDTO, _userId);
+                if (_companyId is null) return BadRequest();
 
-                    return Ok();
-                }
-                else
-                {
-                    return BadRequest();
-                }
+                await _companyService.UpdateUserRoleAsync(userDTO, _userId);
+
+                return Ok();
             }
             catch (Exception ex)
             {

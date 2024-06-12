@@ -143,6 +143,13 @@ namespace OlympusBugTracker.Client.Services
             return addedAttachment!;
         }
 
+        public async Task<TicketAttachmentDTO?> GetTicketAttachmentByIdAsync(int attachmentId, int companyId)
+        {
+            TicketAttachmentDTO? ticketAttachment = await _httpClient.GetFromJsonAsync<TicketAttachmentDTO>($"api/tickets/attachments/{attachmentId}");
+
+            return ticketAttachment;
+        }
+
         public async Task DeleteTicketAttachment(int attachmentId, int companyId)
         {
             HttpResponseMessage response = await _httpClient.DeleteAsync($"api/tickets/attachments/{attachmentId}");

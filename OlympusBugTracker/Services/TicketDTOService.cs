@@ -169,6 +169,13 @@ namespace OlympusBugTracker.Services
             return attachment.ToDTO();
         }
 
+        public async Task<TicketAttachmentDTO?> GetTicketAttachmentByIdAsync(int attachmentId, int companyId)
+        {
+            TicketAttachment? ticketAttachment = await repository.GetTicketAttachmentByIdAsync(attachmentId, companyId);
+
+            return ticketAttachment?.ToDTO();
+        }
+
         public async Task DeleteTicketAttachment(int attachmentId, int companyId)
         {
             await repository.DeleteTicketAttachment(attachmentId, companyId);

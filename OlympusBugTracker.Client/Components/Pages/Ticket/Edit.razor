@@ -94,7 +94,7 @@
         {
             await TicketService.UpdateTicketAsync(ticket, userInfo!.CompanyId, userInfo.UserId);
 
-            Nav.NavigateTo("/tickets");
+            Nav.NavigateTo($"/ticket/{ticket.Id}");
         }
         catch (Exception ex)
         {
