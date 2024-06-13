@@ -371,11 +371,9 @@ namespace OlympusBugTracker.Controllers
                 if (_companyId is null) return BadRequest();
 
                 TicketCommentDTO? comment = await _ticketService.GetCommentByIdAsync(commentId, _companyId.Value);
-
                 if (comment is null) return BadRequest();
 
                 TicketDTO? ticket = await _ticketService.GetTicketByIdAsync(comment.TicketId, _companyId.Value);
-
                 if (ticket is null) return BadRequest();
 
                 if (User.IsInRole("ProjectManager"))
