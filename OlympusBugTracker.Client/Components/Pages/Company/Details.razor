@@ -54,34 +54,39 @@
         </AuthorizeView>
 
 
-        <section class="container py-5 mb-lg-3 mb-xl-4 mt-xl-3 my-xxl-5">
+        <section class="container py-5">
 
             <h2 class="h1 text-center pt-2 pt-sm-3 pt-md-4 pt-lg-5 mt-xl-2 mb-5">Our Team</h2>
 
             <div class="mb-4 mb-lg-5 pb-4 px-3" data-simplebar>
 
-                <div class="row row-cols-lg-4 flex-nowrap flex-lg-wrap gy-lg-5 mx-n3">
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 gy-lg-5 mx-n3">
 
                     @foreach (UserDTO user in company.Users.OrderBy(u => u.Role))
                     {
 
-                        <div class="col">
+                        <div class="col mb-4 mb-lg-0">
 
-                            <div class="d-block text-center" style="min-width: 210px;">
+                            <div class="card border-0 bg-dark bg-opacity-10">
 
-                                <img class="rounded-circle" src="@(string.IsNullOrEmpty(user.ImageURL) ? ImageHelper.DefaultProfilePicture : user.ImageURL)" width="120" alt="Avatar">
+                                <div class="card-body d-block text-center" style="min-width: 210px;">
 
-                                <h3 class="h5 pt-4 mb-1">@user.FullName</h3>
+                                    <img class="rounded-circle card-title" src="@(string.IsNullOrEmpty(user.ImageURL) ? ImageHelper.DefaultProfilePicture : user.ImageURL)" width="120" alt="Avatar">
 
-                                @foreach (Roles role in Enum.GetValues(typeof(Roles)))
-                                {
-                                    if (user.Role == role.ToString())
+                                    <h3 class="card-text h5 pt-4 mb-1">@user.FullName</h3>
+
+                                    @foreach (Roles role in Enum.GetValues(typeof(Roles)))
                                     {
-                                        <p class="text-body-secondary mb-0">@role.GetDisplayName()</p>
+                                        if (user.Role == role.ToString())
+                                        {
+                                            <p class="card-text text-body-secondary mb-0">@role.GetDisplayName()</p>
+                                        }
                                     }
-                                }
+
+                                </div>
 
                             </div>
+
 
                         </div>
 
