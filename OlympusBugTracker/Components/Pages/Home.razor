@@ -1,7 +1,128 @@
 ﻿@page "/"
+@layout LandingLayout
+
+@using OlympusBugTracker.Components.Layout
+
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
 
-Welcome to your new app.
+<section class="py-5 px-sm-4 px-md-5">
+
+    <div class="bg-dark rounded-5 position-relative overflow-hidden py-5 px-3 px-sm-4 px-xl-5 mt-2 mx-md-n3 mx-lg-auto" style="max-width: 1660px;" data-bs-theme="dark">
+
+        <div class="jarallax position-absolute top-0 start-0 w-100 h-100" data-jarallax data-speed="0.6">
+
+            <div class="jarallax-img position-absolute w-100 h-100" style="background-image: url(img/BugWeb.jpg);"></div>
+
+        </div>
+
+        <div class="bg-white position-absolute top-0 start-0 w-100 h-100" style="opacity: 2%;"></div>
+
+        <div class="container position-relative z-2 pt-xl-4 pt-xxl-5 pb-sm-2">
+
+            <div class="row pt-md-3 pt-lg-5">
+
+                <div class="col-lg-6 col-xxl-5 pb-lg-5 mb-xl-5">
+
+                    <h1 class="display-1 text-center text-lg-start mb-xxl-5">Track every issue with <span class="text-primary">Bug Tracker</span></h1>
+
+                </div>
+
+                <div class="col-lg-5 col-xl-4 offset-lg-1 offset-xxl-2 d-flex flex-column pt-2 pt-md-4">
+
+                    <p class="text-body fs-xl text-center text-lg-start pb-2 pb-md-0 mb-4 mb-md-5">Effortlessly manage all project issues with BugTracker, ensuring streamlined operations and clear progress tracking.</p>
+
+                    <div class="d-flex flex-column flex-sm-row align-items-center justify-content-center justify-content-lg-start pb-3 pb-sm-5">
+
+                        <a class="btn btn-lg btn-primary rounded-pill w-100 w-sm-auto me-sm-3 me-xl-4 mb-2 mb-sm-0" href="/Account/Login">Try it out</a>
+
+                        <a class="btn btn-lg btn-link text-white w-100 w-sm-auto px-2" href="#">Explore our Features<i class="ai-arrow-right ms-2"></i></a>
+
+                    </div>
+                    
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="container py-5 mt-2 mt-sm-3 mt-md-4">
+    <h2 class="h1 text-center pt-lg-3">Ticket Creation Example</h2>
+    <p class="pb-3 pb-md-4 mb-0 mb-sm-2 mb-lg-3 text-center">A ticket being created by a project manager would look like this:</p>
+    <div class="row align-items-lg-center">
+
+        <!-- Accordion -->
+        <div class="col-md-6 col-lg-5 pb-2 pb-lg-0 mb-4 mb-md-0">
+            <div class="accordion accordion-alt" id="industries">
+                <div class="accordion-item mb-n3 mb-lg-n2 mb-xl-1">
+                    <h3 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-binded-content="#viewMyTickets" data-bs-target="#view" aria-expanded="true" aria-controls="finance">View My Tickets</button>
+                    </h3>
+                    <div class="accordion-collapse collapse show" id="view" data-bs-parent="#industries">
+                        <div class="accordion-body">Sit purus platea nunc semper auctor integer semper et ac odio eget a lacus eu duis ante sed molestie varius tempus gravida libero pretium sit etiam morbi orci et vestibulum velit.</div>
+                    </div>
+                </div>
+                <div class="accordion-item mb-n3 mb-lg-n2 mb-xl-1">
+                    <h3 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-binded-content="#tech-img" data-bs-target="#tech" aria-expanded="false" aria-controls="tech">Startup and technology</button>
+                    </h3>
+                    <div class="accordion-collapse collapse" id="tech" data-bs-parent="#industries">
+                        <div class="accordion-body">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum posuere finibus dui, eget scelerisque ipsum suscipit nec. Praesent nec quam in ipsum ultricies ultricies et sagittis dui.</div>
+                    </div>
+                </div>
+                <div class="accordion-item mb-n3 mb-lg-n2 mb-xl-1">
+                    <h3 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-binded-content="#medicine-img" data-bs-target="#medicine" aria-expanded="false" aria-controls="medicine">Medicine and beauty</button>
+                    </h3>
+                    <div class="accordion-collapse collapse" id="medicine" data-bs-parent="#industries">
+                        <div class="accordion-body">Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Mauris tincidunt imperdiet hendrerit. Fusce tortor turpis, facilisis ac efficitur eget.</div>
+                    </div>
+                </div>
+                <div class="accordion-item mb-n3 mb-lg-n2 mb-xl-1">
+                    <h3 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-binded-content="#ecommerce-img" data-bs-target="#ecommerce" aria-expanded="false" aria-controls="ecommerce">E-commerce</button>
+                    </h3>
+                    <div class="accordion-collapse collapse" id="ecommerce" data-bs-parent="#industries">
+                        <div class="accordion-body">Curabitur dictum sodales aliquam. Etiam tortor augue, ultrices in efficitur sit amet, luctus dapibus magna. Vivamus eu lacus elementum, ultrices massa vitae, elementum lorem.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Binded images -->
+        <div class="col-md-6 col-lg-7 col-xl-6 offset-xl-1">
+            <div class="ps-lg-4 ps-xl-0">
+                <div class="binded-content">
+                    <div class="binded-item active" id="viewMyTickets">
+                        <img class="rounded-5" src="img/BugWeb.jpg" alt="Image">
+                    </div>
+                    <div class="binded-item" id="tech-img">
+                        <img class="rounded-5" src="img/BugWeb.jpg" alt="Image">
+                    </div>
+                    <div class="binded-item" id="medicine-img">
+                        <img class="rounded-5" src="img/BugWeb.jpg" alt="Image">
+                    </div>
+                    <div class="binded-item" id="ecommerce-img">
+                        <img class="rounded-5" src="img/BugWeb.jpg" alt="Image">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+@code {
+
+
+
+}

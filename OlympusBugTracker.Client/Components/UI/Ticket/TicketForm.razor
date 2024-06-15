@@ -11,6 +11,8 @@
 
             <InputText @bind-Value="Ticket.Title" class="form-control form-control-lg" type="text" placeholder="Ticket Title" id="title" />
 
+            <p class="text-danger">@errorMessageTitle</p>
+
         </div>
 
         <div class="col-sm-6">
@@ -64,6 +66,8 @@
 
                 </InputSelect>
 
+                <p class="text-danger">@errorMessageProject</p>
+
             }
             else
             {
@@ -88,7 +92,9 @@
 
             <label class="form-label fs-base">Description</label>
 
-            <TinyMCE.Blazor.Editor ScriptSrc="/tinymce/tinymce.min.js" @bind-Value="Ticket.Description" Field="() => Ticket.Description" ClassName="rich-text-editor" Conf="editorConfig" class="form-control form-control-lg" placeholder="Project Description" />
+            <TinyMCE.Blazor.Editor ScriptSrc="/tinymce/tinymce.min.js" @bind-Value="Ticket.Description" Field="() => Ticket.Description" ClassName="rich-text-editor" Conf="editorConfig" class="form-control form-control-lg" placeholder="Ticket Description" />
+
+            <p class="text-danger">@errorMessageDescription</p>
 
         </div>
 
@@ -97,7 +103,7 @@
 
             <div class="col-sm-12 pt-2">
 
-                <button class="btn btn-lg btn-primary" type="submit">Create</button>
+                <button class="btn btn-sm btn-primary" type="submit">Create</button>
 
             </div>
 
@@ -107,7 +113,7 @@
 
             <div class="col-sm-12 pt-2">
 
-                <button class="btn btn-lg btn-primary" type="submit">Save</button>
+                <button class="btn btn-sm btn-primary" type="submit">Save</button>
 
             </div>
 
@@ -159,9 +165,12 @@
         },
         { "codesample_global_prismjs", true },
         { "promotion", false },
-        { "height", "600px" },
+        { "height", "400px" },
     };
 
+    private string? errorMessageTitle = "";
+    private string? errorMessageProject = "";
+    private string? errorMessageDescription = "";
 
     #endregion
 
@@ -170,7 +179,37 @@
 
     private async Task HandleSubmit()
     {
-        await OnSubmit.InvokeAsync(Ticket);
+        if (Ticket!.ProjectId is 0)
+        {
+            errorMessageProject = "The project field must be filled.";
+        }
+        else
+        {
+            errorMessageProject = "";
+        }
+
+        if (Ticket.Title is null || Ticket.Title == "")
+        {
+            errorMessageTitle = "The title field must be filled.";
+        }
+        else
+        {
+            errorMessageTitle = "";
+        }
+
+        if (Ticket.Description is null || Ticket.Description == "")
+        {
+            errorMessageDescription = "The description field must be filled.";
+        }
+        else
+        {
+            errorMessageDescription = "";
+        }
+
+        if (Ticket.ProjectId is not 0 && Ticket.Title is not null && Ticket.Description is not null && Ticket.Title != "" && Ticket.Description != "")
+        {
+            await OnSubmit.InvokeAsync(Ticket);
+        }
     }
 
     #endregion
