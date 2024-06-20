@@ -10,7 +10,7 @@
             <span class="text-primary flex-shrink-0 me-2">
                 <img src="img/Black Logo - no background - no text.png" class="mainLogo" />
             </span>
-            Bug Tracker
+            LazyBug
         </a>
 
 
@@ -23,13 +23,13 @@
         <nav class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav navbar-nav-scroll me-auto" style="--ar-scroll-height: 520px;">
 
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">Home</NavLink>
-                </li>
-
                 <AuthorizeView>
 
                     <Authorized>
+
+                        @* <li class="nav-item">
+                            <NavLink class="nav-link" href="dashboard" Match="NavLinkMatch.Prefix">Dashboard</NavLink>
+                        </li> *@
 
                         <li class="nav-item">
                             <NavLink class="nav-link" href="company" Match="NavLinkMatch.Prefix">Company</NavLink>
@@ -80,6 +80,10 @@
                     </Authorized>
 
                     <NotAuthorized>
+
+                        <li class="nav-item">
+                            <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">Home</NavLink>
+                        </li>
 
                         <li class="nav-item">
                             <NavLink class="nav-link" href="Account/Login" Match="NavLinkMatch.All">Login / Register</NavLink>

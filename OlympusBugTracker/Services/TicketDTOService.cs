@@ -25,8 +25,6 @@ namespace OlympusBugTracker.Services
                 ProjectId = ticketDTO.ProjectId
             };
 
-            //ticket.Project = await projectRepository.GetProjectByIdAsync(ticket.ProjectId, companyId);
-
             ticket = await repository.AddTicketAsync(ticket, companyId);
 
             return ticket.ToDTO();

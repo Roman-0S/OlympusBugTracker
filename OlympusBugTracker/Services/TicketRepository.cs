@@ -108,9 +108,6 @@ namespace OlympusBugTracker.Services
 
             ticket.Created = DateTimeOffset.Now;
 
-            //if (ticket.Project?.CompanyId == companyId)
-            //{
-            //}
             context.Tickets.Add(ticket);
             await context.SaveChangesAsync();
 
