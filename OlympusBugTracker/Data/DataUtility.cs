@@ -47,7 +47,7 @@ namespace OlympusBugTracker.Data
                 Port = databaseUri.Port,
                 Username = userInfo[0],
                 Password = userInfo[1],
-                Database = databaseUri.LocalPath.TrimStart('/'),
+                Database = database,
                 SslMode = SslMode.Prefer,
             };
             return builder.ToString();
