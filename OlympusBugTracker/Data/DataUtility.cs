@@ -25,22 +25,22 @@ namespace OlympusBugTracker.Data
         private static Faker faker = new();
 
 
-        public static string? GetConnectionString(IConfiguration configuration)
+        public static string GetConnectionString(IConfiguration configuration)
         {
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
-            var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
-            return string.IsNullOrEmpty(databaseUrl) ? connectionString : BuildConnectionString(databaseUrl);
+            var connectionString = configuration.GetConnectionString("DefaultConnection");  // Local Connection string
+            var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_PRIVATE_URL");  // Railway connection string
+
+            return string.IsNullOrEmpty(databaseUrl) ? connectionString! : BuildConnectionString(databaseUrl);
         }
 
-        public static string BuildConnectionString(string databaseUrl)
+        private static string BuildConnectionString(string databaseUrl)
         {
-            //Provides an object representation of a uniform resource identifier (URI) and easy access to the parts of the URI.
             var databaseUri = new Uri(databaseUrl);
             var userInfo = databaseUri.UserInfo.Split(':');
 
-            var database = Environment.GetEnvironmentVariable("RAILWAY_SERVICE_NAME") ?? typeof(DataUtility).Assembly.GetName().Name;
+            var database = Environment.GetEnvironmentVariable("RAILWAY_SERVICE_NAME")
+                ?? typeof(DataUtility).Assembly.GetName().Name;
 
-            //Provides a simple way to create and manage the contents of connection strings used by the NpgsqlConnection class.
             var builder = new NpgsqlConnectionStringBuilder
             {
                 Host = databaseUri.Host,
@@ -48,8 +48,9 @@ namespace OlympusBugTracker.Data
                 Username = userInfo[0],
                 Password = userInfo[1],
                 Database = database,
-                SslMode = SslMode.Prefer,
+                SslMode = SslMode.Prefer
             };
+
             return builder.ToString();
         }
 
