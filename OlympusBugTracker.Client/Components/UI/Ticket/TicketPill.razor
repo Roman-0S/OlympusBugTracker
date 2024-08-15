@@ -1,0 +1,104 @@
+﻿@if (Ticket is not null)
+{
+
+    <div class="d-flex gap-2">
+
+        @* Ticket Status *@
+        @if (Ticket.Status == Enums.TicketStatus.New)
+        {
+
+            <span>Status: </span><span class="badge rounded-pill text-bg-secondary">@Ticket.Status</span>
+
+        }
+        else if (Ticket.Status == Enums.TicketStatus.InDevelopment)
+        {
+            
+            <span>Status: </span><span class="badge rounded-pill text-bg-primary">@Ticket.Status</span>
+
+        }
+        else if (Ticket.Status == Enums.TicketStatus.Testing)
+        {
+
+            <span>Status: </span><span class="badge rounded-pill text-bg-warning">@Ticket.Status</span>
+
+        }
+        else
+        {
+            <span>Status: </span><span class="badge rounded-pill text-bg-success">@Ticket.Status</span>
+        }
+
+        @* Ticket Priority *@
+        @if (Ticket.Priority == Enums.TicketPriority.Low)
+        {
+            <span>Priority: </span><span class="badge rounded-pill text-bg-dark">@Ticket.Priority</span>
+        }
+        else if (Ticket.Priority == Enums.TicketPriority.Medium)
+        {
+            <span>Priority: </span><span class="badge rounded-pill text-bg-secondary">@Ticket.Priority</span>
+        }
+        else if (Ticket.Priority == Enums.TicketPriority.High)
+        {
+            <span>Priority: </span><span class="badge rounded-pill text-bg-warning">@Ticket.Priority</span>
+        }
+        else if (Ticket.Priority == Enums.TicketPriority.Urgent)
+        {
+            <span>Priority: </span><span class="badge rounded-pill text-bg-danger">@Ticket.Priority</span>
+        }
+
+        @* Ticket Type *@
+        @if (Ticket.Type == Enums.TicketType.NewDevelopment)
+        {
+            <span>Type: </span><span class="badge rounded-pill text-bg-info">@Ticket.Type</span>
+        }
+        else if (Ticket.Type == Enums.TicketType.WorkTask)
+        {
+            <span>Type: </span><span class="badge rounded-pill text-bg-primary">@Ticket.Type</span>
+        }
+        else if (Ticket.Type == Enums.TicketType.Defect)
+        {
+            <span>Type: </span><span class="badge rounded-pill text-bg-danger">@Ticket.Type</span>
+        }
+        else if (Ticket.Type == Enums.TicketType.ChangeRequest)
+        {
+            <span>Type: </span><span class="badge rounded-pill text-bg-warning">@Ticket.Type</span>
+        }
+        else if (Ticket.Type == Enums.TicketType.Enhancement)
+        {
+            <span>Type: </span><span class="badge rounded-pill text-bg-success">@Ticket.Type</span>
+        }
+        else if (Ticket.Type == Enums.TicketType.GeneralTask)
+        {
+            <span>Type: </span><span class="badge rounded-pill text-bg-secondary">@Ticket.Type</span>
+        }
+
+    </div>
+
+}
+
+
+
+
+@code {
+
+    #region parameters
+
+    [Parameter, EditorRequired]
+    public TicketDTO? Ticket { get; set; }
+
+    #endregion
+
+
+    #region state
+
+
+
+    #endregion
+
+
+    #region methods
+
+
+
+    #endregion
+
+}

@@ -1,6 +1,7 @@
 ﻿@page "/ticket/{id:int}"
 @rendermode InteractiveAuto
 
+@using OlympusBugTracker.Client.Components.UI.Ticket
 @using OlympusBugTracker.Client.Components.UI.Ticket_Attachments
 @using OlympusBugTracker.Client.Components.UI.Ticket_Comments
 @using OlympusBugTracker.Client.Helpers
@@ -21,16 +22,16 @@
 
             <h1>@ticket.Title</h1>
 
-            <p>@((MarkupString)ticket.Description!)</p>
+            <p>Created: @ticket.Created.ToString("D")</p>
+            
+            @if (ticket.Updated is not null)
+            {
+                <p>Updated: @ticket.Updated.Value.ToString("D")</p>
+            }
 
-            <p>@ticket.Created - @ticket.Updated</p>
+            <TicketPill Ticket="ticket" />
 
-            <p>@ticket.Priority</p>
-
-            <p>@ticket.Status</p>
-
-            <p>@ticket.Type</p>
-
+            <p class="mt-4">@((MarkupString)ticket.Description!)</p>
 
             <CommentArea Comments="ticket.TicketComments" TicketId="Id" />
 
