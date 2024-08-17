@@ -1,8 +1,10 @@
 ﻿@page "/Account/Login"
+@layout SignInLayout
 
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Identity
+@using OlympusBugTracker.Components.Layout
 @using OlympusBugTracker.Data
 @using static OlympusBugTracker.Client.Models.Enums
 
@@ -14,8 +16,118 @@
 
 <PageTitle>Log in</PageTitle>
 
-<h1>Log in</h1>
-<div class="row">
+<div class="d-lg-flex position-relative h-100">
+
+    <!-- Home button -->
+    <a class="text-nav btn btn-icon bg-light border rounded-circle position-absolute top-0 end-0 p-0 mt-3 me-3 mt-sm-4 me-sm-4" href="/" data-bs-toggle="tooltip" data-bs-placement="left" title="Back to home" aria-label="Back to home">
+        <i class="ai-home"></i>
+    </a>
+
+    <!-- Sign in form -->
+    <div class="d-flex flex-column align-items-center w-lg-50 h-100 px-3 px-lg-5 pt-5">
+
+        <div class="w-100 mt-auto" style="max-width: 526px;">
+
+            <h1>Sign in to LazyBug</h1>
+
+@*             <p class="pb-3 mb-3 mb-lg-4">Don't have an account yet?&nbsp;&nbsp;<a href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">Register here!</a></p>
+ *@
+            <StatusMessage Message="@errorMessage" />
+            <EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login" class="needs-validation" novalidate>
+                <DataAnnotationsValidator />
+
+                <ValidationSummary class="text-danger" role="alert" />
+
+                <div class="form-floating pb-3 mb-3">
+                    <div class="position-relative">
+                        <i class="ai-mail fs-lg position-absolute top-50 start-0 translate-middle-y ms-3"></i>
+                        <InputText @bind-Value="Input.Email" class="form-control form-control-lg ps-5" autocomplete="username" aria-required="true" type="email" placeholder="Email address" required />
+                    </div>
+                    <ValidationMessage For="() => Input.Email" class="text-danger" />
+                </div>
+                <div class="form-floating mb-4">
+                    <div class="position-relative">
+                        <i class="ai-lock-closed fs-lg position-absolute top-50 start-0 translate-middle-y ms-3"></i>
+                        <InputText @bind-Value="Input.Password" class="form-control form-control-lg ps-5" autocomplete="current-password" type="password" placeholder="Password" required />
+                    </div>
+                    <ValidationMessage For="() => Input.Password" class="text-danger" />
+                </div>
+                <div class="d-flex flex-wrap align-items-center justify-content-between pb-4">
+                    <div class="form-check my-1">
+                        <InputCheckbox @bind-Value="Input.RememberMe" class="form-check-input" type="checkbox" id="keep-signedin" />
+                        <label class="form-check-label ms-1" for="keep-signedin">Keep me signed in</label>
+                    </div>
+
+                    <div class="dropdown mb-2">
+
+                        <button class="btn btn-light dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Trouble signing in?
+                        </button>
+
+                        <ul class="dropdown-menu">
+
+                            <li><a class="dropdown-item" href="Account/ForgotPassword">Forgot Password</a></li>
+
+@*                             <li><a class="dropdown-item" href="Account/ResendEmailConfirmation">Resend Email Confirmation</a></li>
+ *@
+                        </ul>
+
+                    </div>
+
+                </div>
+                <button class="btn btn-lg btn-primary w-100 mb-4" type="submit">Sign in</button>
+
+            </EditForm>
+
+            <div class="card">
+
+                <div class="card-body">
+
+                    <h3 class="card-title">Log in as a Demo User</h3>
+
+                    <p>Click one of the buttons below to log in with a demo account</p>
+
+                    <EditForm id="demo-account" Model="Input" method="post" OnSubmit="LoginDemoUser" FormName="demo">
+
+                        <div class="vstack text-center gap-2 px-3">
+
+                            <button class="btn btn-primary" type="submit" name="Input.DemoRole" value="@Roles.Admin">
+                                Admin
+                            </button>
+
+                            <button class="btn btn-primary" type="submit" name="Input.DemoRole" value="@Roles.ProjectManager">
+                                Project Manager
+                            </button>
+
+                            <button class="btn btn-primary" type="submit" name="Input.DemoRole" value="@Roles.Developer">
+                                Developer
+                            </button>
+
+                            <button class="btn btn-primary" type="submit" name="Input.DemoRole" value="@Roles.Submitter">
+                                Submitter
+                            </button>
+
+                        </div>
+
+                    </EditForm>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Copyright -->
+        <p class="nav w-100 fs-sm pt-5 mt-auto mb-5" style="max-width: 526px;"><span class="text-body-secondary">&copy; All rights reserved. Made by</span><a class="nav-link d-inline-block p-0 ms-1" href="https://rs-developer-portfolio.netlify.app/" target="_blank" rel="noopener">Roman Steele</a></p>
+    </div>
+
+
+    <!-- Cover image -->
+    <div class="w-50 bg-size-cover bg-repeat-0 bg-position-center" style="background-image: url(img/pexels-ekaterina-bolovtsova-4680236.jpg);"></div>
+
+</div>
+
+@* <div class="row">
     <div class="col-md-4">
         <section>
             <StatusMessage Message="@errorMessage" />
@@ -94,14 +206,8 @@
 
         </section>
     </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Use another service to log in.</h3>
-            <hr />
-            <ExternalLoginPicker />
-        </section>
-    </div>
-</div>
+
+</div> *@
 
 @code {
     private string? errorMessage;
