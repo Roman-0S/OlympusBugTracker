@@ -63,7 +63,16 @@
 
             <h1>Tickets</h1>
 
-            <table class="table table-bordered table-responsive border border-dark table-striped">
+            <div class="accordion accordion-alt accordion-orders" id="orders">
+
+                @foreach (TicketDTO ticket in tickets)
+                {
+                    <TicketRow Ticket="ticket" UserInfo="userInfo" OnArchive="HandleArchive" OnRestore="HandleRestore" />
+                }
+
+            </div>
+
+            @* <table class="table table-bordered table-responsive border border-dark table-striped">
                 <thead>
                     <tr>
                         <th scope="col">Priority</th>
@@ -83,7 +92,7 @@
 
                 </tbody>
 
-            </table>
+            </table> *@
 
         }
         else
@@ -91,7 +100,16 @@
 
             <h1>Archived Tickets</h1>
 
-            <table class="table table-bordered table-responsive border border-dark table-striped">
+            <div class="accordion accordion-alt accordion-orders" id="orders">
+
+                @foreach (TicketDTO ticket in tickets)
+                {
+                    <TicketRow Ticket="ticket" UserInfo="userInfo" OnArchive="HandleArchive" OnRestore="HandleRestore" />
+                }
+
+            </div>
+
+            @* <table class="table table-bordered table-responsive border border-dark table-striped">
                 <thead>
                     <tr>
                         <th scope="col">Priority</th>
@@ -111,7 +129,7 @@
 
                 </tbody>
 
-            </table>
+            </table> *@
 
         }
 
@@ -169,7 +187,16 @@
 
             <h1>My Tickets</h1>
 
-            <table class="table table-bordered table-responsive border border-dark table-striped">
+            <div class="accordion accordion-alt accordion-orders" id="orders">
+
+                @foreach (TicketDTO ticket in tickets)
+                {
+                    <TicketRow Ticket="ticket" UserInfo="userInfo" OnArchive="HandleArchive" OnRestore="HandleRestore" />
+                }
+
+            </div>
+
+            @* <table class="table table-bordered table-responsive border border-dark table-striped">
                 <thead>
                     <tr>
                         <th scope="col">Priority</th>
@@ -189,7 +216,7 @@
 
                 </tbody>
 
-            </table>
+            </table> *@
 
         }
         else
@@ -197,7 +224,16 @@
 
             <h1>My Archived Tickets</h1>
 
-            <table class="table table-bordered table-responsive border border-dark table-striped">
+            <div class="accordion accordion-alt accordion-orders" id="orders">
+
+                @foreach (TicketDTO ticket in tickets)
+                {
+                    <TicketRow Ticket="ticket" UserInfo="userInfo" OnArchive="HandleArchive" OnRestore="HandleRestore" />
+                }
+
+            </div>
+
+            @* <table class="table table-bordered table-responsive border border-dark table-striped">
                 <thead>
                     <tr>
                         <th scope="col">Priority</th>
@@ -217,7 +253,7 @@
 
                 </tbody>
 
-            </table>
+            </table> *@
 
         }
 

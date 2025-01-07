@@ -143,9 +143,17 @@
             @if (!showArchived)
             {
 
-                <h5>All Tickets</h5>
+                <!-- Orders accordion -->
+                <div class="accordion accordion-alt accordion-orders" id="orders">
 
-                <table class="table table-bordered border border-dark table-striped">
+                    @foreach (TicketDTO ticket in project.Tickets.Where(t => !t.Archived).OrderByDescending(t => t.Created))
+                    {
+                        <TicketRow Ticket="ticket" UserInfo="userInfo" OnArchive="HandleArchive" OnRestore="HandleRestore" />
+                    }
+
+                </div>
+
+                @* <table class="table table-bordered border border-dark table-striped">
                     <thead>
                         <tr>
                             <th scope="col">Priority</th>
@@ -170,15 +178,22 @@
 
                     </tbody>
 
-                </table>
+                </table> *@
 
             }
             else
             {
 
-                <h5>Archived Tickets</h5>
+                <div class="accordion accordion-alt accordion-orders" id="orders">
 
-                <table class="table table-bordered border border-dark table-striped">
+                    @foreach (TicketDTO ticket in project.Tickets.Where(t => t.Archived).OrderByDescending(t => t.Created))
+                    {
+                        <TicketRow Ticket="ticket" UserInfo="userInfo" OnArchive="HandleArchive" OnRestore="HandleRestore" />
+                    }
+
+                </div>
+
+                @* <table class="table table-bordered border border-dark table-striped">
                     <thead>
                         <tr>
                             <th scope="col">Priority</th>
@@ -203,7 +218,7 @@
 
                     </tbody>
 
-                </table>
+                </table> *@
 
             }
 

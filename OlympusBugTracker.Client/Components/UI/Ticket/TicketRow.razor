@@ -4,7 +4,146 @@
     @if (!Ticket.Archived)
     {
 
-        <tr>
+        <!-- Ticket -->
+        <div class="accordion-item border-top mb-0">
+            <div class="accordion-header">
+                <a class="accordion-button d-flex fs-4 fw-normal text-decoration-none py-3 collapsed" href="#@Ticket.Id" data-bs-toggle="collapse" aria-expanded="false" aria-controls="Ticket">
+                    <div class="d-flex justify-content-between w-100" style="max-width: 440px;">
+                        <div class="me-3 me-sm-4" style="width: 130px">
+                            <div class="fs-sm text-body-secondary mb-2">Title</div>
+                            <div class="fs-sm fw-medium text-dark">@Ticket.Title</div>
+                        </div>
+                        <div class="me-3 me-sm-4 text-center" style="width: 80px">
+                            <div class="fs-sm text-body-secondary">Priority</div>
+
+                            @if (Ticket.Priority == Enums.TicketPriority.Low)
+                            {
+                                <span class="badge bg-success bg-opacity-10 text-success fs-xs">@Ticket.Priority</span>
+                            }
+                            else if (Ticket.Priority == Enums.TicketPriority.Medium)
+                            {
+                                <span class="badge bg-info bg-opacity-10 text-info fs-xs">@Ticket.Priority</span>
+                            }
+                            else if (Ticket.Priority == Enums.TicketPriority.High)
+                            {
+                                <span class="badge bg-warning bg-opacity-10 text-warning fs-xs">@Ticket.Priority</span>
+                            }
+                            else if (Ticket.Priority == Enums.TicketPriority.Urgent)
+                            {
+                                <span class="badge bg-danger bg-opacity-10 text-danger fs-xs">@Ticket.Priority</span>
+                            }
+
+                        </div>
+                        <div class="me-3 me-sm-4 text-center" style="width: 110px">
+                            <div class="fs-sm text-body-secondary">Status</div>
+
+                            @if (Ticket.Status == Enums.TicketStatus.New)
+                            {
+                                <span class="badge bg-info bg-opacity-10 text-info fs-xs">@Ticket.Status</span>
+                            }
+                            else if (Ticket.Status == Enums.TicketStatus.InDevelopment)
+                            {
+                                <span class="badge bg-primary bg-opacity-10 text-primary fs-xs">@Ticket.Status.GetDisplayName()</span>
+                            }
+                            else if (Ticket.Status == Enums.TicketStatus.Testing)
+                            {
+                                <span class="badge bg-warning bg-opacity-10 text-warning fs-xs">@Ticket.Status</span>
+                            }
+                            else if (Ticket.Status == Enums.TicketStatus.Resolved)
+                            {
+                                <span class="badge bg-success bg-opacity-10 text-success fs-xs">@Ticket.Status</span>
+                            }
+
+                        </div>
+                    </div>
+                    <div class="accordion-button-img d-none d-sm-flex ms-auto">
+                        <div class="d-flex justify-content-between w-100" style="max-width: 440px;">
+                            <div class="me-3 me-sm-4">
+                                <div class="fs-sm text-body-secondary">Created</div>
+                                <span class="fs-sm fw-medium text-dark">@Ticket.Created.ToString("MMM dd, yyyy")</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="accordion-collapse collapse" id="@Ticket.Id" data-bs-parent="#orders">
+                <div class="accordion-body">
+                    <div class="table-responsive pt-1">
+                        <table class="table align-middle w-100" style="min-width: 450px;">
+                            <tbody>
+                                <tr>
+                                    <td class="border-0 py-1 px-0">
+                                        <div class="d-flex align-items-center">
+
+                                            <div class="ps-3 ps-sm-4">
+                                                <h4 class="h6 mb-2">
+                                                    <a href="ticket/@Ticket.Id">@Ticket.Title</a>
+                                                </h4>
+                                                <div class="text-body-secondary fs-sm me-3">Type: <span class="text-dark fw-medium">@Ticket.Type.GetDisplayName()</span></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="border-0 py-1 pe-0 ps-3 ps-sm-4">
+                                        <div class="fs-sm text-body-secondary mb-2">Created</div>
+                                        <div class="fs-sm fw-medium text-dark">@Ticket.Created.ToString("d")</div>
+                                    </td>
+                                    <td class="border-0 py-1 pe-0 ps-3 ps-sm-4">
+
+                                        @if ((Ticket.Updated != DateTimeOffset.MinValue) && Ticket.Updated is not null)
+                                        {
+                                            <div class="fs-sm text-body-secondary mb-2">Updated</div>
+                                            <div class="fs-sm fw-medium text-dark">@Ticket.Updated.Value.ToString("d")</div>
+                                        }
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="bg-secondary rounded-1 p-4 my-2">
+                        <div class="row">
+                            <div class="col-sm-12 col-md-8 col-lg-9 mb-3 mb-md-0">
+
+                                @if (Ticket.DeveloperUser is not null)
+                                {
+                                    <div class="fs-sm fw-medium text-dark mb-1">Assigned Developer:</div>
+                                    <div class="fs-sm">@Ticket.DeveloperUser.FullName</div>
+                                }
+                                else
+                                {
+                                    <div class="fs-sm fw-medium text-dark mb-1">No Developer Assigned</div>
+                                }
+                            </div>
+                            <div class="col-md-4 col-lg-3 text-md-end">
+
+                                <div class="hstack gap-2">
+
+                                    @if (UserInfo!.Roles.Contains("Admin") || Ticket.Project!.Users.Any(u => u.Id == UserInfo.UserId))
+                                    {
+                                        @if (UserInfo!.Roles.Contains("Admin") || (Ticket.Project!.Users.Any(u => u.Id == UserInfo.UserId) && UserInfo.Roles.Contains("ProjectManager")) || UserInfo.UserId == Ticket.SubmitterUserId || UserInfo.UserId == Ticket.DeveloperUserId)
+                                        {
+                                            <a href="/ticket/edit/@Ticket.Id" class="btn btn-sm btn-outline-primary w-100 w-md-auto">
+                                                Edit Ticket
+                                            </a>
+                                        }
+
+                                        @if (UserInfo!.Roles.Contains("Admin") || (Ticket.Project!.Users.Any(u => u.Id == UserInfo.UserId) && UserInfo.Roles.Contains("ProjectManager")))
+                                        {
+                                            <button class="btn btn-sm btn-outline-danger w-100 w-md-auto" @onclick="HandleArchive">
+                                                Archive Ticket
+                                            </button>
+                                        }
+                                    }
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* <tr>
 
             <th scope="row">@Ticket.Priority</th>
             <td> <a href="ticket/@Ticket.Id" class="text-decoration-none">@Ticket.Title</a> </td>
@@ -46,13 +185,142 @@
 
             }
 
-        </tr>
+        </tr> *@
 
     }
     else
     {
 
-        <tr>
+        <!-- Ticket -->
+        <div class="accordion-item border-top mb-0">
+            <div class="accordion-header">
+                <a class="accordion-button d-flex fs-4 fw-normal text-decoration-none py-3 collapsed" href="#@Ticket.Id" data-bs-toggle="collapse" aria-expanded="false" aria-controls="Ticket">
+                    <div class="d-flex justify-content-between w-100" style="max-width: 440px;">
+                        <div class="me-3 me-sm-4" style="width: 130px">
+                            <div class="fs-sm text-body-secondary mb-2">Title</div>
+                            <div class="fs-sm fw-medium text-dark">@Ticket.Title</div>
+                        </div>
+                        <div class="me-3 me-sm-4 text-center" style="width: 80px">
+                            <div class="fs-sm text-body-secondary">Priority</div>
+
+                            @if (Ticket.Priority == Enums.TicketPriority.Low)
+                            {
+                                <span class="badge bg-success bg-opacity-10 text-success fs-xs">@Ticket.Priority</span>
+                            }
+                            else if (Ticket.Priority == Enums.TicketPriority.Medium)
+                            {
+                                <span class="badge bg-info bg-opacity-10 text-info fs-xs">@Ticket.Priority</span>
+                            }
+                            else if (Ticket.Priority == Enums.TicketPriority.High)
+                            {
+                                <span class="badge bg-warning bg-opacity-10 text-warning fs-xs">@Ticket.Priority</span>
+                            }
+                            else if (Ticket.Priority == Enums.TicketPriority.Urgent)
+                            {
+                                <span class="badge bg-danger bg-opacity-10 text-danger fs-xs">@Ticket.Priority</span>
+                            }
+
+                        </div>
+                        <div class="me-3 me-sm-4 text-center" style="width: 110px">
+                            <div class="fs-sm text-body-secondary">Status</div>
+
+                            @if (Ticket.Status == Enums.TicketStatus.New)
+                            {
+                                <span class="badge bg-info bg-opacity-10 text-info fs-xs">@Ticket.Status</span>
+                            }
+                            else if (Ticket.Status == Enums.TicketStatus.InDevelopment)
+                            {
+                                <span class="badge bg-primary bg-opacity-10 text-primary fs-xs">@Ticket.Status.GetDisplayName()</span>
+                            }
+                            else if (Ticket.Status == Enums.TicketStatus.Testing)
+                            {
+                                <span class="badge bg-warning bg-opacity-10 text-warning fs-xs">@Ticket.Status</span>
+                            }
+                            else if (Ticket.Status == Enums.TicketStatus.Resolved)
+                            {
+                                <span class="badge bg-success bg-opacity-10 text-success fs-xs">@Ticket.Status</span>
+                            }
+
+                        </div>
+                    </div>
+                    <div class="accordion-button-img d-none d-sm-flex ms-auto">
+                        <div class="d-flex justify-content-between w-100" style="max-width: 440px;">
+                            <div class="me-3 me-sm-4">
+                                <div class="fs-sm text-body-secondary">Created</div>
+                                <span class="fs-sm fw-medium text-dark">@Ticket.Created.ToString("MMM dd, yyyy")</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="accordion-collapse collapse" id="@Ticket.Id" data-bs-parent="#orders">
+                <div class="accordion-body">
+                    <div class="table-responsive pt-1">
+                        <table class="table align-middle w-100" style="min-width: 450px;">
+                            <tbody>
+                                <tr>
+                                    <td class="border-0 py-1 px-0">
+                                        <div class="d-flex align-items-center">
+
+                                            <div class="ps-3 ps-sm-4">
+                                                <h4 class="h6 mb-2">
+                                                    <a href="ticket/@Ticket.Id">@Ticket.Title</a>
+                                                </h4>
+                                                <div class="text-body-secondary fs-sm me-3">Type: <span class="text-dark fw-medium">@Ticket.Type.GetDisplayName()</span></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="border-0 py-1 pe-0 ps-3 ps-sm-4">
+                                        <div class="fs-sm text-body-secondary mb-2">Created</div>
+                                        <div class="fs-sm fw-medium text-dark">@Ticket.Created.ToString("d")</div>
+                                    </td>
+                                    <td class="border-0 py-1 pe-0 ps-3 ps-sm-4">
+
+                                        @if ((Ticket.Updated != DateTimeOffset.MinValue) && Ticket.Updated is not null)
+                                        {
+                                            <div class="fs-sm text-body-secondary mb-2">Updated</div>
+                                            <div class="fs-sm fw-medium text-dark">@Ticket.Updated.Value.ToString("d")</div>
+                                        }
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="bg-secondary rounded-1 p-4 my-2">
+                        <div class="row">
+                            <div class="col-sm-12 col-md-8 col-lg-9 mb-3 mb-md-0">
+
+                                @if (Ticket.DeveloperUser is not null)
+                                {
+                                    <div class="fs-sm fw-medium text-dark mb-1">Assigned Developer:</div>
+                                    <div class="fs-sm">@Ticket.DeveloperUser.FullName</div>
+                                }
+                                else
+                                {
+                                    <div class="fs-sm fw-medium text-dark mb-1">No Developer Assigned</div>
+                                }
+                            </div>
+                            <div class="col-md-4 col-lg-3 text-md-end">
+
+                                <div class="hstack gap-2">
+
+                                    @if (UserInfo!.Roles.Contains("Admin") || (Ticket.Project!.Users.Any(u => u.Id == UserInfo.UserId) && UserInfo.Roles.Contains("ProjectManager")))
+                                    {
+                                        <button class="btn btn-sm btn-outline-primary w-100 w-md-auto" @onclick="HandleRestore">
+                                            Restore Ticket
+                                        </button>
+                                    }
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* <tr>
 
             <th scope="row">@Ticket.Priority</th>
             <td>@Ticket.Title</td>
@@ -72,7 +340,7 @@
 
             }
 
-        </tr>
+        </tr> *@
 
     }
 
